@@ -1,0 +1,18 @@
+ignore:
+  resource_names:
+      - CachePolicy
+      - CloudFrontOriginAccessIdentity
+      - ContinuousDeploymentPolicy
+      - Distribution
+      - FieldLevelEncryptionConfig
+      - FieldLevelEncryptionProfile
+      - Function
+      - Invalidation
+      - KeyGroup
+      - MonitoringSubscription
+      - OriginAccessControl
+      - OriginRequestPolicy
+      - PublicKey
+      - RealtimeLogConfig
+      - ResponseHeadersPolicy
+      - StreamingDistribution
