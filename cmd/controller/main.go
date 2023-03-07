@@ -34,6 +34,8 @@ import (
 	svctypes "github.com/aws-controllers-k8s/cloudfront-controller/apis/v1alpha1"
 	svcresource "github.com/aws-controllers-k8s/cloudfront-controller/pkg/resource"
 
+	_ "github.com/aws-controllers-k8s/cloudfront-controller/pkg/resource/cache_policy"
+
 	"github.com/aws-controllers-k8s/cloudfront-controller/pkg/version"
 )
 

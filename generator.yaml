@@ -1,6 +1,6 @@
 ignore:
   resource_names:
-      - CachePolicy
+      #- CachePolicy
       - CloudFrontOriginAccessIdentity
       - ContinuousDeploymentPolicy
       - Distribution
@@ -16,3 +16,43 @@ ignore:
       - RealtimeLogConfig
       - ResponseHeadersPolicy
       - StreamingDistribution
+operations:
+  CreateCachePolicy:
+    output_wrapper_field_path: CachePolicy
+  # CloudFront has both List and Get operations. Prefer the Get operations...
+  # CloudFront has both List and Get operations. Prefer the Get operations...
+  GetCachePolicy:
+    resource_name: CachePolicy
+    operation_type: READ_ONE
+    output_wrapper_field_path: CachePolicy
+resources:
+  CachePolicy:
+    exceptions:
+      terminal_codes:
+        - IllegalUpdate
+        - InconsistentQuantities
+        - InvalidArgument
+        - InvalidIfMatchVersion
+        - PreconditionFailed
+        - TooManyCookiesInCachePolicy
+        - TooManyHeadersInCachePolicy
+        - TooManyQueryStringsInCachePolicy
+    tags:
+      ignore: true
+    hooks:
+      sdk_read_one_post_set_output:
+        template_path: hooks/cache_policy/sdk_read_one_post_set_output.go.tpl
+      sdk_create_post_set_output:
+        template_path: hooks/cache_policy/sdk_create_post_set_output.go.tpl
+      sdk_update_post_build_request:
+        template_path: hooks/cache_policy/sdk_update_post_build_request.go.tpl
+      sdk_update_post_set_output:
+        template_path: hooks/cache_policy/sdk_update_post_set_output.go.tpl
+      sdk_delete_post_build_request:
+        template_path: hooks/cache_policy/sdk_delete_post_build_request.go.tpl
+    fields:
+      ETag:
+        is_read_only: true
+        from:
+          operation: CreateCachePolicy
+          path: ETag

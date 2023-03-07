@@ -27,3 +27,1400 @@ var (
 	_ = &aws.JSONValue{}
 	_ = ackv1alpha1.AWSAccountID("")
 )
+
+// A list of key groups, and the public keys in each key group, that CloudFront
+// can use to verify the signatures of signed URLs and signed cookies.
+type ActiveTrustedKeyGroups struct {
+	Enabled  *bool  `json:"enabled,omitempty"`
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// A list of Amazon Web Services accounts and the active CloudFront key pairs
+// in each account that CloudFront can use to verify the signatures of signed
+// URLs and signed cookies.
+type ActiveTrustedSigners struct {
+	Enabled  *bool  `json:"enabled,omitempty"`
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// Amazon Web Services services in China customers must file for an Internet
+// Content Provider (ICP) recordal if they want to serve content publicly on
+// an alternate domain name, also known as a CNAME, that they've added to CloudFront.
+// AliasICPRecordal provides the ICP recordal status for CNAMEs associated with
+// distributions. The status is returned in the CloudFront response; you can't
+// configure it yourself.
+//
+// For more information about ICP recordals, see Signup, Accounts, and Credentials
+// (https://docs.amazonaws.cn/en_us/aws/latest/userguide/accounts-and-credentials.html)
+// in Getting Started with Amazon Web Services services in China.
+type AliasICPRecordal struct {
+	CNAME *string `json:"cname,omitempty"`
+}
+
+// A complex type that contains information about CNAMEs (alternate domain names),
+// if any, for this distribution.
+type Aliases struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// A complex type that controls which HTTP methods CloudFront processes and
+// forwards to your Amazon S3 bucket or your custom origin. There are three
+// choices:
+//
+//   - CloudFront forwards only GET and HEAD requests.
+//
+//   - CloudFront forwards only GET, HEAD, and OPTIONS requests.
+//
+//   - CloudFront forwards GET, HEAD, OPTIONS, PUT, PATCH, POST, and DELETE
+//     requests.
+//
+// If you pick the third choice, you may need to restrict access to your Amazon
+// S3 bucket or to your custom origin so users can't perform operations that
+// you don't want them to. For example, you might not want users to have permissions
+// to delete objects from your origin.
+type AllowedMethods struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// A complex type that describes how CloudFront processes requests.
+//
+// You must create at least as many cache behaviors (including the default cache
+// behavior) as you have origins if you want CloudFront to serve objects from
+// all of the origins. Each cache behavior specifies the one origin from which
+// you want CloudFront to get objects. If you have two origins and only the
+// default cache behavior, the default cache behavior will cause CloudFront
+// to get objects from one of the origins, but the other origin is never used.
+//
+// For the current quota (formerly known as limit) on the number of cache behaviors
+// that you can add to a distribution, see Quotas (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
+// in the Amazon CloudFront Developer Guide.
+//
+// If you don't want to specify any cache behaviors, include only an empty CacheBehaviors
+// element. Don't include an empty CacheBehavior element because this is invalid.
+//
+// To delete all cache behaviors in an existing distribution, update the distribution
+// configuration and include only an empty CacheBehaviors element.
+//
+// To add, change, or remove one or more cache behaviors, update the distribution
+// configuration and specify all of the cache behaviors that you want to include
+// in the updated distribution.
+//
+// For more information about cache behaviors, see Cache Behavior Settings (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-web-values-specify.html#DownloadDistValuesCacheBehavior)
+// in the Amazon CloudFront Developer Guide.
+type CacheBehavior struct {
+	CachePolicyID           *string `json:"cachePolicyID,omitempty"`
+	Compress                *bool   `json:"compress,omitempty"`
+	DefaultTTL              *int64  `json:"defaultTTL,omitempty"`
+	FieldLevelEncryptionID  *string `json:"fieldLevelEncryptionID,omitempty"`
+	MaxTTL                  *int64  `json:"maxTTL,omitempty"`
+	MinTTL                  *int64  `json:"minTTL,omitempty"`
+	OriginRequestPolicyID   *string `json:"originRequestPolicyID,omitempty"`
+	PathPattern             *string `json:"pathPattern,omitempty"`
+	RealtimeLogConfigARN    *string `json:"realtimeLogConfigARN,omitempty"`
+	ResponseHeadersPolicyID *string `json:"responseHeadersPolicyID,omitempty"`
+	SmoothStreaming         *bool   `json:"smoothStreaming,omitempty"`
+	TargetOriginID          *string `json:"targetOriginID,omitempty"`
+}
+
+// A complex type that contains zero or more CacheBehavior elements.
+type CacheBehaviors struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// A cache policy configuration.
+//
+// This configuration determines the following:
+//
+//   - The values that CloudFront includes in the cache key. These values can
+//     include HTTP headers, cookies, and URL query strings. CloudFront uses
+//     the cache key to find an object in its cache that it can return to the
+//     viewer.
+//
+//   - The default, minimum, and maximum time to live (TTL) values that you
+//     want objects to stay in the CloudFront cache.
+//
+// The headers, cookies, and query strings that are included in the cache key
+// are also included in requests that CloudFront sends to the origin. CloudFront
+// sends a request when it can't find a valid object in its cache that matches
+// the request's cache key. If you want to send values to the origin but not
+// include them in the cache key, use OriginRequestPolicy.
+type CachePolicyConfig struct {
+	Comment    *string `json:"comment,omitempty"`
+	DefaultTTL *int64  `json:"defaultTTL,omitempty"`
+	MaxTTL     *int64  `json:"maxTTL,omitempty"`
+	MinTTL     *int64  `json:"minTTL,omitempty"`
+	Name       *string `json:"name,omitempty"`
+	// This object determines the values that CloudFront includes in the cache key.
+	// These values can include HTTP headers, cookies, and URL query strings. CloudFront
+	// uses the cache key to find an object in its cache that it can return to the
+	// viewer.
+	//
+	// The headers, cookies, and query strings that are included in the cache key
+	// are also included in requests that CloudFront sends to the origin. CloudFront
+	// sends a request when it can't find an object in its cache that matches the
+	// request's cache key. If you want to send values to the origin but not include
+	// them in the cache key, use OriginRequestPolicy.
+	ParametersInCacheKeyAndForwardedToOrigin *ParametersInCacheKeyAndForwardedToOrigin `json:"parametersInCacheKeyAndForwardedToOrigin,omitempty"`
+}
+
+// An object that determines whether any cookies in viewer requests (and if
+// so, which cookies) are included in the cache key and in requests that CloudFront
+// sends to the origin.
+type CachePolicyCookiesConfig struct {
+	CookieBehavior *string `json:"cookieBehavior,omitempty"`
+	// Contains a list of cookie names.
+	Cookies *CookieNames `json:"cookies,omitempty"`
+}
+
+// An object that determines whether any HTTP headers (and if so, which headers)
+// are included in the cache key and in requests that CloudFront sends to the
+// origin.
+type CachePolicyHeadersConfig struct {
+	HeaderBehavior *string `json:"headerBehavior,omitempty"`
+	// Contains a list of HTTP header names.
+	Headers *Headers `json:"headers,omitempty"`
+}
+
+// A list of cache policies.
+type CachePolicyList_SDK struct {
+	Items      []*CachePolicySummary `json:"items,omitempty"`
+	MaxItems   *int64                `json:"maxItems,omitempty"`
+	NextMarker *string               `json:"nextMarker,omitempty"`
+	Quantity   *int64                `json:"quantity,omitempty"`
+}
+
+// An object that determines whether any URL query strings in viewer requests
+// (and if so, which query strings) are included in the cache key and in requests
+// that CloudFront sends to the origin.
+type CachePolicyQueryStringsConfig struct {
+	QueryStringBehavior *string `json:"queryStringBehavior,omitempty"`
+	// Contains a list of query string names.
+	QueryStrings *QueryStringNames `json:"queryStrings,omitempty"`
+}
+
+// Contains a cache policy.
+type CachePolicySummary struct {
+	// A cache policy.
+	//
+	// When it's attached to a cache behavior, the cache policy determines the following:
+	//
+	//    * The values that CloudFront includes in the cache key. These values can
+	//    include HTTP headers, cookies, and URL query strings. CloudFront uses
+	//    the cache key to find an object in its cache that it can return to the
+	//    viewer.
+	//
+	//    * The default, minimum, and maximum time to live (TTL) values that you
+	//    want objects to stay in the CloudFront cache.
+	//
+	// The headers, cookies, and query strings that are included in the cache key
+	// are also included in requests that CloudFront sends to the origin. CloudFront
+	// sends a request when it can't find a valid object in its cache that matches
+	// the request's cache key. If you want to send values to the origin but not
+	// include them in the cache key, use OriginRequestPolicy.
+	CachePolicy *CachePolicy_SDK `json:"cachePolicy,omitempty"`
+	Type        *string          `json:"type_,omitempty"`
+}
+
+// A cache policy.
+//
+// When it's attached to a cache behavior, the cache policy determines the following:
+//
+//   - The values that CloudFront includes in the cache key. These values can
+//     include HTTP headers, cookies, and URL query strings. CloudFront uses
+//     the cache key to find an object in its cache that it can return to the
+//     viewer.
+//
+//   - The default, minimum, and maximum time to live (TTL) values that you
+//     want objects to stay in the CloudFront cache.
+//
+// The headers, cookies, and query strings that are included in the cache key
+// are also included in requests that CloudFront sends to the origin. CloudFront
+// sends a request when it can't find a valid object in its cache that matches
+// the request's cache key. If you want to send values to the origin but not
+// include them in the cache key, use OriginRequestPolicy.
+type CachePolicy_SDK struct {
+	// A cache policy configuration.
+	//
+	// This configuration determines the following:
+	//
+	//    * The values that CloudFront includes in the cache key. These values can
+	//    include HTTP headers, cookies, and URL query strings. CloudFront uses
+	//    the cache key to find an object in its cache that it can return to the
+	//    viewer.
+	//
+	//    * The default, minimum, and maximum time to live (TTL) values that you
+	//    want objects to stay in the CloudFront cache.
+	//
+	// The headers, cookies, and query strings that are included in the cache key
+	// are also included in requests that CloudFront sends to the origin. CloudFront
+	// sends a request when it can't find a valid object in its cache that matches
+	// the request's cache key. If you want to send values to the origin but not
+	// include them in the cache key, use OriginRequestPolicy.
+	CachePolicyConfig *CachePolicyConfig `json:"cachePolicyConfig,omitempty"`
+	ID                *string            `json:"id,omitempty"`
+	LastModifiedTime  *metav1.Time       `json:"lastModifiedTime,omitempty"`
+}
+
+// A complex type that controls whether CloudFront caches the response to requests
+// using the specified HTTP methods. There are two choices:
+//
+//   - CloudFront caches responses to GET and HEAD requests.
+//
+//   - CloudFront caches responses to GET, HEAD, and OPTIONS requests.
+//
+// If you pick the second choice for your Amazon S3 Origin, you may need to
+// forward Access-Control-Request-Method, Access-Control-Request-Headers, and
+// Origin headers for the responses to be cached correctly.
+type CachedMethods struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// An alias (also called a CNAME) and the CloudFront distribution and Amazon
+// Web Services account ID that it's associated with. The distribution and account
+// IDs are partially hidden, which allows you to identify the distributions
+// and accounts that you own, but helps to protect the information of ones that
+// you don't own.
+type ConflictingAlias struct {
+	AccountID      *string `json:"accountID,omitempty"`
+	Alias          *string `json:"alias,omitempty"`
+	DistributionID *string `json:"distributionID,omitempty"`
+}
+
+// A list of aliases (also called CNAMEs) and the CloudFront distributions and
+// Amazon Web Services accounts that they are associated with. In the list,
+// the distribution and account IDs are partially hidden, which allows you to
+// identify the distributions and accounts that you own, but helps to protect
+// the information of ones that you don't own.
+type ConflictingAliasesList struct {
+	MaxItems   *int64  `json:"maxItems,omitempty"`
+	NextMarker *string `json:"nextMarker,omitempty"`
+	Quantity   *int64  `json:"quantity,omitempty"`
+}
+
+// A field-level encryption content type profile.
+type ContentTypeProfile struct {
+	ContentType *string `json:"contentType,omitempty"`
+	ProfileID   *string `json:"profileID,omitempty"`
+}
+
+// The configuration for a field-level encryption content type-profile mapping.
+type ContentTypeProfileConfig struct {
+	ForwardWhenContentTypeIsUnknown *bool `json:"forwardWhenContentTypeIsUnknown,omitempty"`
+}
+
+// Field-level encryption content type-profile.
+type ContentTypeProfiles struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// A continuous deployment policy.
+type ContinuousDeploymentPolicy struct {
+	ID               *string      `json:"id,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+}
+
+// Contains the configuration for a continuous deployment policy.
+type ContinuousDeploymentPolicyConfig struct {
+	Enabled *bool `json:"enabled,omitempty"`
+}
+
+// Contains a list of continuous deployment policies.
+type ContinuousDeploymentPolicyList struct {
+	MaxItems   *int64  `json:"maxItems,omitempty"`
+	NextMarker *string `json:"nextMarker,omitempty"`
+	Quantity   *int64  `json:"quantity,omitempty"`
+}
+
+// This configuration determines which HTTP requests are sent to the staging
+// distribution. If the HTTP request contains a header and value that matches
+// what you specify here, the request is sent to the staging distribution. Otherwise
+// the request is sent to the primary distribution.
+type ContinuousDeploymentSingleHeaderConfig struct {
+	Header *string `json:"header,omitempty"`
+	Value  *string `json:"value,omitempty"`
+}
+
+// Contains a list of cookie names.
+type CookieNames struct {
+	Items    []*string `json:"items,omitempty"`
+	Quantity *int64    `json:"quantity,omitempty"`
+}
+
+// This field is deprecated. We recommend that you use a cache policy or an
+// origin request policy instead of this field.
+//
+// If you want to include cookies in the cache key, use CookiesConfig in a cache
+// policy. See CachePolicy.
+//
+// If you want to send cookies to the origin but not include them in the cache
+// key, use CookiesConfig in an origin request policy. See OriginRequestPolicy.
+//
+// A complex type that specifies whether you want CloudFront to forward cookies
+// to the origin and, if so, which ones. For more information about forwarding
+// cookies to the origin, see Caching Content Based on Cookies (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Cookies.html)
+// in the Amazon CloudFront Developer Guide.
+type CookiePreference struct {
+	// Contains a list of cookie names.
+	WhitelistedNames *CookieNames `json:"whitelistedNames,omitempty"`
+}
+
+// A complex type that controls:
+//
+//   - Whether CloudFront replaces HTTP status codes in the 4xx and 5xx range
+//     with custom error messages before returning the response to the viewer.
+//
+//   - How long CloudFront caches HTTP status codes in the 4xx and 5xx range.
+//
+// For more information about custom error pages, see Customizing Error Responses
+// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/custom-error-pages.html)
+// in the Amazon CloudFront Developer Guide.
+type CustomErrorResponse struct {
+	ErrorCachingMinTTL *int64  `json:"errorCachingMinTTL,omitempty"`
+	ErrorCode          *int64  `json:"errorCode,omitempty"`
+	ResponseCode       *string `json:"responseCode,omitempty"`
+	ResponsePagePath   *string `json:"responsePagePath,omitempty"`
+}
+
+// A complex type that controls:
+//
+//   - Whether CloudFront replaces HTTP status codes in the 4xx and 5xx range
+//     with custom error messages before returning the response to the viewer.
+//
+//   - How long CloudFront caches HTTP status codes in the 4xx and 5xx range.
+//
+// For more information about custom error pages, see Customizing Error Responses
+// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/custom-error-pages.html)
+// in the Amazon CloudFront Developer Guide.
+type CustomErrorResponses struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// A complex type that contains the list of Custom Headers for each origin.
+type CustomHeaders struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// A custom origin. A custom origin is any origin that is not an Amazon S3 bucket,
+// with one exception. An Amazon S3 bucket that is configured with static website
+// hosting (https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteHosting.html)
+// is a custom origin.
+type CustomOriginConfig struct {
+	HTTPPort               *int64 `json:"httpPort,omitempty"`
+	HTTPSPort              *int64 `json:"httpSPort,omitempty"`
+	OriginKeepaliveTimeout *int64 `json:"originKeepaliveTimeout,omitempty"`
+	OriginReadTimeout      *int64 `json:"originReadTimeout,omitempty"`
+}
+
+// A complex type that describes the default cache behavior if you don't specify
+// a CacheBehavior element or if request URLs don't match any of the values
+// of PathPattern in CacheBehavior elements. You must create exactly one default
+// cache behavior.
+type DefaultCacheBehavior struct {
+	CachePolicyID           *string `json:"cachePolicyID,omitempty"`
+	Compress                *bool   `json:"compress,omitempty"`
+	DefaultTTL              *int64  `json:"defaultTTL,omitempty"`
+	FieldLevelEncryptionID  *string `json:"fieldLevelEncryptionID,omitempty"`
+	MaxTTL                  *int64  `json:"maxTTL,omitempty"`
+	MinTTL                  *int64  `json:"minTTL,omitempty"`
+	OriginRequestPolicyID   *string `json:"originRequestPolicyID,omitempty"`
+	RealtimeLogConfigARN    *string `json:"realtimeLogConfigARN,omitempty"`
+	ResponseHeadersPolicyID *string `json:"responseHeadersPolicyID,omitempty"`
+	SmoothStreaming         *bool   `json:"smoothStreaming,omitempty"`
+	TargetOriginID          *string `json:"targetOriginID,omitempty"`
+}
+
+// A distribution tells CloudFront where you want content to be delivered from,
+// and the details about how to track and manage content delivery.
+type Distribution struct {
+	ARN                           *string      `json:"arn,omitempty"`
+	DomainName                    *string      `json:"domainName,omitempty"`
+	ID                            *string      `json:"id,omitempty"`
+	InProgressInvalidationBatches *int64       `json:"inProgressInvalidationBatches,omitempty"`
+	LastModifiedTime              *metav1.Time `json:"lastModifiedTime,omitempty"`
+	Status                        *string      `json:"status,omitempty"`
+}
+
+// A distribution configuration.
+type DistributionConfig struct {
+	CallerReference              *string `json:"callerReference,omitempty"`
+	ContinuousDeploymentPolicyID *string `json:"continuousDeploymentPolicyID,omitempty"`
+	DefaultRootObject            *string `json:"defaultRootObject,omitempty"`
+	Enabled                      *bool   `json:"enabled,omitempty"`
+	IsIPV6Enabled                *bool   `json:"isIPV6Enabled,omitempty"`
+	Staging                      *bool   `json:"staging,omitempty"`
+	WebACLID                     *string `json:"webACLID,omitempty"`
+}
+
+// A list of distribution IDs.
+type DistributionIDList struct {
+	IsTruncated *bool   `json:"isTruncated,omitempty"`
+	Marker      *string `json:"marker,omitempty"`
+	MaxItems    *int64  `json:"maxItems,omitempty"`
+	NextMarker  *string `json:"nextMarker,omitempty"`
+	Quantity    *int64  `json:"quantity,omitempty"`
+}
+
+// A distribution list.
+type DistributionList struct {
+	IsTruncated *bool   `json:"isTruncated,omitempty"`
+	Marker      *string `json:"marker,omitempty"`
+	MaxItems    *int64  `json:"maxItems,omitempty"`
+	NextMarker  *string `json:"nextMarker,omitempty"`
+	Quantity    *int64  `json:"quantity,omitempty"`
+}
+
+// A summary of the information about a CloudFront distribution.
+type DistributionSummary struct {
+	ARN              *string      `json:"arn,omitempty"`
+	Comment          *string      `json:"comment,omitempty"`
+	DomainName       *string      `json:"domainName,omitempty"`
+	Enabled          *bool        `json:"enabled,omitempty"`
+	ID               *string      `json:"id,omitempty"`
+	IsIPV6Enabled    *bool        `json:"isIPV6Enabled,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+	Staging          *bool        `json:"staging,omitempty"`
+	Status           *string      `json:"status,omitempty"`
+	WebACLID         *string      `json:"webACLID,omitempty"`
+}
+
+// Complex data type for field-level encryption profiles that includes all of
+// the encryption entities.
+type EncryptionEntities struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// Complex data type for field-level encryption profiles that includes the encryption
+// key and field pattern specifications.
+type EncryptionEntity struct {
+	ProviderID  *string `json:"providerID,omitempty"`
+	PublicKeyID *string `json:"publicKeyID,omitempty"`
+}
+
+// Contains information about the Amazon Kinesis data stream where you are sending
+// real-time log data in a real-time log configuration.
+type EndPoint struct {
+	StreamType *string `json:"streamType,omitempty"`
+}
+
+// A complex data type that includes the profile configurations and other options
+// specified for field-level encryption.
+type FieldLevelEncryption struct {
+	ID               *string      `json:"id,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+}
+
+// A complex data type that includes the profile configurations specified for
+// field-level encryption.
+type FieldLevelEncryptionConfig struct {
+	CallerReference *string `json:"callerReference,omitempty"`
+	Comment         *string `json:"comment,omitempty"`
+}
+
+// List of field-level encrpytion configurations.
+type FieldLevelEncryptionList struct {
+	MaxItems   *int64  `json:"maxItems,omitempty"`
+	NextMarker *string `json:"nextMarker,omitempty"`
+	Quantity   *int64  `json:"quantity,omitempty"`
+}
+
+// A complex data type for field-level encryption profiles.
+type FieldLevelEncryptionProfile struct {
+	ID               *string      `json:"id,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+}
+
+// A complex data type of profiles for the field-level encryption.
+type FieldLevelEncryptionProfileConfig struct {
+	CallerReference *string `json:"callerReference,omitempty"`
+	Comment         *string `json:"comment,omitempty"`
+	Name            *string `json:"name,omitempty"`
+}
+
+// List of field-level encryption profiles.
+type FieldLevelEncryptionProfileList struct {
+	MaxItems   *int64  `json:"maxItems,omitempty"`
+	NextMarker *string `json:"nextMarker,omitempty"`
+	Quantity   *int64  `json:"quantity,omitempty"`
+}
+
+// The field-level encryption profile summary.
+type FieldLevelEncryptionProfileSummary struct {
+	Comment          *string      `json:"comment,omitempty"`
+	ID               *string      `json:"id,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+	Name             *string      `json:"name,omitempty"`
+}
+
+// A summary of a field-level encryption item.
+type FieldLevelEncryptionSummary struct {
+	Comment          *string      `json:"comment,omitempty"`
+	ID               *string      `json:"id,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+}
+
+// A complex data type that includes the field patterns to match for field-level
+// encryption.
+type FieldPatterns struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// This field is deprecated. We recommend that you use a cache policy or an
+// origin request policy instead of this field.
+//
+// If you want to include values in the cache key, use a cache policy. For more
+// information, see Creating cache policies (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/controlling-the-cache-key.html#cache-key-create-cache-policy)
+// in the Amazon CloudFront Developer Guide.
+//
+// If you want to send values to the origin but not include them in the cache
+// key, use an origin request policy. For more information, see Creating origin
+// request policies (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/controlling-origin-requests.html#origin-request-create-origin-request-policy)
+// in the Amazon CloudFront Developer Guide.
+//
+// A complex type that specifies how CloudFront handles query strings, cookies,
+// and HTTP headers.
+type ForwardedValues struct {
+	// Contains a list of HTTP header names.
+	Headers     *Headers `json:"headers,omitempty"`
+	QueryString *bool    `json:"queryString,omitempty"`
+}
+
+// A list of CloudFront functions that are associated with a cache behavior
+// in a CloudFront distribution. CloudFront functions must be published to the
+// LIVE stage to associate them with a cache behavior.
+type FunctionAssociations struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// Contains configuration information about a CloudFront function.
+type FunctionConfig struct {
+	Comment *string `json:"comment,omitempty"`
+}
+
+// A list of CloudFront functions.
+type FunctionList struct {
+	MaxItems   *int64  `json:"maxItems,omitempty"`
+	NextMarker *string `json:"nextMarker,omitempty"`
+	Quantity   *int64  `json:"quantity,omitempty"`
+}
+
+// Contains metadata about a CloudFront function.
+type FunctionMetadata struct {
+	CreatedTime      *metav1.Time `json:"createdTime,omitempty"`
+	FunctionARN      *string      `json:"functionARN,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+}
+
+// Contains configuration information and metadata about a CloudFront function.
+type FunctionSummary struct {
+	Status *string `json:"status,omitempty"`
+}
+
+// A complex type that controls the countries in which your content is distributed.
+// CloudFront determines the location of your users using MaxMind GeoIP databases.
+type GeoRestriction struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// Contains a list of HTTP header names.
+type Headers struct {
+	Items    []*string `json:"items,omitempty"`
+	Quantity *int64    `json:"quantity,omitempty"`
+}
+
+// An invalidation.
+type Invalidation struct {
+	CreateTime *metav1.Time `json:"createTime,omitempty"`
+	ID         *string      `json:"id,omitempty"`
+	Status     *string      `json:"status,omitempty"`
+}
+
+// An invalidation batch.
+type InvalidationBatch struct {
+	CallerReference *string `json:"callerReference,omitempty"`
+}
+
+// The InvalidationList complex type describes the list of invalidation objects.
+// For more information about invalidation, see Invalidating Objects (Web Distributions
+// Only) (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html)
+// in the Amazon CloudFront Developer Guide.
+type InvalidationList struct {
+	IsTruncated *bool   `json:"isTruncated,omitempty"`
+	Marker      *string `json:"marker,omitempty"`
+	MaxItems    *int64  `json:"maxItems,omitempty"`
+	NextMarker  *string `json:"nextMarker,omitempty"`
+	Quantity    *int64  `json:"quantity,omitempty"`
+}
+
+// A summary of an invalidation request.
+type InvalidationSummary struct {
+	CreateTime *metav1.Time `json:"createTime,omitempty"`
+	ID         *string      `json:"id,omitempty"`
+	Status     *string      `json:"status,omitempty"`
+}
+
+// A list of identifiers for the public keys that CloudFront can use to verify
+// the signatures of signed URLs and signed cookies.
+type KGKeyPairIDs struct {
+	KeyGroupID *string `json:"keyGroupID,omitempty"`
+}
+
+// A key group.
+//
+// A key group contains a list of public keys that you can use with CloudFront
+// signed URLs and signed cookies (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/PrivateContent.html).
+type KeyGroup struct {
+	ID               *string      `json:"id,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+}
+
+// A key group configuration.
+//
+// A key group contains a list of public keys that you can use with CloudFront
+// signed URLs and signed cookies (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/PrivateContent.html).
+type KeyGroupConfig struct {
+	Comment *string `json:"comment,omitempty"`
+	Name    *string `json:"name,omitempty"`
+}
+
+// A list of key groups.
+type KeyGroupList struct {
+	MaxItems   *int64  `json:"maxItems,omitempty"`
+	NextMarker *string `json:"nextMarker,omitempty"`
+	Quantity   *int64  `json:"quantity,omitempty"`
+}
+
+// A list of CloudFront key pair identifiers.
+type KeyPairIDs struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// Contains information about the Amazon Kinesis data stream where you are sending
+// real-time log data.
+type KinesisStreamConfig struct {
+	RoleARN   *string `json:"roleARN,omitempty"`
+	StreamARN *string `json:"streamARN,omitempty"`
+}
+
+// A complex type that contains a Lambda@Edge function association.
+type LambdaFunctionAssociation struct {
+	IncludeBody *bool `json:"includeBody,omitempty"`
+}
+
+// A complex type that specifies a list of Lambda@Edge functions associations
+// for a cache behavior.
+//
+// If you want to invoke one or more Lambda@Edge functions triggered by requests
+// that match the PathPattern of the cache behavior, specify the applicable
+// values for Quantity and Items. Note that there can be up to 4 LambdaFunctionAssociation
+// items in this list (one for each possible value of EventType) and each EventType
+// can be associated with only one function.
+//
+// If you don't want to invoke any Lambda@Edge functions for the requests that
+// match PathPattern, specify 0 for Quantity and omit Items.
+type LambdaFunctionAssociations struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// A complex type that controls whether access logs are written for the distribution.
+type LoggingConfig struct {
+	Bucket         *string `json:"bucket,omitempty"`
+	Enabled        *bool   `json:"enabled,omitempty"`
+	IncludeCookies *bool   `json:"includeCookies,omitempty"`
+	Prefix         *string `json:"prefix,omitempty"`
+}
+
+// An origin.
+//
+// An origin is the location where content is stored, and from which CloudFront
+// gets content to serve to viewers. To specify an origin:
+//
+//   - Use S3OriginConfig to specify an Amazon S3 bucket that is not configured
+//     with static website hosting.
+//
+//   - Use CustomOriginConfig to specify all other kinds of origins, including:
+//     An Amazon S3 bucket that is configured with static website hosting An
+//     Elastic Load Balancing load balancer An AWS Elemental MediaPackage endpoint
+//     An AWS Elemental MediaStore container Any other HTTP server, running on
+//     an Amazon EC2 instance or any other kind of host
+//
+// For the current maximum number of origins that you can specify per distribution,
+// see General Quotas on Web Distributions (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html#limits-web-distributions)
+// in the Amazon CloudFront Developer Guide (quotas were formerly referred to
+// as limits).
+type Origin struct {
+	ConnectionAttempts    *int64  `json:"connectionAttempts,omitempty"`
+	ConnectionTimeout     *int64  `json:"connectionTimeout,omitempty"`
+	DomainName            *string `json:"domainName,omitempty"`
+	ID                    *string `json:"id,omitempty"`
+	OriginAccessControlID *string `json:"originAccessControlID,omitempty"`
+	OriginPath            *string `json:"originPath,omitempty"`
+}
+
+// A CloudFront origin access control, including its unique identifier.
+type OriginAccessControl struct {
+	ID *string `json:"id,omitempty"`
+}
+
+// A CloudFront origin access control configuration.
+type OriginAccessControlConfig struct {
+	Description *string `json:"description,omitempty"`
+	Name        *string `json:"name,omitempty"`
+}
+
+// A list of CloudFront origin access controls.
+type OriginAccessControlList struct {
+	IsTruncated *bool   `json:"isTruncated,omitempty"`
+	Marker      *string `json:"marker,omitempty"`
+	MaxItems    *int64  `json:"maxItems,omitempty"`
+	NextMarker  *string `json:"nextMarker,omitempty"`
+	Quantity    *int64  `json:"quantity,omitempty"`
+}
+
+// A CloudFront origin access control.
+type OriginAccessControlSummary struct {
+	Description *string `json:"description,omitempty"`
+	ID          *string `json:"id,omitempty"`
+	Name        *string `json:"name,omitempty"`
+}
+
+// CloudFront origin access identity.
+type OriginAccessIdentity struct {
+	ID                *string `json:"id,omitempty"`
+	S3CanonicalUserID *string `json:"s3CanonicalUserID,omitempty"`
+}
+
+// Origin access identity configuration. Send a GET request to the /CloudFront
+// API version/CloudFront/identity ID/config resource.
+type OriginAccessIdentityConfig struct {
+	CallerReference *string `json:"callerReference,omitempty"`
+	Comment         *string `json:"comment,omitempty"`
+}
+
+// Lists the origin access identities for CloudFront.Send a GET request to the
+// /CloudFront API version/origin-access-identity/cloudfront resource. The response
+// includes a CloudFrontOriginAccessIdentityList element with zero or more CloudFrontOriginAccessIdentitySummary
+// child elements. By default, your entire list of origin access identities
+// is returned in one single page. If the list is long, you can paginate it
+// using the MaxItems and Marker parameters.
+type OriginAccessIdentityList struct {
+	IsTruncated *bool   `json:"isTruncated,omitempty"`
+	Marker      *string `json:"marker,omitempty"`
+	MaxItems    *int64  `json:"maxItems,omitempty"`
+	NextMarker  *string `json:"nextMarker,omitempty"`
+	Quantity    *int64  `json:"quantity,omitempty"`
+}
+
+// Summary of the information about a CloudFront origin access identity.
+type OriginAccessIdentitySummary struct {
+	Comment           *string `json:"comment,omitempty"`
+	ID                *string `json:"id,omitempty"`
+	S3CanonicalUserID *string `json:"s3CanonicalUserID,omitempty"`
+}
+
+// A complex type that contains HeaderName and HeaderValue elements, if any,
+// for this distribution.
+type OriginCustomHeader struct {
+	HeaderName *string `json:"headerName,omitempty"`
+}
+
+// An origin group includes two origins (a primary origin and a second origin
+// to failover to) and a failover criteria that you specify. You create an origin
+// group to support origin failover in CloudFront. When you create or update
+// a distribution, you can specifiy the origin group instead of a single origin,
+// and CloudFront will failover from the primary origin to the second origin
+// under the failover conditions that you've chosen.
+type OriginGroup struct {
+	ID *string `json:"id,omitempty"`
+}
+
+// An origin in an origin group.
+type OriginGroupMember struct {
+	OriginID *string `json:"originID,omitempty"`
+}
+
+// A complex data type for the origins included in an origin group.
+type OriginGroupMembers struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// A complex data type for the origin groups specified for a distribution.
+type OriginGroups struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// An origin request policy.
+//
+// When it's attached to a cache behavior, the origin request policy determines
+// the values that CloudFront includes in requests that it sends to the origin.
+// Each request that CloudFront sends to the origin includes the following:
+//
+//   - The request body and the URL path (without the domain name) from the
+//     viewer request.
+//
+//   - The headers that CloudFront automatically includes in every origin request,
+//     including Host, User-Agent, and X-Amz-Cf-Id.
+//
+//   - All HTTP headers, cookies, and URL query strings that are specified
+//     in the cache policy or the origin request policy. These can include items
+//     from the viewer request and, in the case of headers, additional ones that
+//     are added by CloudFront.
+//
+// CloudFront sends a request when it can't find an object in its cache that
+// matches the request. If you want to send values to the origin and also include
+// them in the cache key, use CachePolicy.
+type OriginRequestPolicy struct {
+	ID               *string      `json:"id,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+}
+
+// An origin request policy configuration.
+//
+// This configuration determines the values that CloudFront includes in requests
+// that it sends to the origin. Each request that CloudFront sends to the origin
+// includes the following:
+//
+//   - The request body and the URL path (without the domain name) from the
+//     viewer request.
+//
+//   - The headers that CloudFront automatically includes in every origin request,
+//     including Host, User-Agent, and X-Amz-Cf-Id.
+//
+//   - All HTTP headers, cookies, and URL query strings that are specified
+//     in the cache policy or the origin request policy. These can include items
+//     from the viewer request and, in the case of headers, additional ones that
+//     are added by CloudFront.
+//
+// CloudFront sends a request when it can't find an object in its cache that
+// matches the request. If you want to send values to the origin and also include
+// them in the cache key, use CachePolicy.
+type OriginRequestPolicyConfig struct {
+	Comment *string `json:"comment,omitempty"`
+	Name    *string `json:"name,omitempty"`
+}
+
+// An object that determines whether any cookies in viewer requests (and if
+// so, which cookies) are included in requests that CloudFront sends to the
+// origin.
+type OriginRequestPolicyCookiesConfig struct {
+	// Contains a list of cookie names.
+	Cookies *CookieNames `json:"cookies,omitempty"`
+}
+
+// An object that determines whether any HTTP headers (and if so, which headers)
+// are included in requests that CloudFront sends to the origin.
+type OriginRequestPolicyHeadersConfig struct {
+	// Contains a list of HTTP header names.
+	Headers *Headers `json:"headers,omitempty"`
+}
+
+// A list of origin request policies.
+type OriginRequestPolicyList struct {
+	MaxItems   *int64  `json:"maxItems,omitempty"`
+	NextMarker *string `json:"nextMarker,omitempty"`
+	Quantity   *int64  `json:"quantity,omitempty"`
+}
+
+// An object that determines whether any URL query strings in viewer requests
+// (and if so, which query strings) are included in requests that CloudFront
+// sends to the origin.
+type OriginRequestPolicyQueryStringsConfig struct {
+	// Contains a list of query string names.
+	QueryStrings *QueryStringNames `json:"queryStrings,omitempty"`
+}
+
+// A complex type that contains information about the SSL/TLS protocols that
+// CloudFront can use when establishing an HTTPS connection with your origin.
+type OriginSSLProtocols struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// CloudFront Origin Shield.
+//
+// Using Origin Shield can help reduce the load on your origin. For more information,
+// see Using Origin Shield (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/origin-shield.html)
+// in the Amazon CloudFront Developer Guide.
+type OriginShield struct {
+	Enabled *bool `json:"enabled,omitempty"`
+}
+
+// Contains information about the origins for this distribution.
+type Origins struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// This object determines the values that CloudFront includes in the cache key.
+// These values can include HTTP headers, cookies, and URL query strings. CloudFront
+// uses the cache key to find an object in its cache that it can return to the
+// viewer.
+//
+// The headers, cookies, and query strings that are included in the cache key
+// are also included in requests that CloudFront sends to the origin. CloudFront
+// sends a request when it can't find an object in its cache that matches the
+// request's cache key. If you want to send values to the origin but not include
+// them in the cache key, use OriginRequestPolicy.
+type ParametersInCacheKeyAndForwardedToOrigin struct {
+	// An object that determines whether any cookies in viewer requests (and if
+	// so, which cookies) are included in the cache key and in requests that CloudFront
+	// sends to the origin.
+	CookiesConfig              *CachePolicyCookiesConfig `json:"cookiesConfig,omitempty"`
+	EnableAcceptEncodingBrotli *bool                     `json:"enableAcceptEncodingBrotli,omitempty"`
+	EnableAcceptEncodingGzip   *bool                     `json:"enableAcceptEncodingGzip,omitempty"`
+	// An object that determines whether any HTTP headers (and if so, which headers)
+	// are included in the cache key and in requests that CloudFront sends to the
+	// origin.
+	HeadersConfig *CachePolicyHeadersConfig `json:"headersConfig,omitempty"`
+	// An object that determines whether any URL query strings in viewer requests
+	// (and if so, which query strings) are included in the cache key and in requests
+	// that CloudFront sends to the origin.
+	QueryStringsConfig *CachePolicyQueryStringsConfig `json:"queryStringsConfig,omitempty"`
+}
+
+// A complex type that contains information about the objects that you want
+// to invalidate. For more information, see Specifying the Objects to Invalidate
+// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html#invalidation-specifying-objects)
+// in the Amazon CloudFront Developer Guide.
+type Paths struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// A public key that you can use with signed URLs and signed cookies (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/PrivateContent.html),
+// or with field-level encryption (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/field-level-encryption.html).
+type PublicKey struct {
+	CreatedTime *metav1.Time `json:"createdTime,omitempty"`
+	ID          *string      `json:"id,omitempty"`
+}
+
+// Configuration information about a public key that you can use with signed
+// URLs and signed cookies (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/PrivateContent.html),
+// or with field-level encryption (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/field-level-encryption.html).
+type PublicKeyConfig struct {
+	CallerReference *string `json:"callerReference,omitempty"`
+	Comment         *string `json:"comment,omitempty"`
+	EncodedKey      *string `json:"encodedKey,omitempty"`
+	Name            *string `json:"name,omitempty"`
+}
+
+// A list of public keys that you can use with signed URLs and signed cookies
+// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/PrivateContent.html),
+// or with field-level encryption (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/field-level-encryption.html).
+type PublicKeyList struct {
+	MaxItems   *int64  `json:"maxItems,omitempty"`
+	NextMarker *string `json:"nextMarker,omitempty"`
+	Quantity   *int64  `json:"quantity,omitempty"`
+}
+
+// Contains information about a public key.
+type PublicKeySummary struct {
+	Comment     *string      `json:"comment,omitempty"`
+	CreatedTime *metav1.Time `json:"createdTime,omitempty"`
+	EncodedKey  *string      `json:"encodedKey,omitempty"`
+	ID          *string      `json:"id,omitempty"`
+	Name        *string      `json:"name,omitempty"`
+}
+
+// Query argument-profile mapping for field-level encryption.
+type QueryArgProfile struct {
+	ProfileID *string `json:"profileID,omitempty"`
+	QueryArg  *string `json:"queryArg,omitempty"`
+}
+
+// Configuration for query argument-profile mapping for field-level encryption.
+type QueryArgProfileConfig struct {
+	ForwardWhenQueryArgProfileIsUnknown *bool `json:"forwardWhenQueryArgProfileIsUnknown,omitempty"`
+}
+
+// Query argument-profile mapping for field-level encryption.
+type QueryArgProfiles struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// This field is deprecated. We recommend that you use a cache policy or an
+// origin request policy instead of this field.
+//
+// If you want to include query strings in the cache key, use QueryStringsConfig
+// in a cache policy. See CachePolicy.
+//
+// If you want to send query strings to the origin but not include them in the
+// cache key, use QueryStringsConfig in an origin request policy. See OriginRequestPolicy.
+//
+// A complex type that contains information about the query string parameters
+// that you want CloudFront to use for caching for a cache behavior.
+type QueryStringCacheKeys struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// Contains a list of query string names.
+type QueryStringNames struct {
+	Items    []*string `json:"items,omitempty"`
+	Quantity *int64    `json:"quantity,omitempty"`
+}
+
+// A real-time log configuration.
+type RealtimeLogConfig struct {
+	ARN          *string `json:"arn,omitempty"`
+	Name         *string `json:"name,omitempty"`
+	SamplingRate *int64  `json:"samplingRate,omitempty"`
+}
+
+// A list of real-time log configurations.
+type RealtimeLogConfigs struct {
+	IsTruncated *bool   `json:"isTruncated,omitempty"`
+	Marker      *string `json:"marker,omitempty"`
+	MaxItems    *int64  `json:"maxItems,omitempty"`
+	NextMarker  *string `json:"nextMarker,omitempty"`
+}
+
+// A response headers policy.
+//
+// A response headers policy contains information about a set of HTTP response
+// headers.
+//
+// After you create a response headers policy, you can use its ID to attach
+// it to one or more cache behaviors in a CloudFront distribution. When it's
+// attached to a cache behavior, the response headers policy affects the HTTP
+// headers that CloudFront includes in HTTP responses to requests that match
+// the cache behavior. CloudFront adds or removes response headers according
+// to the configuration of the response headers policy.
+//
+// For more information, see Adding or removing HTTP headers in CloudFront responses
+// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/modifying-response-headers.html)
+// in the Amazon CloudFront Developer Guide.
+type ResponseHeadersPolicy struct {
+	ID               *string      `json:"id,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+}
+
+// A list of HTTP header names that CloudFront includes as values for the Access-Control-Allow-Headers
+// HTTP response header.
+//
+// For more information about the Access-Control-Allow-Headers HTTP response
+// header, see Access-Control-Allow-Headers (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers)
+// in the MDN Web Docs.
+type ResponseHeadersPolicyAccessControlAllowHeaders struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// A list of HTTP methods that CloudFront includes as values for the Access-Control-Allow-Methods
+// HTTP response header.
+//
+// For more information about the Access-Control-Allow-Methods HTTP response
+// header, see Access-Control-Allow-Methods (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods)
+// in the MDN Web Docs.
+type ResponseHeadersPolicyAccessControlAllowMethods struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// A list of origins (domain names) that CloudFront can use as the value for
+// the Access-Control-Allow-Origin HTTP response header.
+//
+// For more information about the Access-Control-Allow-Origin HTTP response
+// header, see Access-Control-Allow-Origin (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin)
+// in the MDN Web Docs.
+type ResponseHeadersPolicyAccessControlAllowOrigins struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// A list of HTTP headers that CloudFront includes as values for the Access-Control-Expose-Headers
+// HTTP response header.
+//
+// For more information about the Access-Control-Expose-Headers HTTP response
+// header, see Access-Control-Expose-Headers (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers)
+// in the MDN Web Docs.
+type ResponseHeadersPolicyAccessControlExposeHeaders struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// A configuration for a set of HTTP response headers that are used for cross-origin
+// resource sharing (CORS). CloudFront adds these headers to HTTP responses
+// that it sends for CORS requests that match a cache behavior associated with
+// this response headers policy.
+//
+// For more information about CORS, see Cross-Origin Resource Sharing (CORS)
+// (https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) in the MDN Web Docs.
+type ResponseHeadersPolicyCORSConfig struct {
+	AccessControlAllowCredentials *bool  `json:"accessControlAllowCredentials,omitempty"`
+	AccessControlMaxAgeSec        *int64 `json:"accessControlMaxAgeSec,omitempty"`
+	OriginOverride                *bool  `json:"originOverride,omitempty"`
+}
+
+// A response headers policy configuration.
+//
+// A response headers policy configuration contains metadata about the response
+// headers policy, and configurations for sets of HTTP response headers.
+type ResponseHeadersPolicyConfig struct {
+	Comment *string `json:"comment,omitempty"`
+	Name    *string `json:"name,omitempty"`
+}
+
+// The policy directives and their values that CloudFront includes as values
+// for the Content-Security-Policy HTTP response header.
+//
+// For more information about the Content-Security-Policy HTTP response header,
+// see Content-Security-Policy (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy)
+// in the MDN Web Docs.
+type ResponseHeadersPolicyContentSecurityPolicy struct {
+	ContentSecurityPolicy *string `json:"contentSecurityPolicy,omitempty"`
+	Override              *bool   `json:"override,omitempty"`
+}
+
+// Determines whether CloudFront includes the X-Content-Type-Options HTTP response
+// header with its value set to nosniff.
+//
+// For more information about the X-Content-Type-Options HTTP response header,
+// see X-Content-Type-Options (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options)
+// in the MDN Web Docs.
+type ResponseHeadersPolicyContentTypeOptions struct {
+	Override *bool `json:"override,omitempty"`
+}
+
+// An HTTP response header name and its value. CloudFront includes this header
+// in HTTP responses that it sends for requests that match a cache behavior
+// that's associated with this response headers policy.
+type ResponseHeadersPolicyCustomHeader struct {
+	Header   *string `json:"header,omitempty"`
+	Override *bool   `json:"override,omitempty"`
+	Value    *string `json:"value,omitempty"`
+}
+
+// A list of HTTP response header names and their values. CloudFront includes
+// these headers in HTTP responses that it sends for requests that match a cache
+// behavior that's associated with this response headers policy.
+type ResponseHeadersPolicyCustomHeadersConfig struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// Determines whether CloudFront includes the X-Frame-Options HTTP response
+// header and the header's value.
+//
+// For more information about the X-Frame-Options HTTP response header, see
+// X-Frame-Options (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options)
+// in the MDN Web Docs.
+type ResponseHeadersPolicyFrameOptions struct {
+	Override *bool `json:"override,omitempty"`
+}
+
+// A list of response headers policies.
+type ResponseHeadersPolicyList struct {
+	MaxItems   *int64  `json:"maxItems,omitempty"`
+	NextMarker *string `json:"nextMarker,omitempty"`
+	Quantity   *int64  `json:"quantity,omitempty"`
+}
+
+// Determines whether CloudFront includes the Referrer-Policy HTTP response
+// header and the header's value.
+//
+// For more information about the Referrer-Policy HTTP response header, see
+// Referrer-Policy (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy)
+// in the MDN Web Docs.
+type ResponseHeadersPolicyReferrerPolicy struct {
+	Override *bool `json:"override,omitempty"`
+}
+
+// The name of an HTTP header that CloudFront removes from HTTP responses to
+// requests that match the cache behavior that this response headers policy
+// is attached to.
+type ResponseHeadersPolicyRemoveHeader struct {
+	Header *string `json:"header,omitempty"`
+}
+
+// A list of HTTP header names that CloudFront removes from HTTP responses to
+// requests that match the cache behavior that this response headers policy
+// is attached to.
+type ResponseHeadersPolicyRemoveHeadersConfig struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// A configuration for enabling the Server-Timing header in HTTP responses sent
+// from CloudFront. CloudFront adds this header to HTTP responses that it sends
+// in response to requests that match a cache behavior that's associated with
+// this response headers policy.
+//
+// You can use the Server-Timing header to view metrics that can help you gain
+// insights about the behavior and performance of CloudFront. For example, you
+// can see which cache layer served a cache hit, or the first byte latency from
+// the origin when there was a cache miss. You can use the metrics in the Server-Timing
+// header to troubleshoot issues or test the efficiency of your CloudFront configuration.
+// For more information, see Server-Timing header (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/understanding-response-headers-policies.html#server-timing-header)
+// in the Amazon CloudFront Developer Guide.
+type ResponseHeadersPolicyServerTimingHeadersConfig struct {
+	Enabled *bool `json:"enabled,omitempty"`
+}
+
+// Determines whether CloudFront includes the Strict-Transport-Security HTTP
+// response header and the header's value.
+//
+// For more information about the Strict-Transport-Security HTTP response header,
+// see Strict-Transport-Security (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security)
+// in the MDN Web Docs.
+type ResponseHeadersPolicyStrictTransportSecurity struct {
+	AccessControlMaxAgeSec *int64 `json:"accessControlMaxAgeSec,omitempty"`
+	IncludeSubdomains      *bool  `json:"includeSubdomains,omitempty"`
+	Override               *bool  `json:"override,omitempty"`
+	Preload                *bool  `json:"preload,omitempty"`
+}
+
+// Determines whether CloudFront includes the X-XSS-Protection HTTP response
+// header and the header's value.
+//
+// For more information about the X-XSS-Protection HTTP response header, see
+// X-XSS-Protection (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection)
+// in the MDN Web Docs.
+type ResponseHeadersPolicyXSSProtection struct {
+	ModeBlock  *bool   `json:"modeBlock,omitempty"`
+	Override   *bool   `json:"override,omitempty"`
+	Protection *bool   `json:"protection,omitempty"`
+	ReportURI  *string `json:"reportURI,omitempty"`
+}
+
+// A complex type that contains information about the Amazon S3 bucket from
+// which you want CloudFront to get your media files for distribution.
+type S3Origin struct {
+	DomainName           *string `json:"domainName,omitempty"`
+	OriginAccessIdentity *string `json:"originAccessIdentity,omitempty"`
+}
+
+// A complex type that contains information about the Amazon S3 origin. If the
+// origin is a custom origin or an S3 bucket that is configured as a website
+// endpoint, use the CustomOriginConfig element instead.
+type S3OriginConfig struct {
+	OriginAccessIdentity *string `json:"originAccessIdentity,omitempty"`
+}
+
+// Session stickiness provides the ability to define multiple requests from
+// a single viewer as a single session. This prevents the potentially inconsistent
+// experience of sending some of a given user's requests to your staging distribution,
+// while others are sent to your primary distribution. Define the session duration
+// using TTL values.
+type SessionStickinessConfig struct {
+	IdleTTL    *int64 `json:"idleTTL,omitempty"`
+	MaximumTTL *int64 `json:"maximumTTL,omitempty"`
+}
+
+// A list of Amazon Web Services accounts and the active CloudFront key pairs
+// in each account that CloudFront can use to verify the signatures of signed
+// URLs and signed cookies.
+type Signer struct {
+	AWSAccountNumber *string `json:"awsAccountNumber,omitempty"`
+}
+
+// The CloudFront domain name of the staging distribution.
+type StagingDistributionDNSNames struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// A complex data type for the status codes that you specify that, when returned
+// by a primary origin, trigger CloudFront to failover to a second origin.
+type StatusCodes struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// A streaming distribution tells CloudFront where you want RTMP content to
+// be delivered from, and the details about how to track and manage content
+// delivery.
+type StreamingDistribution struct {
+	ARN              *string      `json:"arn,omitempty"`
+	DomainName       *string      `json:"domainName,omitempty"`
+	ID               *string      `json:"id,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+	Status           *string      `json:"status,omitempty"`
+}
+
+// The RTMP distribution's configuration information.
+type StreamingDistributionConfig struct {
+	CallerReference *string `json:"callerReference,omitempty"`
+	Comment         *string `json:"comment,omitempty"`
+	Enabled         *bool   `json:"enabled,omitempty"`
+}
+
+// A streaming distribution list.
+type StreamingDistributionList struct {
+	IsTruncated *bool   `json:"isTruncated,omitempty"`
+	Marker      *string `json:"marker,omitempty"`
+	MaxItems    *int64  `json:"maxItems,omitempty"`
+	NextMarker  *string `json:"nextMarker,omitempty"`
+	Quantity    *int64  `json:"quantity,omitempty"`
+}
+
+// A summary of the information for a CloudFront streaming distribution.
+type StreamingDistributionSummary struct {
+	ARN              *string      `json:"arn,omitempty"`
+	Comment          *string      `json:"comment,omitempty"`
+	DomainName       *string      `json:"domainName,omitempty"`
+	Enabled          *bool        `json:"enabled,omitempty"`
+	ID               *string      `json:"id,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+	Status           *string      `json:"status,omitempty"`
+}
+
+// A complex type that controls whether access logs are written for this streaming
+// distribution.
+type StreamingLoggingConfig struct {
+	Bucket  *string `json:"bucket,omitempty"`
+	Enabled *bool   `json:"enabled,omitempty"`
+	Prefix  *string `json:"prefix,omitempty"`
+}
+
+// Contains the result of testing a CloudFront function with TestFunction.
+type TestResult struct {
+	ComputeUtilization *string `json:"computeUtilization,omitempty"`
+}
+
+// A list of key groups whose public keys CloudFront can use to verify the signatures
+// of signed URLs and signed cookies.
+type TrustedKeyGroups struct {
+	Enabled  *bool  `json:"enabled,omitempty"`
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// A list of Amazon Web Services accounts whose public keys CloudFront can use
+// to verify the signatures of signed URLs and signed cookies.
+type TrustedSigners struct {
+	Enabled  *bool  `json:"enabled,omitempty"`
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// A complex type that determines the distribution's SSL/TLS configuration for
+// communicating with viewers.
+//
+// If the distribution doesn't use Aliases (also known as alternate domain names
+// or CNAMEs)—that is, if the distribution uses the CloudFront domain name
+// such as d111111abcdef8.cloudfront.net—set CloudFrontDefaultCertificate
+// to true and leave all other fields empty.
+//
+// If the distribution uses Aliases (alternate domain names or CNAMEs), use
+// the fields in this type to specify the following settings:
+//
+//   - Which viewers the distribution accepts HTTPS connections from: only
+//     viewers that support server name indication (SNI) (https://en.wikipedia.org/wiki/Server_Name_Indication)
+//     (recommended), or all viewers including those that don't support SNI.
+//     To accept HTTPS connections from only viewers that support SNI, set SSLSupportMethod
+//     to sni-only. This is recommended. Most browsers and clients support SNI.
+//     To accept HTTPS connections from all viewers, including those that don't
+//     support SNI, set SSLSupportMethod to vip. This is not recommended, and
+//     results in additional monthly charges from CloudFront.
+//
+//   - The minimum SSL/TLS protocol version that the distribution can use to
+//     communicate with viewers. To specify a minimum version, choose a value
+//     for MinimumProtocolVersion. For more information, see Security Policy
+//     (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-web-values-specify.html#DownloadDistValues-security-policy)
+//     in the Amazon CloudFront Developer Guide.
+//
+//   - The location of the SSL/TLS certificate, Certificate Manager (ACM) (https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html)
+//     (recommended) or Identity and Access Management (IAM) (https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_server-certs.html).
+//     You specify the location by setting a value in one of the following fields
+//     (not both): ACMCertificateArn IAMCertificateId
+//
+// All distributions support HTTPS connections from viewers. To require viewers
+// to use HTTPS only, or to redirect them from HTTP to HTTPS, use ViewerProtocolPolicy
+// in the CacheBehavior or DefaultCacheBehavior. To specify how CloudFront should
+// use SSL/TLS to communicate with your custom origin, use CustomOriginConfig.
+//
+// For more information, see Using HTTPS with CloudFront (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https.html)
+// and Using Alternate Domain Names and HTTPS (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https-alternate-domain-names.html)
+// in the Amazon CloudFront Developer Guide.
+type ViewerCertificate struct {
+	ACMCertificateARN            *string `json:"aCMCertificateARN,omitempty"`
+	Certificate                  *string `json:"certificate,omitempty"`
+	CloudFrontDefaultCertificate *bool   `json:"cloudFrontDefaultCertificate,omitempty"`
+	IAMCertificateID             *string `json:"iamCertificateID,omitempty"`
+}

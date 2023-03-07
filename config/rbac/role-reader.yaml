@@ -9,6 +9,7 @@ rules:
 - apiGroups:
   - cloudfront.services.k8s.aws
   resources:
+  - cachepolicies
   verbs:
   - get
   - list

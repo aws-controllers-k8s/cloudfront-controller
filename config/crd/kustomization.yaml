@@ -3,3 +3,4 @@ kind: Kustomization
 bases:
   - common
 resources:
+  - bases/cloudfront.services.k8s.aws_cachepolicies.yaml
