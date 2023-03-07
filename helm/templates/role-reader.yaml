@@ -10,6 +10,7 @@ rules:
   - cloudfront.services.k8s.aws
   resources:
   - cachepolicies
+  - distributions
   verbs:
   - get
   - list

@@ -1,0 +1,15 @@
+apiVersion: cloudfront.services.k8s.aws/v1alpha1
+kind: Distribution
+metadata:
+  name: $DISTRIBUTION_NAME
+spec:
+  distributionConfig:
+    comment: $DISTRIBUTION_COMMENT
+    enabled: true
+    defaultCacheBehavior:
+      targetOriginID: $ORIGIN_ID
+      viewerProtocolPolicy: allow-all
+    origins:
+      items:
+        - id: $ORIGIN_ID
+          domainName: $ORIGIN_S3_URL

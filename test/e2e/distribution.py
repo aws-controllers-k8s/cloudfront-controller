@@ -11,7 +11,7 @@
 # express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
 
-"""Utilities for working with CachePolicy resources"""
+"""Utilities for working with Distribution resources"""
 
 import datetime
 import time
@@ -26,17 +26,17 @@ DEFAULT_WAIT_UNTIL_DELETED_INTERVAL_SECONDS = 15
 
 
 def wait_until_exists(
-        cache_policy_id: str,
+        distribution_id: str,
         timeout_seconds: int = DEFAULT_WAIT_UNTIL_EXISTS_TIMEOUT_SECONDS,
         interval_seconds: int = DEFAULT_WAIT_UNTIL_EXISTS_INTERVAL_SECONDS,
     ) -> None:
-    """Waits until a CachePolicy with a supplied name is returned from
-    CloudFront GetCachePolicy API.
+    """Waits until a Distribution with a supplied name is returned from
+    CloudFront GetDistribution API.
 
     Usage:
-        from e2e.cache_policy import wait_until_exists
+        from e2e.distribution import wait_until_exists
 
-        wait_until_exists(cache_policy_id)
+        wait_until_exists(distribution_id)
 
     Raises:
         pytest.fail upon timeout
@@ -47,28 +47,28 @@ def wait_until_exists(
     while True:
         if datetime.datetime.now() >= timeout:
             pytest.fail(
-                "Timed out waiting for CachePolicy to exist "
+                "Timed out waiting for Distribution to exist "
                 "in CloudFront API"
             )
         time.sleep(interval_seconds)
 
-        latest = get(cache_policy_id)
+        latest = get(distribution_id)
         if latest is not None:
             break
 
 
 def wait_until_deleted(
-        cache_policy_id: str,
+        distribution_id: str,
         timeout_seconds: int = DEFAULT_WAIT_UNTIL_DELETED_TIMEOUT_SECONDS,
         interval_seconds: int = DEFAULT_WAIT_UNTIL_DELETED_INTERVAL_SECONDS,
     ) -> None:
-    """Waits until a CachePolicy with a supplied ID is no longer returned from
+    """Waits until a Distribution with a supplied ID is no longer returned from
     the CloudFront API.
 
     Usage:
-        from e2e.cache_policy import wait_until_deleted
+        from e2e.distribution import wait_until_deleted
 
-        wait_until_deleted(cache_policy_id)
+        wait_until_deleted(distribution_id)
 
     Raises:
         pytest.fail upon timeout
@@ -79,25 +79,25 @@ def wait_until_deleted(
     while True:
         if datetime.datetime.now() >= timeout:
             pytest.fail(
-                "Timed out waiting for CachePolicy to be "
+                "Timed out waiting for Distribution to be "
                 "deleted in CloudFront API"
             )
         time.sleep(interval_seconds)
 
-        latest = get(cache_policy_id)
+        latest = get(distribution_id)
         if latest is None:
             break
 
 
-def get(cache_policy_id):
-    """Returns a dict containing the CachePolicy record from the CloudFront
+def get(distribution_id):
+    """Returns a dict containing the Distribution record from the CloudFront
     API.
 
-    If no such CachePolicy exists, returns None.
+    If no such Distribution exists, returns None.
     """
     c = boto3.client('cloudfront')
     try:
-        resp = c.get_cache_policy(Id=cache_policy_id)
-        return resp['CachePolicy']
-    except c.exceptions.NoSuchCachePolicy:
+        resp = c.get_distribution(Id=distribution_id)
+        return resp['Distribution']
+    except c.exceptions.NoSuchDistribution:
         return None

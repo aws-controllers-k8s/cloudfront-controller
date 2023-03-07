@@ -125,9 +125,6 @@ func (rm *resourceManager) sdkFind(
 						}
 						f0f5f0f1.Items = f0f5f0f1f0
 					}
-					if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Quantity != nil {
-						f0f5f0f1.Quantity = resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Quantity
-					}
 					f0f5f0.Cookies = f0f5f0f1
 				}
 				f0f5.CookiesConfig = f0f5f0
@@ -153,9 +150,6 @@ func (rm *resourceManager) sdkFind(
 							f0f5f3f1f0 = append(f0f5f3f1f0, &f0f5f3f1f0elem)
 						}
 						f0f5f3f1.Items = f0f5f3f1f0
-					}
-					if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers.Quantity != nil {
-						f0f5f3f1.Quantity = resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers.Quantity
 					}
 					f0f5f3.Headers = f0f5f3f1
 				}
@@ -300,9 +294,6 @@ func (rm *resourceManager) sdkCreate(
 						}
 						f0f5f0f1.Items = f0f5f0f1f0
 					}
-					if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Quantity != nil {
-						f0f5f0f1.Quantity = resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Quantity
-					}
 					f0f5f0.Cookies = f0f5f0f1
 				}
 				f0f5.CookiesConfig = f0f5f0
@@ -328,9 +319,6 @@ func (rm *resourceManager) sdkCreate(
 							f0f5f3f1f0 = append(f0f5f3f1f0, &f0f5f3f1f0elem)
 						}
 						f0f5f3f1.Items = f0f5f3f1f0
-					}
-					if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers.Quantity != nil {
-						f0f5f3f1.Quantity = resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers.Quantity
 					}
 					f0f5f3.Headers = f0f5f3f1
 				}
@@ -431,9 +419,6 @@ func (rm *resourceManager) newCreateRequestPayload(
 						}
 						f0f5f0f1.SetItems(f0f5f0f1f0)
 					}
-					if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Quantity != nil {
-						f0f5f0f1.SetQuantity(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Quantity)
-					}
 					f0f5f0.SetCookies(f0f5f0f1)
 				}
 				f0f5.SetCookiesConfig(f0f5f0)
@@ -459,9 +444,6 @@ func (rm *resourceManager) newCreateRequestPayload(
 							f0f5f3f1f0 = append(f0f5f3f1f0, &f0f5f3f1f0elem)
 						}
 						f0f5f3f1.SetItems(f0f5f3f1f0)
-					}
-					if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers.Quantity != nil {
-						f0f5f3f1.SetQuantity(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers.Quantity)
 					}
 					f0f5f3.SetHeaders(f0f5f3f1)
 				}
@@ -594,9 +576,6 @@ func (rm *resourceManager) newUpdateRequestPayload(
 						}
 						f0f5f0f1.SetItems(f0f5f0f1f0)
 					}
-					if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Quantity != nil {
-						f0f5f0f1.SetQuantity(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Quantity)
-					}
 					f0f5f0.SetCookies(f0f5f0f1)
 				}
 				f0f5.SetCookiesConfig(f0f5f0)
@@ -622,9 +601,6 @@ func (rm *resourceManager) newUpdateRequestPayload(
 							f0f5f3f1f0 = append(f0f5f3f1f0, &f0f5f3f1f0elem)
 						}
 						f0f5f3f1.SetItems(f0f5f3f1f0)
-					}
-					if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers.Quantity != nil {
-						f0f5f3f1.SetQuantity(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers.Quantity)
 					}
 					f0f5f3.SetHeaders(f0f5f3f1)
 				}
