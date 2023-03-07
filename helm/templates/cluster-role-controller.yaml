@@ -47,6 +47,26 @@ rules:
   - patch
   - watch
 - apiGroups:
+  - cloudfront.services.k8s.aws
+  resources:
+  - cachepolicies
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - cloudfront.services.k8s.aws
+  resources:
+  - cachepolicies/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
   - services.k8s.aws
   resources:
   - adoptedresources

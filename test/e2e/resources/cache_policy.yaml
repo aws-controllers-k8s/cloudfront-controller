@@ -1,0 +1,9 @@
+apiVersion: cloudfront.services.k8s.aws/v1alpha1
+kind: CachePolicy
+metadata:
+  name: $CACHE_POLICY_NAME
+spec:
+  cachePolicyConfig:
+    name: $CACHE_POLICY_NAME
+    comment: $CACHE_POLICY_COMMENT
+    minTTL: $MIN_TTL
