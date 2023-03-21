@@ -1,8 +1,8 @@
 service:
-  full_name:
-  short_name:
-  link:
-  documentation:
+  full_name: Amazon CloudFront
+  short_name: CloudFront
+  link: https://aws.amazon.com/cloudfront/
+  documentation: https://docs.aws.amazon.com/cloudfront/index.html
 api_versions:
   - api_version: v1alpha1
     status: available
