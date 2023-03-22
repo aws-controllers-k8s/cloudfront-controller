@@ -1,6 +1,6 @@
 apiVersion: v1
 name: cloudfront-chart
-description: A Helm chart for the ACK service controller for  ()
+description: A Helm chart for the ACK service controller for Amazon CloudFront (CloudFront)
 version: v0.0.0-non-release-version
 appVersion: v0.0.0-non-release-version
 home: https://github.com/aws-controllers-k8s/cloudfront-controller
@@ -10,7 +10,7 @@ sources:
 maintainers:
   - name: ACK Admins
     url: https://github.com/orgs/aws-controllers-k8s/teams/ack-admin
-  - name:  Admins
+  - name: CloudFront Admins
     url: https://github.com/orgs/aws-controllers-k8s/teams/cloudfront-maintainer
 keywords:
   - aws
