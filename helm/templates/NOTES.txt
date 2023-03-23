@@ -4,7 +4,7 @@ This chart deploys "public.ecr.aws/aws-controllers-k8s/cloudfront-controller:v0.
 Check its status by running:
   kubectl --namespace {{ .Release.Namespace }} get pods -l "app.kubernetes.io/instance={{ .Release.Name }}"
 
-You are now able to create  () resources!
+You are now able to create Amazon CloudFront (CloudFront) resources!
 
 The controller is running in "{{ .Values.installScope }}" mode.
 The controller is configured to manage AWS resources in region: "{{ .Values.aws.region }}"
