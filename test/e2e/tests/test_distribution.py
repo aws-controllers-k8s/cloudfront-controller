@@ -28,8 +28,8 @@ from e2e import distribution
 
 DISTRIBUTION_RESOURCE_PLURAL = "distributions"
 DELETE_WAIT_AFTER_SECONDS = 10
-CHECK_STATUS_WAIT_SECONDS = 10
-MODIFY_WAIT_AFTER_SECONDS = 10
+CHECK_STATUS_WAIT_SECONDS = 300
+MODIFY_WAIT_AFTER_SECONDS = 300
 
 
 @pytest.fixture(scope="module")
@@ -41,13 +41,13 @@ def simple_distribution():
     region = identity.get_region()
     resources = get_bootstrap_resources()
     bucket_name = resources.PublicBucket.name
-    bucket_url = f"https://{{bucket_name}}.s3-{{region}}.amazonaws.com/"
+    bucket_domain_name = f"{bucket_name}.s3.amazonaws.com"
 
     replacements = REPLACEMENT_VALUES.copy()
     replacements['DISTRIBUTION_NAME'] = distribution_name
     replacements['DISTRIBUTION_COMMENT'] = distribution_comment
     replacements['ORIGIN_ID'] = origin_id
-    replacements['ORIGIN_S3_URL'] = bucket_url
+    replacements['ORIGIN_S3_DOMAIN_NAME'] = bucket_domain_name
 
     resource_data = load_resource(
         "distribution",

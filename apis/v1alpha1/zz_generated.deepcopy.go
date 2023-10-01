@@ -1517,6 +1517,11 @@ func (in *DistributionStatus) DeepCopyInto(out *DistributionStatus) {
 			}
 		}
 	}
+	if in.CallerReference != nil {
+		in, out := &in.CallerReference, &out.CallerReference
+		*out = new(string)
+		**out = **in
+	}
 	if in.DomainName != nil {
 		in, out := &in.DomainName, &out.DomainName
 		*out = new(string)

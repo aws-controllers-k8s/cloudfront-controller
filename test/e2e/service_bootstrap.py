@@ -26,7 +26,7 @@ public_bucket_policy = """{
     "Sid":"AllowPublicRead",
     "Effect":"Allow",
     "Principal": {
-      "AWS": "*"
+      "Service": "cloudfront.amazonaws.com"
     },
     "Action":["s3:GetObject"],
     "Resource":["arn:aws:s3:::$NAME/*"]

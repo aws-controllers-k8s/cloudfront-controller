@@ -9,7 +9,14 @@ spec:
     defaultCacheBehavior:
       targetOriginID: $ORIGIN_ID
       viewerProtocolPolicy: allow-all
+      minTTL: 1000
+      forwardedValues:
+        queryString: false
+        cookies:
+          forward: "none"
     origins:
       items:
-        - id: $ORIGIN_ID
-          domainName: $ORIGIN_S3_URL
+      - id: $ORIGIN_ID
+        domainName: $ORIGIN_S3_DOMAIN_NAME
+        s3OriginConfig:
+          originAccessIdentity: ''

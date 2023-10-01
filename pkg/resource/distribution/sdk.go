@@ -885,6 +885,11 @@ func (rm *resourceManager) sdkFind(
 	if resp.ETag != nil {
 		ko.Status.ETag = resp.ETag
 	}
+	// We need to set the CallerReference here. All the Update operations
+	// will have to re-use the same CallerReference.
+	if resp.Distribution != nil && resp.Distribution.DistributionConfig != nil {
+		ko.Status.CallerReference = resp.Distribution.DistributionConfig.CallerReference
+	}
 
 	return &resource{ko}, nil
 }
@@ -932,7 +937,9 @@ func (rm *resourceManager) sdkCreate(
 	// This is an idempotency token required in the API call...
 	input.DistributionConfig.SetCallerReference(getIdempotencyToken())
 	// This is because we can't have nice things...
-	setQuantityFields(input)
+	if input.DistributionConfig != nil {
+		setQuantityFields(input.DistributionConfig)
+	}
 
 	var resp *svcsdk.CreateDistributionOutput
 	_ = resp
@@ -2437,10 +2444,18 @@ func (rm *resourceManager) sdkUpdate(
 	if err != nil {
 		return nil, err
 	}
+	// We should re-use the same token we used to create the Distribution resource.
+	if latest.ko.Status.CallerReference != nil {
+		input.DistributionConfig.SetCallerReference(*latest.ko.Status.CallerReference)
+	}
 	// If we don't do this, we get the following on every update call:
 	// InvalidIfMatchVersion: The If-Match version is missing or not valid for the resource.
 	if latest.ko.Status.ETag != nil {
 		input.SetIfMatch(*latest.ko.Status.ETag)
+	}
+	// ¯\\\_(ツ)_/¯
+	if input.DistributionConfig != nil {
+		setQuantityFields(input.DistributionConfig)
 	}
 
 	var resp *svcsdk.UpdateDistributionOutput

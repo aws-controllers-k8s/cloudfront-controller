@@ -68,6 +68,8 @@ type DistributionStatus struct {
 	// in Getting Started with Amazon Web Services services in China.
 	// +kubebuilder:validation:Optional
 	AliasICPRecordals []*AliasICPRecordal `json:"aliasICPRecordals,omitempty"`
+	// +kubebuilder:validation:Optional
+	CallerReference *string `json:"callerReference,omitempty"`
 	// The distribution's CloudFront domain name. For example: d111111abcdef8.cloudfront.net.
 	// +kubebuilder:validation:Optional
 	DomainName *string `json:"domainName,omitempty"`

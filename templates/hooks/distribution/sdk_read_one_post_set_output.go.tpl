@@ -4,4 +4,9 @@
     // therefore not picked up by SetResource code generation.
 	if resp.ETag != nil {
 		ko.Status.ETag = resp.ETag
-	} 
+	}
+	// We need to set the CallerReference here. All the Update operations
+	// will have to re-use the same CallerReference.
+	if resp.Distribution != nil &&  resp.Distribution.DistributionConfig != nil {
+		ko.Status.CallerReference = resp.Distribution.DistributionConfig.CallerReference
+	}

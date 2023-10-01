@@ -911,6 +911,8 @@ spec:
                       type: string
                   type: object
                 type: array
+              callerReference:
+                type: string
               conditions:
                 description: All CRS managed by ACK have a common `Status.Conditions`
                   member that contains a collection of `ackv1alpha1.Condition` objects

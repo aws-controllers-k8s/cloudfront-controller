@@ -165,3 +165,6 @@ resources:
         from:
           operation: CreateDistribution
           path: ETag
+      CallerReference:
+        type: string
+        is_read_only: true
