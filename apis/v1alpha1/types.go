@@ -912,13 +912,15 @@ type FunctionAssociations struct {
 // Contains configuration information about a CloudFront function.
 type FunctionConfig struct {
 	Comment *string `json:"comment,omitempty"`
+	Runtime *string `json:"runtime,omitempty"`
 }
 
 // A list of CloudFront functions.
-type FunctionList struct {
-	MaxItems   *int64  `json:"maxItems,omitempty"`
-	NextMarker *string `json:"nextMarker,omitempty"`
-	Quantity   *int64  `json:"quantity,omitempty"`
+type FunctionList_SDK struct {
+	Items      []*FunctionSummary `json:"items,omitempty"`
+	MaxItems   *int64             `json:"maxItems,omitempty"`
+	NextMarker *string            `json:"nextMarker,omitempty"`
+	Quantity   *int64             `json:"quantity,omitempty"`
 }
 
 // Contains metadata about a CloudFront function.
@@ -926,11 +928,17 @@ type FunctionMetadata struct {
 	CreatedTime      *metav1.Time `json:"createdTime,omitempty"`
 	FunctionARN      *string      `json:"functionARN,omitempty"`
 	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+	Stage            *string      `json:"stage,omitempty"`
 }
 
 // Contains configuration information and metadata about a CloudFront function.
 type FunctionSummary struct {
-	Status *string `json:"status,omitempty"`
+	// Contains configuration information about a CloudFront function.
+	FunctionConfig *FunctionConfig `json:"functionConfig,omitempty"`
+	// Contains metadata about a CloudFront function.
+	FunctionMetadata *FunctionMetadata `json:"functionMetadata,omitempty"`
+	Name             *string           `json:"name,omitempty"`
+	Status           *string           `json:"status,omitempty"`
 }
 
 // A complex type that controls the countries in which your content is distributed.
@@ -1753,6 +1761,8 @@ type TestResult struct {
 	ComputeUtilization   *string `json:"computeUtilization,omitempty"`
 	FunctionErrorMessage *string `json:"functionErrorMessage,omitempty"`
 	FunctionOutput       *string `json:"functionOutput,omitempty"`
+	// Contains configuration information and metadata about a CloudFront function.
+	FunctionSummary *FunctionSummary `json:"functionSummary,omitempty"`
 }
 
 // A list of key groups whose public keys CloudFront can use to verify the signatures

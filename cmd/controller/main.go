@@ -37,6 +37,7 @@ import (
 
 	_ "github.com/aws-controllers-k8s/cloudfront-controller/pkg/resource/cache_policy"
 	_ "github.com/aws-controllers-k8s/cloudfront-controller/pkg/resource/distribution"
+	_ "github.com/aws-controllers-k8s/cloudfront-controller/pkg/resource/function"
 
 	"github.com/aws-controllers-k8s/cloudfront-controller/pkg/version"
 )

@@ -11,6 +11,7 @@ rules:
   resources:
   - cachepolicies
   - distributions
+  - functions
   verbs:
   - create
   - delete
@@ -24,6 +25,7 @@ rules:
   resources:
   - cachepolicies
   - distributions
+  - functions
   verbs:
   - get
   - patch
