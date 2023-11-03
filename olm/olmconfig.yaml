@@ -13,7 +13,7 @@ description: |-
   **About Amazon CloudFront**
 
 
-  {ADD YOUR DESCRIPTION HERE}
+  Amazon CloudFront is a web service that speeds up distribution of your static and dynamic web content, such as .html, .css, .js, and image files, to your users. CloudFront delivers your content through a worldwide network of data centers called edge locations.
 
 
   **About the AWS Controllers for Kubernetes**
@@ -22,13 +22,15 @@ description: |-
   This controller is a component of the [AWS Controller for Kubernetes](https://github.com/aws/aws-controllers-k8s)
   project. This project is currently in **developer preview**.
 samples:
-- kind: ExampleCustomKind
+- kind: CachePolicy
   spec: '{}'
-- kind: SecondExampleCustomKind
+- kind: Function
+  spec: '{}'
+- kind: Distribution
   spec: '{}'
 maintainers:
 - name: "cloudfront maintainer team"
   email: "ack-maintainers@amazon.com"
 links:
 - name: Amazon CloudFront Developer Resources
-  url: https://aws.amazon.com/CloudFront/developer-resources/
+  url: https://aws.amazon.com/cloudfront/developer-resources/
