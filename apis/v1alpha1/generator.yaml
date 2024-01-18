@@ -3,7 +3,7 @@ ignore:
       #- CachePolicy
       - CloudFrontOriginAccessIdentity
       - ContinuousDeploymentPolicy
-      - Distribution
+      #- Distribution
       - FieldLevelEncryptionConfig
       - FieldLevelEncryptionProfile
       - Function
@@ -16,15 +16,60 @@ ignore:
       - RealtimeLogConfig
       - ResponseHeadersPolicy
       - StreamingDistribution
+  field_paths:
+    # NOTE(jaypipes): This is an idempotency token and handled automatically by
+    # the controller; we don't want it as a field on the resource.
+    - CreateDistributionInput.DistributionConfig.CallerReference
+    # CloudFront's API is XML-based and they have this silly nested list struct
+    # things with an "items" and "quantity" field and errors like
+    # "InconsistentQuantities" when the number of items doesn't match the value
+    # of the "quantities" field. Let's ignore the quantities field since we can
+    # always calculate it by doing a len(items)...
+    - CreateDistributionInput.DistributionConfig.Origins.Quantity
+    - CreateDistributionInput.DistributionConfig.Origins.Items.Origin.CustomHeaders.Quantity
+    - CreateDistributionInput.DistributionConfig.Origins.Items.Origin.CustomOriginConfig.OriginSslProtocols.Quantity
+    - CreateDistributionInput.DistributionConfig.OriginGroups.Quantity
+    - CreateDistributionInput.DistributionConfig.OriginGroups.Items.OriginGroup.FailoverCriteria.StatusCodes.Quantity
+    - CreateDistributionInput.DistributionConfig.OriginGroups.Items.OriginGroup.Members.Quantity
+    - CreateDistributionInput.DistributionConfig.Aliases.Quantity
+    # NOTE(jaypipes): "GeoRestriction" is singular here. Not a typo...
+    - CreateDistributionInput.DistributionConfig.Restrictions.GeoRestriction.Quantity
+    - CreateDistributionInput.DistributionConfig.CustomErrorResponses.Quantity
+    - CreateDistributionInput.DistributionConfig.CacheBehaviors.Quantity
+    - CreateDistributionInput.DistributionConfig.CacheBehaviors.Items.TrustedKeyGroups.Quantity
+    - CreateDistributionInput.DistributionConfig.CacheBehaviors.Items.TrustedSigners.Quantity
+    - CreateDistributionInput.DistributionConfig.CacheBehaviors.Items.LambdaFunctionAssociations.Quantity
+    - CreateDistributionInput.DistributionConfig.CacheBehaviors.Items.AllowedMethods.Quantity
+    - CreateDistributionInput.DistributionConfig.CacheBehaviors.Items.AllowedMethods.CachedMethods.Quantity
+    - CreateDistributionInput.DistributionConfig.CacheBehaviors.Items.FunctionAssociations.Quantity
+    - CreateDistributionInput.DistributionConfig.CacheBehaviors.Items.ForwardedValues.Cookies.WhitelistedNames.Quantity
+    - CreateDistributionInput.DistributionConfig.CacheBehaviors.Items.ForwardedValues.Headers.Quantity
+    - CreateDistributionInput.DistributionConfig.CacheBehaviors.Items.ForwardedValues.QueryStringCacheKeys.Quantity
+    - CreateDistributionInput.DistributionConfig.DefaultCacheBehavior.TrustedKeyGroups.Quantity
+    - CreateDistributionInput.DistributionConfig.DefaultCacheBehavior.TrustedSigners.Quantity
+    - CreateDistributionInput.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Quantity
+    - CreateDistributionInput.DistributionConfig.DefaultCacheBehavior.AllowedMethods.Quantity
+    - CreateDistributionInput.DistributionConfig.DefaultCacheBehavior.AllowedMethods.CachedMethods.Quantity
+    - CreateDistributionInput.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Quantity
+    - CreateDistributionInput.DistributionConfig.DefaultCacheBehavior.ForwardedValues.Cookies.WhitelistedNames.Quantity
+    - CreateDistributionInput.DistributionConfig.DefaultCacheBehavior.ForwardedValues.Headers.Quantity
+    - CreateDistributionInput.DistributionConfig.DefaultCacheBehavior.ForwardedValues.QueryStringCacheKeys.Quantity
+    - CreateDistributionOutput.Distribution.ActiveTrustedKeyGroups.Quantity
+    - CreateDistributionOutput.Distribution.ActiveTrustedSigners.Quantity
 operations:
+  # CloudFront has both List and Get operations. Prefer the Get operations...
   CreateCachePolicy:
     output_wrapper_field_path: CachePolicy
-  # CloudFront has both List and Get operations. Prefer the Get operations...
-  # CloudFront has both List and Get operations. Prefer the Get operations...
   GetCachePolicy:
     resource_name: CachePolicy
     operation_type: READ_ONE
     output_wrapper_field_path: CachePolicy
+  CreateDistribution:
+    output_wrapper_field_path: Distribution
+  GetDistribution:
+    resource_name: Distribution
+    operation_type: READ_ONE
+    output_wrapper_field_path: Distribution
 resources:
   CachePolicy:
     exceptions:
@@ -56,3 +101,70 @@ resources:
         from:
           operation: CreateCachePolicy
           path: ETag
+  Distribution:
+    exceptions:
+      terminal_codes:
+        # NOTE(jaypipes): Yes, believe it or not, this isn't a typo. This is
+        # the actual error code...
+        - IllegalFieldLevelEncryptionConfigAssociationWithCacheBehavior
+        - IllegalOriginAccessConfiguration
+        - InconsistentQuantities
+        - InvalidArgument
+        - InvalidIfMatchVersion
+        - InvalidDefaultRootObject
+        - InvalidDomainNameForOriginAccessControl
+        - InvalidErrorCode
+        - InvalidForwardCookies
+        - InvalidFunctionAssociation
+        - InvalidGeoRestrictionParameter
+        - InvalidHeadersForS3Origin
+        - InvalidLambdaFunctionAssociation
+        - InvalidLocationCode
+        - InvalidMinimumProtocolVersion
+        - InvalidOrigin
+        - InvalidOriginAccessControl
+        - InvalidOriginAccessIdentity
+        - InvalidOriginKeepaliveTimeout
+        - InvalidOriginReadTimeout
+        - InvalidProtocolSettings
+        - InvalidQueryStringParameters
+        - InvalidRelativePath
+        - InvalidRequiredProtocol
+        - InvalidResponseCode
+        - InvalidTTLOrder
+        - InvalidViewerCertificate
+        - InvalidWebACLId
+        - MissingBody
+        - TooManyCacheBehaviours
+        - TooManyCertificates
+        - TooManyCookieNamesInWhiteList
+        - TooManyDistributionCNAMEs
+        - TooManyOriginCustomHeaders
+        - TooManyOriginGroupsPerDistribution
+        - TooManyOrigins
+        - TooManyQueryStringParameters
+        - TooManyTrustedSigners
+    tags:
+      ignore: true
+    hooks:
+      sdk_read_one_post_set_output:
+        template_path: hooks/distribution/sdk_read_one_post_set_output.go.tpl
+      sdk_create_post_build_request:
+        template_path: hooks/distribution/sdk_create_post_build_request.go.tpl
+      sdk_create_post_set_output:
+        template_path: hooks/distribution/sdk_create_post_set_output.go.tpl
+      sdk_update_post_build_request:
+        template_path: hooks/distribution/sdk_update_post_build_request.go.tpl
+      sdk_update_post_set_output:
+        template_path: hooks/distribution/sdk_update_post_set_output.go.tpl
+      sdk_delete_post_build_request:
+        template_path: hooks/distribution/sdk_delete_post_build_request.go.tpl
+    fields:
+      ETag:
+        is_read_only: true
+        from:
+          operation: CreateDistribution
+          path: ETag
+      CallerReference:
+        type: string
+        is_read_only: true

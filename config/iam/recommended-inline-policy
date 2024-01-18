@@ -8,7 +8,11 @@
                 "cloudfront:CreateCachePolicy",
                 "cloudfront:UpdateCachePolicy",
                 "cloudfront:DeleteCachePolicy",
-                "cloudfront:GetCachePolicy"
+                "cloudfront:GetCachePolicy",
+                "cloudfront:CreateDistribution",
+                "cloudfront:UpdateDistribution",
+                "cloudfront:DeleteDistribution",
+                "cloudfront:GetDistribution"
             ],
             "Resource": "*"
         }

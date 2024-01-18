@@ -36,6 +36,7 @@ import (
 	svcresource "github.com/aws-controllers-k8s/cloudfront-controller/pkg/resource"
 
 	_ "github.com/aws-controllers-k8s/cloudfront-controller/pkg/resource/cache_policy"
+	_ "github.com/aws-controllers-k8s/cloudfront-controller/pkg/resource/distribution"
 
 	"github.com/aws-controllers-k8s/cloudfront-controller/pkg/version"
 )
