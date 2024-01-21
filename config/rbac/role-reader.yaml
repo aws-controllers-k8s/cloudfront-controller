@@ -12,6 +12,7 @@ rules:
   - cachepolicies
   - distributions
   - functions
+  - originrequestpolicies
   verbs:
   - get
   - list

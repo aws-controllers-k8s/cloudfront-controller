@@ -1214,31 +1214,6 @@ type OriginGroups struct {
 	Items []*OriginGroup `json:"items,omitempty"`
 }
 
-// An origin request policy.
-//
-// When it's attached to a cache behavior, the origin request policy determines
-// the values that CloudFront includes in requests that it sends to the origin.
-// Each request that CloudFront sends to the origin includes the following:
-//
-//   - The request body and the URL path (without the domain name) from the
-//     viewer request.
-//
-//   - The headers that CloudFront automatically includes in every origin request,
-//     including Host, User-Agent, and X-Amz-Cf-Id.
-//
-//   - All HTTP headers, cookies, and URL query strings that are specified
-//     in the cache policy or the origin request policy. These can include items
-//     from the viewer request and, in the case of headers, additional ones that
-//     are added by CloudFront.
-//
-// CloudFront sends a request when it can't find an object in its cache that
-// matches the request. If you want to send values to the origin and also include
-// them in the cache key, use CachePolicy.
-type OriginRequestPolicy struct {
-	ID               *string      `json:"id,omitempty"`
-	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
-}
-
 // An origin request policy configuration.
 //
 // This configuration determines the values that CloudFront includes in requests
@@ -1261,13 +1236,25 @@ type OriginRequestPolicy struct {
 // them in the cache key, use CachePolicy.
 type OriginRequestPolicyConfig struct {
 	Comment *string `json:"comment,omitempty"`
-	Name    *string `json:"name,omitempty"`
+	// An object that determines whether any cookies in viewer requests (and if
+	// so, which cookies) are included in requests that CloudFront sends to the
+	// origin.
+	CookiesConfig *OriginRequestPolicyCookiesConfig `json:"cookiesConfig,omitempty"`
+	// An object that determines whether any HTTP headers (and if so, which headers)
+	// are included in requests that CloudFront sends to the origin.
+	HeadersConfig *OriginRequestPolicyHeadersConfig `json:"headersConfig,omitempty"`
+	Name          *string                           `json:"name,omitempty"`
+	// An object that determines whether any URL query strings in viewer requests
+	// (and if so, which query strings) are included in requests that CloudFront
+	// sends to the origin.
+	QueryStringsConfig *OriginRequestPolicyQueryStringsConfig `json:"queryStringsConfig,omitempty"`
 }
 
 // An object that determines whether any cookies in viewer requests (and if
 // so, which cookies) are included in requests that CloudFront sends to the
 // origin.
 type OriginRequestPolicyCookiesConfig struct {
+	CookieBehavior *string `json:"cookieBehavior,omitempty"`
 	// Contains a list of cookie names.
 	Cookies *CookieNames `json:"cookies,omitempty"`
 }
@@ -1275,23 +1262,98 @@ type OriginRequestPolicyCookiesConfig struct {
 // An object that determines whether any HTTP headers (and if so, which headers)
 // are included in requests that CloudFront sends to the origin.
 type OriginRequestPolicyHeadersConfig struct {
+	HeaderBehavior *string `json:"headerBehavior,omitempty"`
 	// Contains a list of HTTP header names.
 	Headers *Headers `json:"headers,omitempty"`
 }
 
 // A list of origin request policies.
-type OriginRequestPolicyList struct {
-	MaxItems   *int64  `json:"maxItems,omitempty"`
-	NextMarker *string `json:"nextMarker,omitempty"`
-	Quantity   *int64  `json:"quantity,omitempty"`
+type OriginRequestPolicyList_SDK struct {
+	Items      []*OriginRequestPolicySummary `json:"items,omitempty"`
+	MaxItems   *int64                        `json:"maxItems,omitempty"`
+	NextMarker *string                       `json:"nextMarker,omitempty"`
+	Quantity   *int64                        `json:"quantity,omitempty"`
 }
 
 // An object that determines whether any URL query strings in viewer requests
 // (and if so, which query strings) are included in requests that CloudFront
 // sends to the origin.
 type OriginRequestPolicyQueryStringsConfig struct {
+	QueryStringBehavior *string `json:"queryStringBehavior,omitempty"`
 	// Contains a list of query string names.
 	QueryStrings *QueryStringNames `json:"queryStrings,omitempty"`
+}
+
+// Contains an origin request policy.
+type OriginRequestPolicySummary struct {
+	// An origin request policy.
+	//
+	// When it's attached to a cache behavior, the origin request policy determines
+	// the values that CloudFront includes in requests that it sends to the origin.
+	// Each request that CloudFront sends to the origin includes the following:
+	//
+	//    * The request body and the URL path (without the domain name) from the
+	//    viewer request.
+	//
+	//    * The headers that CloudFront automatically includes in every origin request,
+	//    including Host, User-Agent, and X-Amz-Cf-Id.
+	//
+	//    * All HTTP headers, cookies, and URL query strings that are specified
+	//    in the cache policy or the origin request policy. These can include items
+	//    from the viewer request and, in the case of headers, additional ones that
+	//    are added by CloudFront.
+	//
+	// CloudFront sends a request when it can't find an object in its cache that
+	// matches the request. If you want to send values to the origin and also include
+	// them in the cache key, use CachePolicy.
+	OriginRequestPolicy *OriginRequestPolicy_SDK `json:"originRequestPolicy,omitempty"`
+	Type                *string                  `json:"type_,omitempty"`
+}
+
+// An origin request policy.
+//
+// When it's attached to a cache behavior, the origin request policy determines
+// the values that CloudFront includes in requests that it sends to the origin.
+// Each request that CloudFront sends to the origin includes the following:
+//
+//   - The request body and the URL path (without the domain name) from the
+//     viewer request.
+//
+//   - The headers that CloudFront automatically includes in every origin request,
+//     including Host, User-Agent, and X-Amz-Cf-Id.
+//
+//   - All HTTP headers, cookies, and URL query strings that are specified
+//     in the cache policy or the origin request policy. These can include items
+//     from the viewer request and, in the case of headers, additional ones that
+//     are added by CloudFront.
+//
+// CloudFront sends a request when it can't find an object in its cache that
+// matches the request. If you want to send values to the origin and also include
+// them in the cache key, use CachePolicy.
+type OriginRequestPolicy_SDK struct {
+	ID               *string      `json:"id,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+	// An origin request policy configuration.
+	//
+	// This configuration determines the values that CloudFront includes in requests
+	// that it sends to the origin. Each request that CloudFront sends to the origin
+	// includes the following:
+	//
+	//    * The request body and the URL path (without the domain name) from the
+	//    viewer request.
+	//
+	//    * The headers that CloudFront automatically includes in every origin request,
+	//    including Host, User-Agent, and X-Amz-Cf-Id.
+	//
+	//    * All HTTP headers, cookies, and URL query strings that are specified
+	//    in the cache policy or the origin request policy. These can include items
+	//    from the viewer request and, in the case of headers, additional ones that
+	//    are added by CloudFront.
+	//
+	// CloudFront sends a request when it can't find an object in its cache that
+	// matches the request. If you want to send values to the origin and also include
+	// them in the cache key, use CachePolicy.
+	OriginRequestPolicyConfig *OriginRequestPolicyConfig `json:"originRequestPolicyConfig,omitempty"`
 }
 
 // A complex type that contains information about the SSL/TLS protocols that
@@ -1418,8 +1480,7 @@ type QueryStringCacheKeys struct {
 
 // Contains a list of query string names.
 type QueryStringNames struct {
-	Items    []*string `json:"items,omitempty"`
-	Quantity *int64    `json:"quantity,omitempty"`
+	Items []*string `json:"items,omitempty"`
 }
 
 // A real-time log configuration.

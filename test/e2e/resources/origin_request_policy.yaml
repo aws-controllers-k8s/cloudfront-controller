@@ -1,0 +1,14 @@
+apiVersion: cloudfront.services.k8s.aws/v1alpha1
+kind: OriginRequestPolicy
+metadata:
+  name: $ORIGIN_REQUEST_POLICY_NAME
+spec:
+  originRequestPolicyConfig:
+    name: $ORIGIN_REQUEST_POLICY_NAME
+    comment: $ORIGIN_REQUEST_POLICY_COMMENT
+    cookiesConfig:
+      cookieBehavior: all
+    headersConfig:
+      headerBehavior: allViewer
+    queryStringsConfig:
+      queryStringBehavior: all

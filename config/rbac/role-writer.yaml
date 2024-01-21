@@ -12,6 +12,7 @@ rules:
   - cachepolicies
   - distributions
   - functions
+  - originrequestpolicies
   verbs:
   - create
   - delete
@@ -26,6 +27,7 @@ rules:
   - cachepolicies
   - distributions
   - functions
+  - originrequestpolicies
   verbs:
   - get
   - patch
