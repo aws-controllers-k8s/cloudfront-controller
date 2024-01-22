@@ -1498,26 +1498,6 @@ type RealtimeLogConfigs struct {
 	NextMarker  *string `json:"nextMarker,omitempty"`
 }
 
-// A response headers policy.
-//
-// A response headers policy contains information about a set of HTTP response
-// headers.
-//
-// After you create a response headers policy, you can use its ID to attach
-// it to one or more cache behaviors in a CloudFront distribution. When it's
-// attached to a cache behavior, the response headers policy affects the HTTP
-// headers that CloudFront includes in HTTP responses to requests that match
-// the cache behavior. CloudFront adds or removes response headers according
-// to the configuration of the response headers policy.
-//
-// For more information, see Adding or removing HTTP headers in CloudFront responses
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/modifying-response-headers.html)
-// in the Amazon CloudFront Developer Guide.
-type ResponseHeadersPolicy struct {
-	ID               *string      `json:"id,omitempty"`
-	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
-}
-
 // A list of HTTP header names that CloudFront includes as values for the Access-Control-Allow-Headers
 // HTTP response header.
 //
@@ -1525,7 +1505,7 @@ type ResponseHeadersPolicy struct {
 // header, see Access-Control-Allow-Headers (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers)
 // in the MDN Web Docs.
 type ResponseHeadersPolicyAccessControlAllowHeaders struct {
-	Quantity *int64 `json:"quantity,omitempty"`
+	Items []*string `json:"items,omitempty"`
 }
 
 // A list of HTTP methods that CloudFront includes as values for the Access-Control-Allow-Methods
@@ -1535,7 +1515,7 @@ type ResponseHeadersPolicyAccessControlAllowHeaders struct {
 // header, see Access-Control-Allow-Methods (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods)
 // in the MDN Web Docs.
 type ResponseHeadersPolicyAccessControlAllowMethods struct {
-	Quantity *int64 `json:"quantity,omitempty"`
+	Items []*string `json:"items,omitempty"`
 }
 
 // A list of origins (domain names) that CloudFront can use as the value for
@@ -1545,7 +1525,7 @@ type ResponseHeadersPolicyAccessControlAllowMethods struct {
 // header, see Access-Control-Allow-Origin (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin)
 // in the MDN Web Docs.
 type ResponseHeadersPolicyAccessControlAllowOrigins struct {
-	Quantity *int64 `json:"quantity,omitempty"`
+	Items []*string `json:"items,omitempty"`
 }
 
 // A list of HTTP headers that CloudFront includes as values for the Access-Control-Expose-Headers
@@ -1555,7 +1535,7 @@ type ResponseHeadersPolicyAccessControlAllowOrigins struct {
 // header, see Access-Control-Expose-Headers (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers)
 // in the MDN Web Docs.
 type ResponseHeadersPolicyAccessControlExposeHeaders struct {
-	Quantity *int64 `json:"quantity,omitempty"`
+	Items []*string `json:"items,omitempty"`
 }
 
 // A configuration for a set of HTTP response headers that are used for cross-origin
@@ -1566,9 +1546,37 @@ type ResponseHeadersPolicyAccessControlExposeHeaders struct {
 // For more information about CORS, see Cross-Origin Resource Sharing (CORS)
 // (https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) in the MDN Web Docs.
 type ResponseHeadersPolicyCORSConfig struct {
-	AccessControlAllowCredentials *bool  `json:"accessControlAllowCredentials,omitempty"`
-	AccessControlMaxAgeSec        *int64 `json:"accessControlMaxAgeSec,omitempty"`
-	OriginOverride                *bool  `json:"originOverride,omitempty"`
+	AccessControlAllowCredentials *bool `json:"accessControlAllowCredentials,omitempty"`
+	// A list of HTTP header names that CloudFront includes as values for the Access-Control-Allow-Headers
+	// HTTP response header.
+	//
+	// For more information about the Access-Control-Allow-Headers HTTP response
+	// header, see Access-Control-Allow-Headers (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers)
+	// in the MDN Web Docs.
+	AccessControlAllowHeaders *ResponseHeadersPolicyAccessControlAllowHeaders `json:"accessControlAllowHeaders,omitempty"`
+	// A list of HTTP methods that CloudFront includes as values for the Access-Control-Allow-Methods
+	// HTTP response header.
+	//
+	// For more information about the Access-Control-Allow-Methods HTTP response
+	// header, see Access-Control-Allow-Methods (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods)
+	// in the MDN Web Docs.
+	AccessControlAllowMethods *ResponseHeadersPolicyAccessControlAllowMethods `json:"accessControlAllowMethods,omitempty"`
+	// A list of origins (domain names) that CloudFront can use as the value for
+	// the Access-Control-Allow-Origin HTTP response header.
+	//
+	// For more information about the Access-Control-Allow-Origin HTTP response
+	// header, see Access-Control-Allow-Origin (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin)
+	// in the MDN Web Docs.
+	AccessControlAllowOrigins *ResponseHeadersPolicyAccessControlAllowOrigins `json:"accessControlAllowOrigins,omitempty"`
+	// A list of HTTP headers that CloudFront includes as values for the Access-Control-Expose-Headers
+	// HTTP response header.
+	//
+	// For more information about the Access-Control-Expose-Headers HTTP response
+	// header, see Access-Control-Expose-Headers (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers)
+	// in the MDN Web Docs.
+	AccessControlExposeHeaders *ResponseHeadersPolicyAccessControlExposeHeaders `json:"accessControlExposeHeaders,omitempty"`
+	AccessControlMaxAgeSec     *int64                                           `json:"accessControlMaxAgeSec,omitempty"`
+	OriginOverride             *bool                                            `json:"originOverride,omitempty"`
 }
 
 // A response headers policy configuration.
@@ -1577,7 +1585,40 @@ type ResponseHeadersPolicyCORSConfig struct {
 // headers policy, and configurations for sets of HTTP response headers.
 type ResponseHeadersPolicyConfig struct {
 	Comment *string `json:"comment,omitempty"`
-	Name    *string `json:"name,omitempty"`
+	// A configuration for a set of HTTP response headers that are used for cross-origin
+	// resource sharing (CORS). CloudFront adds these headers to HTTP responses
+	// that it sends for CORS requests that match a cache behavior associated with
+	// this response headers policy.
+	//
+	// For more information about CORS, see Cross-Origin Resource Sharing (CORS)
+	// (https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) in the MDN Web Docs.
+	CORSConfig *ResponseHeadersPolicyCORSConfig `json:"corsConfig,omitempty"`
+	// A list of HTTP response header names and their values. CloudFront includes
+	// these headers in HTTP responses that it sends for requests that match a cache
+	// behavior that's associated with this response headers policy.
+	CustomHeadersConfig *ResponseHeadersPolicyCustomHeadersConfig `json:"customHeadersConfig,omitempty"`
+	Name                *string                                   `json:"name,omitempty"`
+	// A list of HTTP header names that CloudFront removes from HTTP responses to
+	// requests that match the cache behavior that this response headers policy
+	// is attached to.
+	RemoveHeadersConfig *ResponseHeadersPolicyRemoveHeadersConfig `json:"removeHeadersConfig,omitempty"`
+	// A configuration for a set of security-related HTTP response headers. CloudFront
+	// adds these headers to HTTP responses that it sends for requests that match
+	// a cache behavior associated with this response headers policy.
+	SecurityHeadersConfig *ResponseHeadersPolicySecurityHeadersConfig `json:"securityHeadersConfig,omitempty"`
+	// A configuration for enabling the Server-Timing header in HTTP responses sent
+	// from CloudFront. CloudFront adds this header to HTTP responses that it sends
+	// in response to requests that match a cache behavior that's associated with
+	// this response headers policy.
+	//
+	// You can use the Server-Timing header to view metrics that can help you gain
+	// insights about the behavior and performance of CloudFront. For example, you
+	// can see which cache layer served a cache hit, or the first byte latency from
+	// the origin when there was a cache miss. You can use the metrics in the Server-Timing
+	// header to troubleshoot issues or test the efficiency of your CloudFront configuration.
+	// For more information, see Server-Timing header (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/understanding-response-headers-policies.html#server-timing-header)
+	// in the Amazon CloudFront Developer Guide.
+	ServerTimingHeadersConfig *ResponseHeadersPolicyServerTimingHeadersConfig `json:"serverTimingHeadersConfig,omitempty"`
 }
 
 // The policy directives and their values that CloudFront includes as values
@@ -1614,7 +1655,7 @@ type ResponseHeadersPolicyCustomHeader struct {
 // these headers in HTTP responses that it sends for requests that match a cache
 // behavior that's associated with this response headers policy.
 type ResponseHeadersPolicyCustomHeadersConfig struct {
-	Quantity *int64 `json:"quantity,omitempty"`
+	Items []*ResponseHeadersPolicyCustomHeader `json:"items,omitempty"`
 }
 
 // Determines whether CloudFront includes the X-Frame-Options HTTP response
@@ -1624,14 +1665,16 @@ type ResponseHeadersPolicyCustomHeadersConfig struct {
 // X-Frame-Options (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options)
 // in the MDN Web Docs.
 type ResponseHeadersPolicyFrameOptions struct {
-	Override *bool `json:"override,omitempty"`
+	FrameOption *string `json:"frameOption,omitempty"`
+	Override    *bool   `json:"override,omitempty"`
 }
 
 // A list of response headers policies.
-type ResponseHeadersPolicyList struct {
-	MaxItems   *int64  `json:"maxItems,omitempty"`
-	NextMarker *string `json:"nextMarker,omitempty"`
-	Quantity   *int64  `json:"quantity,omitempty"`
+type ResponseHeadersPolicyList_SDK struct {
+	Items      []*ResponseHeadersPolicySummary `json:"items,omitempty"`
+	MaxItems   *int64                          `json:"maxItems,omitempty"`
+	NextMarker *string                         `json:"nextMarker,omitempty"`
+	Quantity   *int64                          `json:"quantity,omitempty"`
 }
 
 // Determines whether CloudFront includes the Referrer-Policy HTTP response
@@ -1641,7 +1684,8 @@ type ResponseHeadersPolicyList struct {
 // Referrer-Policy (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy)
 // in the MDN Web Docs.
 type ResponseHeadersPolicyReferrerPolicy struct {
-	Override *bool `json:"override,omitempty"`
+	Override       *bool   `json:"override,omitempty"`
+	ReferrerPolicy *string `json:"referrerPolicy,omitempty"`
 }
 
 // The name of an HTTP header that CloudFront removes from HTTP responses to
@@ -1655,7 +1699,55 @@ type ResponseHeadersPolicyRemoveHeader struct {
 // requests that match the cache behavior that this response headers policy
 // is attached to.
 type ResponseHeadersPolicyRemoveHeadersConfig struct {
-	Quantity *int64 `json:"quantity,omitempty"`
+	Items []*ResponseHeadersPolicyRemoveHeader `json:"items,omitempty"`
+}
+
+// A configuration for a set of security-related HTTP response headers. CloudFront
+// adds these headers to HTTP responses that it sends for requests that match
+// a cache behavior associated with this response headers policy.
+type ResponseHeadersPolicySecurityHeadersConfig struct {
+	// The policy directives and their values that CloudFront includes as values
+	// for the Content-Security-Policy HTTP response header.
+	//
+	// For more information about the Content-Security-Policy HTTP response header,
+	// see Content-Security-Policy (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy)
+	// in the MDN Web Docs.
+	ContentSecurityPolicy *ResponseHeadersPolicyContentSecurityPolicy `json:"contentSecurityPolicy,omitempty"`
+	// Determines whether CloudFront includes the X-Content-Type-Options HTTP response
+	// header with its value set to nosniff.
+	//
+	// For more information about the X-Content-Type-Options HTTP response header,
+	// see X-Content-Type-Options (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options)
+	// in the MDN Web Docs.
+	ContentTypeOptions *ResponseHeadersPolicyContentTypeOptions `json:"contentTypeOptions,omitempty"`
+	// Determines whether CloudFront includes the X-Frame-Options HTTP response
+	// header and the header's value.
+	//
+	// For more information about the X-Frame-Options HTTP response header, see
+	// X-Frame-Options (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options)
+	// in the MDN Web Docs.
+	FrameOptions *ResponseHeadersPolicyFrameOptions `json:"frameOptions,omitempty"`
+	// Determines whether CloudFront includes the Referrer-Policy HTTP response
+	// header and the header's value.
+	//
+	// For more information about the Referrer-Policy HTTP response header, see
+	// Referrer-Policy (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy)
+	// in the MDN Web Docs.
+	ReferrerPolicy *ResponseHeadersPolicyReferrerPolicy `json:"referrerPolicy,omitempty"`
+	// Determines whether CloudFront includes the Strict-Transport-Security HTTP
+	// response header and the header's value.
+	//
+	// For more information about the Strict-Transport-Security HTTP response header,
+	// see Strict-Transport-Security (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security)
+	// in the MDN Web Docs.
+	StrictTransportSecurity *ResponseHeadersPolicyStrictTransportSecurity `json:"strictTransportSecurity,omitempty"`
+	// Determines whether CloudFront includes the X-XSS-Protection HTTP response
+	// header and the header's value.
+	//
+	// For more information about the X-XSS-Protection HTTP response header, see
+	// X-XSS-Protection (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection)
+	// in the MDN Web Docs.
+	XSSProtection *ResponseHeadersPolicyXSSProtection `json:"xSSProtection,omitempty"`
 }
 
 // A configuration for enabling the Server-Timing header in HTTP responses sent
@@ -1671,7 +1763,8 @@ type ResponseHeadersPolicyRemoveHeadersConfig struct {
 // For more information, see Server-Timing header (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/understanding-response-headers-policies.html#server-timing-header)
 // in the Amazon CloudFront Developer Guide.
 type ResponseHeadersPolicyServerTimingHeadersConfig struct {
-	Enabled *bool `json:"enabled,omitempty"`
+	Enabled      *bool    `json:"enabled,omitempty"`
+	SamplingRate *float64 `json:"samplingRate,omitempty"`
 }
 
 // Determines whether CloudFront includes the Strict-Transport-Security HTTP
@@ -1687,6 +1780,27 @@ type ResponseHeadersPolicyStrictTransportSecurity struct {
 	Preload                *bool  `json:"preload,omitempty"`
 }
 
+// Contains a response headers policy.
+type ResponseHeadersPolicySummary struct {
+	// A response headers policy.
+	//
+	// A response headers policy contains information about a set of HTTP response
+	// headers.
+	//
+	// After you create a response headers policy, you can use its ID to attach
+	// it to one or more cache behaviors in a CloudFront distribution. When it's
+	// attached to a cache behavior, the response headers policy affects the HTTP
+	// headers that CloudFront includes in HTTP responses to requests that match
+	// the cache behavior. CloudFront adds or removes response headers according
+	// to the configuration of the response headers policy.
+	//
+	// For more information, see Adding or removing HTTP headers in CloudFront responses
+	// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/modifying-response-headers.html)
+	// in the Amazon CloudFront Developer Guide.
+	ResponseHeadersPolicy *ResponseHeadersPolicy_SDK `json:"responseHeadersPolicy,omitempty"`
+	Type                  *string                    `json:"type_,omitempty"`
+}
+
 // Determines whether CloudFront includes the X-XSS-Protection HTTP response
 // header and the header's value.
 //
@@ -1698,6 +1812,31 @@ type ResponseHeadersPolicyXSSProtection struct {
 	Override   *bool   `json:"override,omitempty"`
 	Protection *bool   `json:"protection,omitempty"`
 	ReportURI  *string `json:"reportURI,omitempty"`
+}
+
+// A response headers policy.
+//
+// A response headers policy contains information about a set of HTTP response
+// headers.
+//
+// After you create a response headers policy, you can use its ID to attach
+// it to one or more cache behaviors in a CloudFront distribution. When it's
+// attached to a cache behavior, the response headers policy affects the HTTP
+// headers that CloudFront includes in HTTP responses to requests that match
+// the cache behavior. CloudFront adds or removes response headers according
+// to the configuration of the response headers policy.
+//
+// For more information, see Adding or removing HTTP headers in CloudFront responses
+// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/modifying-response-headers.html)
+// in the Amazon CloudFront Developer Guide.
+type ResponseHeadersPolicy_SDK struct {
+	ID               *string      `json:"id,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+	// A response headers policy configuration.
+	//
+	// A response headers policy configuration contains metadata about the response
+	// headers policy, and configurations for sets of HTTP response headers.
+	ResponseHeadersPolicyConfig *ResponseHeadersPolicyConfig `json:"responseHeadersPolicyConfig,omitempty"`
 }
 
 // A complex type that identifies ways in which you want to restrict distribution

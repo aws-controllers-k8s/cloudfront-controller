@@ -1,0 +1,13 @@
+apiVersion: cloudfront.services.k8s.aws/v1alpha1
+kind: ResponseHeadersPolicy
+metadata:
+  name: $RESPONSE_HEADERS_POLICY_NAME
+spec:
+  responseHeadersPolicyConfig:
+    name: $RESPONSE_HEADERS_POLICY_NAME
+    comment: $RESPONSE_HEADERS_POLICY_COMMENT
+    customHeadersConfig:
+      items:
+      - header: "X-ACK-CONTROLLER"
+        override: true
+        value: "CLOUDFRONT"

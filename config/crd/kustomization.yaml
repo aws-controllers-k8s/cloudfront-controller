@@ -6,3 +6,4 @@ resources:
   - bases/cloudfront.services.k8s.aws_distributions.yaml
   - bases/cloudfront.services.k8s.aws_functions.yaml
   - bases/cloudfront.services.k8s.aws_originrequestpolicies.yaml
+  - bases/cloudfront.services.k8s.aws_responseheaderspolicies.yaml
