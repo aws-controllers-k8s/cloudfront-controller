@@ -13,6 +13,7 @@ rules:
   - distributions
   - functions
   - originrequestpolicies
+  - responseheaderspolicies
   verbs:
   - get
   - list

@@ -14,7 +14,7 @@ ignore:
       # - OriginRequestPolicy
       - PublicKey
       - RealtimeLogConfig
-      - ResponseHeadersPolicy
+      #- ResponseHeadersPolicy
       - StreamingDistribution
   field_paths:
     # NOTE(jaypipes): This is an idempotency token and handled automatically by
@@ -57,8 +57,15 @@ ignore:
     - CreateDistributionOutput.Distribution.ActiveTrustedKeyGroups.Quantity
     - CreateDistributionOutput.Distribution.ActiveTrustedSigners.Quantity
     # OriginRequestPolicy fields
-    # - CreateOriginRequestPolicyOutput.OriginRequestPolicy.QueryStringsConfig.QueryStrings.Quantity
     - CreateOriginRequestPolicyOutput.OriginRequestPolicy.OriginRequestPolicyConfig.QueryStringsConfig.QueryStrings.Quantity
+    # ResponseHeadersPolicy fields
+    - CreateResponseHeadersPolicyOutput.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowHeaders.Quantity
+    - CreateResponseHeadersPolicyOutput.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowMethods.Quantity
+    - CreateResponseHeadersPolicyOutput.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowOrigins.Quantity
+    - CreateResponseHeadersPolicyOutput.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlExposeHeaders.Quantity
+    - CreateResponseHeadersPolicyOutput.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CustomHeadersConfig.Quantity
+    - CreateResponseHeadersPolicyOutput.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.RemoveHeadersConfig.Quantity
+
 operations:
   # CloudFront has both List and Get operations. Prefer the Get operations...
   CreateCachePolicy:
@@ -82,6 +89,12 @@ operations:
     resource_name: OriginRequestPolicy
     operation_type: READ_ONE
     output_wrapper_field_path: OriginRequestPolicy
+  CreateResponseHeadersPolicy:
+    output_wrapper_field_path: ResponseHeadersPolicy
+  GetResponseHeadersPolicy:
+    resource_name: ResponseHeadersPolicy
+    operation_type: READ_ONE
+    output_wrapper_field_path: ResponseHeadersPolicy
 resources:
   CachePolicy:
     exceptions:
@@ -216,3 +229,23 @@ resources:
         template_path: hooks/origin_request_policy/sdk_update_post_set_output.go.tpl
       sdk_delete_post_build_request:
         template_path: hooks/origin_request_policy/sdk_delete_post_build_request.go.tpl
+  ResponseHeadersPolicy:
+    tags:
+      ignore: true
+    fields:
+      ETag:
+        is_read_only: true
+        type: string
+    hooks:
+      sdk_read_one_post_set_output:
+        template_path: hooks/response_headers_policy/sdk_read_one_post_set_output.go.tpl
+      sdk_create_post_set_output:
+        template_path: hooks/response_headers_policy/sdk_create_post_set_output.go.tpl
+      sdk_create_post_build_request:
+        template_path: hooks/response_headers_policy/sdk_create_post_build_request.go.tpl
+      sdk_update_post_build_request:
+        template_path: hooks/response_headers_policy/sdk_update_post_build_request.go.tpl
+      sdk_update_post_set_output:
+        template_path: hooks/response_headers_policy/sdk_update_post_set_output.go.tpl
+      sdk_delete_post_build_request:
+        template_path: hooks/response_headers_policy/sdk_delete_post_build_request.go.tpl

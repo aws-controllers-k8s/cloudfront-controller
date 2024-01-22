@@ -127,6 +127,26 @@ rules:
   - patch
   - update
 - apiGroups:
+  - cloudfront.services.k8s.aws
+  resources:
+  - responseheaderspolicies
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - cloudfront.services.k8s.aws
+  resources:
+  - responseheaderspolicies/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
   - services.k8s.aws
   resources:
   - adoptedresources
