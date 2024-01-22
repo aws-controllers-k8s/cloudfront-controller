@@ -171,9 +171,6 @@ func (rm *resourceManager) sdkFind(
 						}
 						f0f5f4f1.Items = f0f5f4f1f0
 					}
-					if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings.Quantity != nil {
-						f0f5f4f1.Quantity = resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings.Quantity
-					}
 					f0f5f4.QueryStrings = f0f5f4f1
 				}
 				f0f5.QueryStringsConfig = f0f5f4
@@ -340,9 +337,6 @@ func (rm *resourceManager) sdkCreate(
 						}
 						f0f5f4f1.Items = f0f5f4f1f0
 					}
-					if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings.Quantity != nil {
-						f0f5f4f1.Quantity = resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings.Quantity
-					}
 					f0f5f4.QueryStrings = f0f5f4f1
 				}
 				f0f5.QueryStringsConfig = f0f5f4
@@ -464,9 +458,6 @@ func (rm *resourceManager) newCreateRequestPayload(
 							f0f5f4f1f0 = append(f0f5f4f1f0, &f0f5f4f1f0elem)
 						}
 						f0f5f4f1.SetItems(f0f5f4f1f0)
-					}
-					if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings.Quantity != nil {
-						f0f5f4f1.SetQuantity(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings.Quantity)
 					}
 					f0f5f4.SetQueryStrings(f0f5f4f1)
 				}
@@ -621,9 +612,6 @@ func (rm *resourceManager) newUpdateRequestPayload(
 							f0f5f4f1f0 = append(f0f5f4f1f0, &f0f5f4f1f0elem)
 						}
 						f0f5f4f1.SetItems(f0f5f4f1f0)
-					}
-					if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings.Quantity != nil {
-						f0f5f4f1.SetQuantity(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings.Quantity)
 					}
 					f0f5f4.SetQueryStrings(f0f5f4f1)
 				}
