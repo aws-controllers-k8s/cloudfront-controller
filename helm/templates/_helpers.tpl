@@ -46,3 +46,174 @@ If release name contains chart name it will be used as a full name.
 {{- define "aws.credentials.path" -}}
 {{- printf "%s/%s" (include "aws.credentials.secret_mount_path" .) .Values.aws.credentials.secretKey -}}
 {{- end -}}
+
+{{/* The rules a of ClusterRole or Role */}}
+{{- define "controller-role-rules" }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - cloudfront.services.k8s.aws
+  resources:
+  - cachepolicies
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - cloudfront.services.k8s.aws
+  resources:
+  - cachepolicies/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - cloudfront.services.k8s.aws
+  resources:
+  - distributions
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - cloudfront.services.k8s.aws
+  resources:
+  - distributions/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - cloudfront.services.k8s.aws
+  resources:
+  - functions
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - cloudfront.services.k8s.aws
+  resources:
+  - functions/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - cloudfront.services.k8s.aws
+  resources:
+  - originrequestpolicies
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - cloudfront.services.k8s.aws
+  resources:
+  - originrequestpolicies/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - cloudfront.services.k8s.aws
+  resources:
+  - responseheaderspolicies
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - cloudfront.services.k8s.aws
+  resources:
+  - responseheaderspolicies/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - services.k8s.aws
+  resources:
+  - adoptedresources
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - services.k8s.aws
+  resources:
+  - adoptedresources/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - services.k8s.aws
+  resources:
+  - fieldexports
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - services.k8s.aws
+  resources:
+  - fieldexports/status
+  verbs:
+  - get
+  - patch
+  - update
+{{- end }}
