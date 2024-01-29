@@ -1,188 +1,27 @@
-apiVersion: rbac.authorization.k8s.io/v1
 {{ if eq .Values.installScope "cluster" }}
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  creationTimestamp: null
   name: ack-cloudfront-controller
   labels:
   {{- range $key, $value := .Values.role.labels }}
     {{ $key }}: {{ $value | quote }}
   {{- end }}
-{{ else }}
+{{- include "controller-role-rules" . -}}
+{{ else if .Values.watchNamespace }}
+{{ $rules := include "controller-role-rules" . }}
+{{ $namespaces := split "," .Values.watchNamespace }}
+{{ range $namespaces }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  creationTimestamp: null
   name: ack-cloudfront-controller
+  namespace: {{ . }}
   labels:
   {{- range $key, $value := .Values.role.labels }}
     {{ $key }}: {{ $value | quote }}
   {{- end }}
-  namespace: {{ .Release.Namespace }}
+{{- $rules }}
 {{ end }}
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - configmaps
-  verbs:
-  - get
-  - list
-  - patch
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - get
-  - list
-  - patch
-  - watch
-- apiGroups:
-  - cloudfront.services.k8s.aws
-  resources:
-  - cachepolicies
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - cloudfront.services.k8s.aws
-  resources:
-  - cachepolicies/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - cloudfront.services.k8s.aws
-  resources:
-  - distributions
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - cloudfront.services.k8s.aws
-  resources:
-  - distributions/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - cloudfront.services.k8s.aws
-  resources:
-  - functions
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - cloudfront.services.k8s.aws
-  resources:
-  - functions/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - cloudfront.services.k8s.aws
-  resources:
-  - originrequestpolicies
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - cloudfront.services.k8s.aws
-  resources:
-  - originrequestpolicies/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - cloudfront.services.k8s.aws
-  resources:
-  - responseheaderspolicies
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - cloudfront.services.k8s.aws
-  resources:
-  - responseheaderspolicies/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - services.k8s.aws
-  resources:
-  - adoptedresources
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - services.k8s.aws
-  resources:
-  - adoptedresources/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - services.k8s.aws
-  resources:
-  - fieldexports
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - services.k8s.aws
-  resources:
-  - fieldexports/status
-  verbs:
-  - get
-  - patch
-  - update
+{{ end }}
