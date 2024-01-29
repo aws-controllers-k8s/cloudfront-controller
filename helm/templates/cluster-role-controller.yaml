@@ -1,15 +1,16 @@
+{{ $labels := .Values.role.labels }}
+{{ $rules := include "controller-role-rules" . }}
 {{ if eq .Values.installScope "cluster" }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: ack-cloudfront-controller
   labels:
-  {{- range $key, $value := .Values.role.labels }}
+  {{- range $key, $value := $labels }}
     {{ $key }}: {{ $value | quote }}
   {{- end }}
-{{- include "controller-role-rules" . -}}
+{{- $rules }}
 {{ else if .Values.watchNamespace }}
-{{ $rules := include "controller-role-rules" . }}
 {{ $namespaces := split "," .Values.watchNamespace }}
 {{ range $namespaces }}
 ---
@@ -19,7 +20,7 @@ metadata:
   name: ack-cloudfront-controller
   namespace: {{ . }}
   labels:
-  {{- range $key, $value := .Values.role.labels }}
+  {{- range $key, $value := $labels }}
     {{ $key }}: {{ $value | quote }}
   {{- end }}
 {{- $rules }}
