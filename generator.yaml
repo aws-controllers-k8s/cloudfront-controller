@@ -193,6 +193,11 @@ resources:
       CallerReference:
         type: string
         is_read_only: true
+      DistributionConfig.ViewerCertificate.ACMCertificateARN:
+        references:
+          service_name: acm
+          resource: Certificate
+          path: Status.ACKResourceMetadata.ARN
   Function:
     tags:
       ignore: true

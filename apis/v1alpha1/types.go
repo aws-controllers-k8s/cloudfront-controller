@@ -2019,11 +2019,13 @@ type TrustedSigners struct {
 // and Using Alternate Domain Names and HTTPS (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https-alternate-domain-names.html)
 // in the Amazon CloudFront Developer Guide.
 type ViewerCertificate struct {
-	ACMCertificateARN            *string `json:"aCMCertificateARN,omitempty"`
-	Certificate                  *string `json:"certificate,omitempty"`
-	CertificateSource            *string `json:"certificateSource,omitempty"`
-	CloudFrontDefaultCertificate *bool   `json:"cloudFrontDefaultCertificate,omitempty"`
-	IAMCertificateID             *string `json:"iamCertificateID,omitempty"`
-	MinimumProtocolVersion       *string `json:"minimumProtocolVersion,omitempty"`
-	SSLSupportMethod             *string `json:"sslSupportMethod,omitempty"`
+	ACMCertificateARN *string `json:"acmCertificateARN,omitempty"`
+	// Reference field for ACMCertificateARN
+	ACMCertificateRef            *ackv1alpha1.AWSResourceReferenceWrapper `json:"acmCertificateRef,omitempty"`
+	Certificate                  *string                                  `json:"certificate,omitempty"`
+	CertificateSource            *string                                  `json:"certificateSource,omitempty"`
+	CloudFrontDefaultCertificate *bool                                    `json:"cloudFrontDefaultCertificate,omitempty"`
+	IAMCertificateID             *string                                  `json:"iamCertificateID,omitempty"`
+	MinimumProtocolVersion       *string                                  `json:"minimumProtocolVersion,omitempty"`
+	SSLSupportMethod             *string                                  `json:"sslSupportMethod,omitempty"`
 }

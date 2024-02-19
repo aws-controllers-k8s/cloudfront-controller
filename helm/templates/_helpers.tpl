@@ -77,6 +77,20 @@ rules:
   - patch
   - watch
 - apiGroups:
+  - acm.services.k8s.aws
+  resources:
+  - certificates
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - acm.services.k8s.aws
+  resources:
+  - certificates/status
+  verbs:
+  - get
+  - list
+- apiGroups:
   - cloudfront.services.k8s.aws
   resources:
   - cachepolicies

@@ -1,3 +1,5 @@
+github.com/aws-controllers-k8s/acm-controller v0.0.13 h1:MweVMF9lAV9PpimS6L5NWVsoFfkmAfHUgoC/Msl887w=
+github.com/aws-controllers-k8s/acm-controller v0.0.13/go.mod h1:hUc8oa8RtxUk49svAoegfscFzhgmJvRCh2FklskrEwg=
 github.com/aws-controllers-k8s/runtime v0.30.0 h1:AibYRdi/7xUA3t8BA0u8g+J+OioaTAT6R4Vq8hxLiYw=
 github.com/aws-controllers-k8s/runtime v0.30.0/go.mod h1:Pv1ozlUaO11KO2mwPN/HzhAtZ70ZDE9UP24mjsbkul0=
 github.com/aws/aws-sdk-go v1.49.0 h1:g9BkW1fo9GqKfwg2+zCD+TW/D36Ux+vtfJ8guF4AYmY=
