@@ -5331,6 +5331,11 @@ func (in *ViewerCertificate) DeepCopyInto(out *ViewerCertificate) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.ACMCertificateRef != nil {
+		in, out := &in.ACMCertificateRef, &out.ACMCertificateRef
+		*out = new(corev1alpha1.AWSResourceReferenceWrapper)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.Certificate != nil {
 		in, out := &in.Certificate, &out.Certificate
 		*out = new(string)
