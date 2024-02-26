@@ -7,3 +7,15 @@ spec:
     name: $CACHE_POLICY_NAME
     comment: $CACHE_POLICY_COMMENT
     minTTL: $MIN_TTL
+    parametersInCacheKeyAndForwardedToOrigin:
+      cookiesConfig:
+        cookieBehavior: none
+      enableAcceptEncodingBrotli: true
+      enableAcceptEncodingGzip: true
+      headersConfig:
+        headerBehavior: whitelist
+        headers:
+          items:
+          - Authorization
+      queryStringsConfig:
+        queryStringBehavior: all

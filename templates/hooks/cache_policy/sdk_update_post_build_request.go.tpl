@@ -3,3 +3,5 @@
 	if latest.ko.Status.ETag != nil {
 		input.SetIfMatch(*latest.ko.Status.ETag)
 	}
+	// ¯\\\_(ツ)_/¯
+	setQuantityFields(input.CachePolicyConfig)
