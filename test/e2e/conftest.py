@@ -13,8 +13,8 @@
 
 import boto3
 import pytest
-
 from acktest import k8s
+
 
 def pytest_addoption(parser):
     parser.addoption("--runslow", action="store_true", default=False, help="run slow tests")
@@ -25,6 +25,9 @@ def pytest_configure(config):
     )
     config.addinivalue_line(
         "markers", "slow: mark test as slow to run"
+    )
+    config.addinivalue_line(
+        "markers", "function_overrides: mark test with function overrides"
     )
 
 def pytest_collection_modifyitems(config, items):

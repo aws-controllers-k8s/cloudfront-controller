@@ -1,0 +1,6 @@
+resources:
+  Function:
+    fields:
+      LiveETag:
+        override: |
+          The version identifier for the LIVE stage of the CloudFront function.

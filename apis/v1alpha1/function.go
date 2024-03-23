@@ -58,6 +58,9 @@ type FunctionStatus struct {
 	// Contains configuration information and metadata about a CloudFront function.
 	// +kubebuilder:validation:Optional
 	FunctionSummary *FunctionSummary `json:"functionSummary,omitempty"`
+	// The version identifier for the LIVE stage of the CloudFront function.
+	// +kubebuilder:validation:Optional
+	LiveETag *string `json:"liveETag,omitempty"`
 	// The URL of the CloudFront function. Use the URL to manage the function with
 	// the CloudFront API.
 	// +kubebuilder:validation:Optional
