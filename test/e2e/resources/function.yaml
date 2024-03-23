@@ -2,6 +2,8 @@ apiVersion: cloudfront.services.k8s.aws/v1alpha1
 kind: Function
 metadata:
   name: $FUNCTION_NAME
+  annotations:
+    cloudfront.services.k8s.aws/auto-publish: "$AUTO_PUBLISH"
 spec:
   name: $FUNCTION_NAME
   functionCode: ZnVuY3Rpb24gaGFuZGxlcihldmVudCkgewogIHJldHVybiB7CiAgICBzdGF0dXNDb2RlOiAzMDIsCiAgICBzdGF0dXNEZXNjcmlwdGlvbjogJ0ZvdW5kJywKICAgIGhlYWRlcnM6IHsKICAgICAgbG9jYXRpb246IHsgdmFsdWU6ICdodHRwczovLy8nIH0KICAgIH0KICB9Cn0K

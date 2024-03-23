@@ -13,18 +13,17 @@
 
 """Integration tests for the CloudFront Function resource"""
 
+import logging
 import time
 
 import pytest
-
+from acktest.aws import identity
 from acktest.k8s import condition
 from acktest.k8s import resource as k8s
-from acktest.aws import identity
 from acktest.resources import random_suffix_name
-from e2e import service_marker, CRD_GROUP, CRD_VERSION, load_resource
+from e2e import CRD_GROUP, CRD_VERSION, function, load_resource, service_marker
 from e2e.bootstrap_resources import get_bootstrap_resources
 from e2e.replacement_values import REPLACEMENT_VALUES
-from e2e import function
 
 FUNCTIONS_RESOURCE_PLURAL = "functions"
 DELETE_WAIT_AFTER_SECONDS = 10
@@ -32,8 +31,8 @@ CHECK_STATUS_WAIT_SECONDS = 30
 MODIFY_WAIT_AFTER_SECONDS = 30
 
 
-@pytest.fixture(scope="module")
-def simple_function():
+@pytest.fixture
+def simple_function(request):
     function_name = random_suffix_name("my-function", 24)
 
     # resources = get_bootstrap_resources()
@@ -45,6 +44,19 @@ def simple_function():
     replacements['FUNCTION_NAME'] = function_name
     replacements['FUNCTION_RUNTIME'] = "cloudfront-js-2.0"
     replacements['DOMAIN_NAME'] = "example.com"
+
+    # Another reason why we need to stop using python and pytest for
+    # e2e tests.
+    auto_publish = "false"
+    marker = request.node.get_closest_marker("function_overrides")
+    if marker is not None:
+        data = marker.args[0]
+        if 'auto_publish' in data:
+            if data['auto_publish'] == True:
+                logging.info("Auto publish is set to true")
+                auto_publish = "true"
+    
+    replacements['AUTO_PUBLISH'] = auto_publish
 
     resource_data = load_resource(
         "function",
@@ -107,4 +119,39 @@ class TestFunction:
 
         latest = function.get(function_name)
         assert latest is not None
+        assert latest['Status'] == "UNPUBLISHED"
         assert latest['FunctionConfig']['Comment'] == "New comment"
+
+    @pytest.mark.function_overrides({
+        'auto_publish': True,
+    })
+    def test_auto_publish(self, simple_function):
+        ref, res, function_name = simple_function
+
+        time.sleep(CHECK_STATUS_WAIT_SECONDS)
+
+        # Check that function exists
+        cr = k8s.get_resource(ref)
+        assert cr is not None
+
+        condition.assert_synced(ref)
+
+        latest = function.get(function_name)
+        assert latest is not None
+        assert latest['Status'] == "UNASSOCIATED"
+
+        updates = {
+            "spec": {
+                "functionConfig": {
+                    "comment": "New comment"
+                }
+            },
+        }
+        k8s.patch_custom_resource(ref, updates)
+        time.sleep(MODIFY_WAIT_AFTER_SECONDS)
+
+        latest = function.get(function_name)
+        assert latest is not None
+        assert latest['FunctionConfig']['Comment'] == "New comment"
+        assert latest['Status'] == "UNASSOCIATED"
+
