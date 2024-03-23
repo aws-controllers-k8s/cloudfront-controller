@@ -15,6 +15,7 @@ package function
 
 import (
 	"context"
+	"strconv"
 
 	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
 	svcsdk "github.com/aws/aws-sdk-go/service/cloudfront"
@@ -56,4 +57,41 @@ func (rm *resourceManager) setFunctionCode(ctx context.Context, r *v1alpha1.Func
 	}
 	r.Spec.FunctionCode = []byte(output.FunctionCode)
 	return nil
+}
+
+// publishFunction publishes the a CloudFront function.
+func (rm *resourceManager) publishFunction(ctx context.Context, r *v1alpha1.Function) (err error) {
+	rlog := ackrtlog.FromContext(ctx)
+	exit := rlog.Trace("rm.publishFunction")
+	defer func() { exit(err) }()
+
+	_, err = rm.sdkapi.PublishFunctionWithContext(
+		ctx,
+		&svcsdk.PublishFunctionInput{
+			Name:    r.Spec.Name,
+			IfMatch: r.Status.ETag,
+		},
+	)
+	rm.metrics.RecordAPICall("POST", "PublishFunction", err)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// functionAutoPublishEnabled returns true if the function should be
+// automatically published after a successful update or create operation.
+func functionAutoPublishEnabled(f *v1alpha1.Function) bool {
+	annotations := f.ObjectMeta.GetAnnotations()
+	if annotations == nil {
+		return false
+	}
+
+	autoPublish, ok := annotations[v1alpha1.AutoPublishAnnotation]
+	if ok {
+		return autoPublish == strconv.FormatBool(true)
+	}
+
+	// By default we do not auto-publish functions.
+	return false
 }

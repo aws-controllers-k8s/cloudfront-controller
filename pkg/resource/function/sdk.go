@@ -259,6 +259,11 @@ func (rm *resourceManager) sdkCreate(
 	}
 
 	rm.setStatusDefaults(ko)
+	if functionAutoPublishEnabled(ko) {
+		if err := rm.publishFunction(ctx, ko); err != nil {
+			return nil, err
+		}
+	}
 	return &resource{ko}, nil
 }
 
@@ -364,6 +369,11 @@ func (rm *resourceManager) sdkUpdate(
 	}
 
 	rm.setStatusDefaults(ko)
+	if functionAutoPublishEnabled(ko) {
+		if err := rm.publishFunction(ctx, ko); err != nil {
+			return nil, err
+		}
+	}
 	return &resource{ko}, nil
 }
 
