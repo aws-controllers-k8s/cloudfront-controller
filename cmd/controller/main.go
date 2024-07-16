@@ -43,6 +43,7 @@ import (
 	_ "github.com/aws-controllers-k8s/cloudfront-controller/pkg/resource/cache_policy"
 	_ "github.com/aws-controllers-k8s/cloudfront-controller/pkg/resource/distribution"
 	_ "github.com/aws-controllers-k8s/cloudfront-controller/pkg/resource/function"
+	_ "github.com/aws-controllers-k8s/cloudfront-controller/pkg/resource/origin_access_control"
 	_ "github.com/aws-controllers-k8s/cloudfront-controller/pkg/resource/origin_request_policy"
 	_ "github.com/aws-controllers-k8s/cloudfront-controller/pkg/resource/response_headers_policy"
 
