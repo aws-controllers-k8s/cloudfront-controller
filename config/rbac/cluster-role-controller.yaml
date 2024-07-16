@@ -107,6 +107,26 @@ rules:
 - apiGroups:
   - cloudfront.services.k8s.aws
   resources:
+  - originaccesscontrols
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - cloudfront.services.k8s.aws
+  resources:
+  - originaccesscontrols/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - cloudfront.services.k8s.aws
+  resources:
   - originrequestpolicies
   verbs:
   - create

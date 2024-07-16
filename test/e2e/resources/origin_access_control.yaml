@@ -1,0 +1,11 @@
+apiVersion: cloudfront.services.k8s.aws/v1alpha1
+kind: OriginAccessControl
+metadata:
+  name: $ORIGIN_ACCESS_CONTROL_NAME
+spec:
+  originAccessControlConfig:
+    name: $ORIGIN_ACCESS_CONTROL_NAME
+    description: $ORIGIN_ACCESS_CONTROL_DESCRIPTION
+    originAccessControlOriginType: s3
+    signingBehavior: always
+    signingProtocol: sigv4

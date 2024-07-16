@@ -1104,31 +1104,40 @@ type Origin struct {
 	S3OriginConfig *S3OriginConfig `json:"s3OriginConfig,omitempty"`
 }
 
-// A CloudFront origin access control, including its unique identifier.
-type OriginAccessControl struct {
-	ID *string `json:"id,omitempty"`
-}
-
 // A CloudFront origin access control configuration.
 type OriginAccessControlConfig struct {
-	Description *string `json:"description,omitempty"`
-	Name        *string `json:"name,omitempty"`
+	Description                   *string `json:"description,omitempty"`
+	Name                          *string `json:"name,omitempty"`
+	OriginAccessControlOriginType *string `json:"originAccessControlOriginType,omitempty"`
+	SigningBehavior               *string `json:"signingBehavior,omitempty"`
+	SigningProtocol               *string `json:"signingProtocol,omitempty"`
 }
 
 // A list of CloudFront origin access controls.
-type OriginAccessControlList struct {
-	IsTruncated *bool   `json:"isTruncated,omitempty"`
-	Marker      *string `json:"marker,omitempty"`
-	MaxItems    *int64  `json:"maxItems,omitempty"`
-	NextMarker  *string `json:"nextMarker,omitempty"`
-	Quantity    *int64  `json:"quantity,omitempty"`
+type OriginAccessControlList_SDK struct {
+	IsTruncated *bool                         `json:"isTruncated,omitempty"`
+	Items       []*OriginAccessControlSummary `json:"items,omitempty"`
+	Marker      *string                       `json:"marker,omitempty"`
+	MaxItems    *int64                        `json:"maxItems,omitempty"`
+	NextMarker  *string                       `json:"nextMarker,omitempty"`
+	Quantity    *int64                        `json:"quantity,omitempty"`
 }
 
 // A CloudFront origin access control.
 type OriginAccessControlSummary struct {
-	Description *string `json:"description,omitempty"`
-	ID          *string `json:"id,omitempty"`
-	Name        *string `json:"name,omitempty"`
+	Description                   *string `json:"description,omitempty"`
+	ID                            *string `json:"id,omitempty"`
+	Name                          *string `json:"name,omitempty"`
+	OriginAccessControlOriginType *string `json:"originAccessControlOriginType,omitempty"`
+	SigningBehavior               *string `json:"signingBehavior,omitempty"`
+	SigningProtocol               *string `json:"signingProtocol,omitempty"`
+}
+
+// A CloudFront origin access control, including its unique identifier.
+type OriginAccessControl_SDK struct {
+	ID *string `json:"id,omitempty"`
+	// A CloudFront origin access control configuration.
+	OriginAccessControlConfig *OriginAccessControlConfig `json:"originAccessControlConfig,omitempty"`
 }
 
 // CloudFront origin access identity.

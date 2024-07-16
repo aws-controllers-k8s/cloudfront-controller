@@ -12,6 +12,7 @@ rules:
   - cachepolicies
   - distributions
   - functions
+  - originaccesscontrols
   - originrequestpolicies
   - responseheaderspolicies
   verbs:
