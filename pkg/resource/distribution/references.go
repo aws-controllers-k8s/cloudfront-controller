@@ -64,12 +64,11 @@ func (rm *resourceManager) ResolveReferences(
 	apiReader client.Reader,
 	res acktypes.AWSResource,
 ) (acktypes.AWSResource, bool, error) {
-	namespace := res.MetaObject().GetNamespace()
 	ko := rm.concreteResource(res).ko
 
 	resourceHasReferences := false
 	err := validateReferenceFields(ko)
-	if fieldHasReferences, err := rm.resolveReferenceForDistributionConfig_ViewerCertificate_ACMCertificateARN(ctx, apiReader, namespace, ko); err != nil {
+	if fieldHasReferences, err := rm.resolveReferenceForDistributionConfig_ViewerCertificate_ACMCertificateARN(ctx, apiReader, ko); err != nil {
 		return &resource{ko}, (resourceHasReferences || fieldHasReferences), err
 	} else {
 		resourceHasReferences = resourceHasReferences || fieldHasReferences
@@ -99,7 +98,6 @@ func validateReferenceFields(ko *svcapitypes.Distribution) error {
 func (rm *resourceManager) resolveReferenceForDistributionConfig_ViewerCertificate_ACMCertificateARN(
 	ctx context.Context,
 	apiReader client.Reader,
-	namespace string,
 	ko *svcapitypes.Distribution,
 ) (hasReferences bool, err error) {
 	if ko.Spec.DistributionConfig != nil {
@@ -109,6 +107,10 @@ func (rm *resourceManager) resolveReferenceForDistributionConfig_ViewerCertifica
 				arr := ko.Spec.DistributionConfig.ViewerCertificate.ACMCertificateRef.From
 				if arr.Name == nil || *arr.Name == "" {
 					return hasReferences, fmt.Errorf("provided resource reference is nil or empty: DistributionConfig.ViewerCertificate.ACMCertificateRef")
+				}
+				namespace := ko.ObjectMeta.GetNamespace()
+				if arr.Namespace != nil && *arr.Namespace != "" {
+					namespace = *arr.Namespace
 				}
 				obj := &acmapitypes.Certificate{}
 				if err := getReferencedResourceState_Certificate(ctx, apiReader, obj, *arr.Name, namespace); err != nil {
