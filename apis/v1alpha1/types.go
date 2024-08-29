@@ -1756,7 +1756,7 @@ type ResponseHeadersPolicySecurityHeadersConfig struct {
 	// For more information about the X-XSS-Protection HTTP response header, see
 	// X-XSS-Protection (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection)
 	// in the MDN Web Docs.
-	XSSProtection *ResponseHeadersPolicyXSSProtection `json:"xSSProtection,omitempty"`
+	XSSProtection *ResponseHeadersPolicyXSSProtection `json:"xssProtection,omitempty"`
 }
 
 // A configuration for enabling the Server-Timing header in HTTP responses sent
