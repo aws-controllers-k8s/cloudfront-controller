@@ -273,7 +273,7 @@ spec:
                           preload:
                             type: boolean
                         type: object
-                      xSSProtection:
+                      xssProtection:
                         description: |-
                           Determines whether CloudFront includes the X-XSS-Protection HTTP response
                           header and the header's value.
