@@ -55,6 +55,7 @@ rules:
   - ""
   resources:
   - configmaps
+  - secrets
   verbs:
   - get
   - list
@@ -69,24 +70,9 @@ rules:
   - list
   - watch
 - apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - get
-  - list
-  - patch
-  - watch
-- apiGroups:
   - acm.services.k8s.aws
   resources:
   - certificates
-  verbs:
-  - get
-  - list
-- apiGroups:
-  - acm.services.k8s.aws
-  resources:
   - certificates/status
   verbs:
   - get
@@ -95,105 +81,10 @@ rules:
   - cloudfront.services.k8s.aws
   resources:
   - cachepolicies
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - cloudfront.services.k8s.aws
-  resources:
-  - cachepolicies/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - cloudfront.services.k8s.aws
-  resources:
   - distributions
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - cloudfront.services.k8s.aws
-  resources:
-  - distributions/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - cloudfront.services.k8s.aws
-  resources:
   - functions
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - cloudfront.services.k8s.aws
-  resources:
-  - functions/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - cloudfront.services.k8s.aws
-  resources:
   - originaccesscontrols
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - cloudfront.services.k8s.aws
-  resources:
-  - originaccesscontrols/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - cloudfront.services.k8s.aws
-  resources:
   - originrequestpolicies
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - cloudfront.services.k8s.aws
-  resources:
-  - originrequestpolicies/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - cloudfront.services.k8s.aws
-  resources:
   - responseheaderspolicies
   verbs:
   - create
@@ -206,6 +97,11 @@ rules:
 - apiGroups:
   - cloudfront.services.k8s.aws
   resources:
+  - cachepolicies/status
+  - distributions/status
+  - functions/status
+  - originaccesscontrols/status
+  - originrequestpolicies/status
   - responseheaderspolicies/status
   verbs:
   - get
@@ -215,25 +111,6 @@ rules:
   - services.k8s.aws
   resources:
   - adoptedresources
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - services.k8s.aws
-  resources:
-  - adoptedresources/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - services.k8s.aws
-  resources:
   - fieldexports
   verbs:
   - create
@@ -246,6 +123,7 @@ rules:
 - apiGroups:
   - services.k8s.aws
   resources:
+  - adoptedresources/status
   - fieldexports/status
   verbs:
   - get
