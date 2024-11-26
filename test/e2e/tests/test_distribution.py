@@ -27,9 +27,9 @@ from e2e.replacement_values import REPLACEMENT_VALUES
 from e2e import distribution
 
 DISTRIBUTION_RESOURCE_PLURAL = "distributions"
-DELETE_WAIT_AFTER_SECONDS = 10
-CHECK_STATUS_WAIT_SECONDS = 300
-MODIFY_WAIT_AFTER_SECONDS = 300
+DELETE_WAIT_AFTER_SECONDS = 600
+CHECK_STATUS_WAIT_SECONDS = 600
+MODIFY_WAIT_AFTER_SECONDS = 600
 
 
 @pytest.fixture(scope="module")
@@ -77,7 +77,7 @@ def simple_distribution():
     )
     assert deleted
 
-    distribution.wait_until_deleted(distribution_id)
+    distribution.wait_until_deleted(distribution_id, 1200, 15)
 
 
 @service_marker
@@ -127,3 +127,26 @@ class TestDistribution:
         assert 'DistributionConfig' in latest
         assert 'Enabled' in latest['DistributionConfig']
         assert bool(latest['DistributionConfig']['Enabled']) == False
+
+    def test_disable_pre_delete(self, simple_distribution):
+        ref, res, distribution_id = simple_distribution
+
+        time.sleep(CHECK_STATUS_WAIT_SECONDS)
+
+        # Before we update the Distribution CR below, let's check to see that
+        # the MinTTL field in the CR is still what we set in the original
+        # Create call.
+        cr = k8s.get_resource(ref)
+        assert cr is not None
+        assert 'spec' in cr
+        assert 'distributionConfig' in cr['spec']
+        assert 'enabled' in cr['spec']['distributionConfig']
+        assert bool(cr['spec']['distributionConfig']['enabled']) == True
+
+        condition.assert_synced(ref)
+
+        latest = distribution.get(distribution_id)
+        assert latest is not None
+        assert 'DistributionConfig' in latest
+        assert 'Enabled' in latest['DistributionConfig']
+        assert bool(latest['DistributionConfig']['Enabled']) == True

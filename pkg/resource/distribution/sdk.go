@@ -891,6 +891,10 @@ func (rm *resourceManager) sdkFind(
 		ko.Status.CallerReference = resp.Distribution.DistributionConfig.CallerReference
 	}
 
+	// Requeue if the distribution is in progress
+	if distributionInProgress(&resource{ko}) {
+		return &resource{ko}, requeueWaitInProgress
+	}
 	return &resource{ko}, nil
 }
 
@@ -3177,6 +3181,18 @@ func (rm *resourceManager) sdkDelete(
 	defer func() {
 		exit(err)
 	}()
+	if r.ko.Spec.DistributionConfig.Enabled != nil && *r.ko.Spec.DistributionConfig.Enabled {
+		resourceCopy := r.ko.DeepCopy()
+		// If the distribution is enabled make sure to disable it before making a delete API call
+		resourceCopy.Spec.DistributionConfig.Enabled = aws.Bool(false)
+		_, err := rm.sdkUpdate(ctx, &resource{resourceCopy}, r, nil)
+		if err != nil {
+			return nil, err
+		}
+
+		// Now keep requeing until the distribution is disabled.
+		return nil, requeueWaitInProgress
+	}
 	input, err := rm.newDeleteRequestPayload(r)
 	if err != nil {
 		return nil, err
