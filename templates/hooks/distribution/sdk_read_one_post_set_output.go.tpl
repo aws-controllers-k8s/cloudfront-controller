@@ -10,3 +10,8 @@
 	if resp.Distribution != nil &&  resp.Distribution.DistributionConfig != nil {
 		ko.Status.CallerReference = resp.Distribution.DistributionConfig.CallerReference
 	}
+
+	// Requeue if the distribution is in progress
+	if distributionInProgress(&resource{ko}) {
+		return &resource{ko}, requeueWaitInProgress
+	}

@@ -1,21 +1,21 @@
 ignore:
   resource_names:
-      #- CachePolicy
-      - CloudFrontOriginAccessIdentity
-      - ContinuousDeploymentPolicy
-      #- Distribution
-      - FieldLevelEncryptionConfig
-      - FieldLevelEncryptionProfile
-      # Function
-      - Invalidation
-      - KeyGroup
-      - MonitoringSubscription
-      # - OriginAccessControl
-      # - OriginRequestPolicy
-      - PublicKey
-      - RealtimeLogConfig
-      #- ResponseHeadersPolicy
-      - StreamingDistribution
+    #- CachePolicy
+    - CloudFrontOriginAccessIdentity
+    - ContinuousDeploymentPolicy
+    #- Distribution
+    - FieldLevelEncryptionConfig
+    - FieldLevelEncryptionProfile
+    # Function
+    - Invalidation
+    - KeyGroup
+    - MonitoringSubscription
+    # - OriginAccessControl
+    # - OriginRequestPolicy
+    - PublicKey
+    - RealtimeLogConfig
+    #- ResponseHeadersPolicy
+    - StreamingDistribution
   field_paths:
     # NOTE(jaypipes): This is an idempotency token and handled automatically by
     # the controller; we don't want it as a field on the resource.
@@ -192,6 +192,8 @@ resources:
         template_path: hooks/distribution/sdk_update_post_set_output.go.tpl
       sdk_delete_post_build_request:
         template_path: hooks/distribution/sdk_delete_post_build_request.go.tpl
+      sdk_delete_pre_build_request:
+        template_path: hooks/distribution/sdk_delete_pre_build_request.go.tpl
     fields:
       ETag:
         is_read_only: true
@@ -212,10 +214,10 @@ resources:
     fields:
       ETag:
         set:
-        - method: Update
-          to: IfMatch
-        - method: Delete
-          to: IfMatch
+          - method: Update
+            to: IfMatch
+          - method: Delete
+            to: IfMatch
     hooks:
       sdk_read_one_post_set_output:
         template_path: hooks/function/sdk_read_one_post_set_output.go.tpl

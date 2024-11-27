@@ -14,10 +14,42 @@
 package distribution
 
 import (
+	"fmt"
 	"time"
 
+	ackrequeue "github.com/aws-controllers-k8s/runtime/pkg/requeue"
 	svcsdk "github.com/aws/aws-sdk-go/service/cloudfront"
 )
+
+const (
+	StatusInProgress = "InProgress"
+	StatusDeployed   = "Deployed"
+
+	requeueInProgressDuration = 15 * time.Second
+)
+
+var (
+	requeueWaitInProgress = ackrequeue.NeededAfter(
+		fmt.Errorf("distribution in '%s' state, cannot be modified or deleted", StatusInProgress),
+		requeueInProgressDuration,
+	)
+)
+
+func distributionInProgress(r *resource) bool {
+	if r.ko.Status.Status == nil {
+		return false
+	}
+	cs := *r.ko.Status.Status
+	return cs == StatusInProgress
+}
+
+func distributionDeployed(r *resource) bool {
+	if r.ko.Status.Status == nil {
+		return false
+	}
+	cs := *r.ko.Status.Status
+	return cs == StatusDeployed
+}
 
 // getIdempotencyToken returns a unique string to be used in certain API calls
 // to ensure no replay of the call.
