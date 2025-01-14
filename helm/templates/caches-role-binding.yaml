@@ -8,7 +8,7 @@ roleRef:
   name: ack-namespaces-cache-cloudfront-controller
 subjects:
 - kind: ServiceAccount
-  name: ack-cloudfront-controller
+  name: {{ include "ack-cloudfront-controller.service-account.name" . }}
   namespace: {{ .Release.Namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -22,5 +22,5 @@ roleRef:
   name: ack-configmaps-cache-cloudfront-controller
 subjects:
 - kind: ServiceAccount
-  name: ack-cloudfront-controller
+  name: {{ include "ack-cloudfront-controller.service-account.name" . }}
   namespace: {{ .Release.Namespace }}
