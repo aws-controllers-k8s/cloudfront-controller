@@ -19,6 +19,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"reflect"
 	"strings"
 
@@ -28,8 +29,10 @@ import (
 	ackerr "github.com/aws-controllers-k8s/runtime/pkg/errors"
 	ackrequeue "github.com/aws-controllers-k8s/runtime/pkg/requeue"
 	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
-	"github.com/aws/aws-sdk-go/aws"
-	svcsdk "github.com/aws/aws-sdk-go/service/cloudfront"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	svcsdk "github.com/aws/aws-sdk-go-v2/service/cloudfront"
+	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
+	smithy "github.com/aws/smithy-go"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -40,8 +43,7 @@ import (
 var (
 	_ = &metav1.Time{}
 	_ = strings.ToLower("")
-	_ = &aws.JSONValue{}
-	_ = &svcsdk.CloudFront{}
+	_ = &svcsdk.Client{}
 	_ = &svcapitypes.ResponseHeadersPolicy{}
 	_ = ackv1alpha1.AWSAccountID("")
 	_ = &ackerr.NotFound
@@ -49,6 +51,7 @@ var (
 	_ = &reflect.Value{}
 	_ = fmt.Sprintf("")
 	_ = &ackrequeue.NoRequeue{}
+	_ = &aws.Config{}
 )
 
 // sdkFind returns SDK-specific information about a supplied resource
@@ -74,13 +77,11 @@ func (rm *resourceManager) sdkFind(
 	}
 
 	var resp *svcsdk.GetResponseHeadersPolicyOutput
-	resp, err = rm.sdkapi.GetResponseHeadersPolicyWithContext(ctx, input)
+	resp, err = rm.sdkapi.GetResponseHeadersPolicy(ctx, input)
 	rm.metrics.RecordAPICall("READ_ONE", "GetResponseHeadersPolicy", err)
 	if err != nil {
-		if reqErr, ok := ackerr.AWSRequestFailure(err); ok && reqErr.StatusCode() == 404 {
-			return nil, ackerr.NotFound
-		}
-		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "NoSuchResponseHeadersPolicy" {
+		var awsErr smithy.APIError
+		if errors.As(err, &awsErr) && awsErr.ErrorCode() == "NoSuchResponseHeadersPolicy" {
 			return nil, ackerr.NotFound
 		}
 		return nil, err
@@ -113,13 +114,7 @@ func (rm *resourceManager) sdkFind(
 			if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowHeaders != nil {
 				f2f1f1 := &svcapitypes.ResponseHeadersPolicyAccessControlAllowHeaders{}
 				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowHeaders.Items != nil {
-					f2f1f1f0 := []*string{}
-					for _, f2f1f1f0iter := range resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowHeaders.Items {
-						var f2f1f1f0elem string
-						f2f1f1f0elem = *f2f1f1f0iter
-						f2f1f1f0 = append(f2f1f1f0, &f2f1f1f0elem)
-					}
-					f2f1f1.Items = f2f1f1f0
+					f2f1f1.Items = aws.StringSlice(resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowHeaders.Items)
 				}
 				f2f1.AccessControlAllowHeaders = f2f1f1
 			}
@@ -128,9 +123,9 @@ func (rm *resourceManager) sdkFind(
 				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowMethods.Items != nil {
 					f2f1f2f0 := []*string{}
 					for _, f2f1f2f0iter := range resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowMethods.Items {
-						var f2f1f2f0elem string
-						f2f1f2f0elem = *f2f1f2f0iter
-						f2f1f2f0 = append(f2f1f2f0, &f2f1f2f0elem)
+						var f2f1f2f0elem *string
+						f2f1f2f0elem = aws.String(string(f2f1f2f0iter))
+						f2f1f2f0 = append(f2f1f2f0, f2f1f2f0elem)
 					}
 					f2f1f2.Items = f2f1f2f0
 				}
@@ -139,31 +134,20 @@ func (rm *resourceManager) sdkFind(
 			if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowOrigins != nil {
 				f2f1f3 := &svcapitypes.ResponseHeadersPolicyAccessControlAllowOrigins{}
 				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowOrigins.Items != nil {
-					f2f1f3f0 := []*string{}
-					for _, f2f1f3f0iter := range resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowOrigins.Items {
-						var f2f1f3f0elem string
-						f2f1f3f0elem = *f2f1f3f0iter
-						f2f1f3f0 = append(f2f1f3f0, &f2f1f3f0elem)
-					}
-					f2f1f3.Items = f2f1f3f0
+					f2f1f3.Items = aws.StringSlice(resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowOrigins.Items)
 				}
 				f2f1.AccessControlAllowOrigins = f2f1f3
 			}
 			if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlExposeHeaders != nil {
 				f2f1f4 := &svcapitypes.ResponseHeadersPolicyAccessControlExposeHeaders{}
 				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlExposeHeaders.Items != nil {
-					f2f1f4f0 := []*string{}
-					for _, f2f1f4f0iter := range resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlExposeHeaders.Items {
-						var f2f1f4f0elem string
-						f2f1f4f0elem = *f2f1f4f0iter
-						f2f1f4f0 = append(f2f1f4f0, &f2f1f4f0elem)
-					}
-					f2f1f4.Items = f2f1f4f0
+					f2f1f4.Items = aws.StringSlice(resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlExposeHeaders.Items)
 				}
 				f2f1.AccessControlExposeHeaders = f2f1f4
 			}
 			if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlMaxAgeSec != nil {
-				f2f1.AccessControlMaxAgeSec = resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlMaxAgeSec
+				accessControlMaxAgeSecCopy := int64(*resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlMaxAgeSec)
+				f2f1.AccessControlMaxAgeSec = &accessControlMaxAgeSecCopy
 			}
 			if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.OriginOverride != nil {
 				f2f1.OriginOverride = resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.OriginOverride
@@ -230,8 +214,8 @@ func (rm *resourceManager) sdkFind(
 			}
 			if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions != nil {
 				f2f5f2 := &svcapitypes.ResponseHeadersPolicyFrameOptions{}
-				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.FrameOption != nil {
-					f2f5f2.FrameOption = resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.FrameOption
+				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.FrameOption != "" {
+					f2f5f2.FrameOption = aws.String(string(resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.FrameOption))
 				}
 				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.Override != nil {
 					f2f5f2.Override = resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.Override
@@ -243,15 +227,16 @@ func (rm *resourceManager) sdkFind(
 				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.Override != nil {
 					f2f5f3.Override = resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.Override
 				}
-				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.ReferrerPolicy != nil {
-					f2f5f3.ReferrerPolicy = resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.ReferrerPolicy
+				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.ReferrerPolicy != "" {
+					f2f5f3.ReferrerPolicy = aws.String(string(resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.ReferrerPolicy))
 				}
 				f2f5.ReferrerPolicy = f2f5f3
 			}
 			if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity != nil {
 				f2f5f4 := &svcapitypes.ResponseHeadersPolicyStrictTransportSecurity{}
 				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.AccessControlMaxAgeSec != nil {
-					f2f5f4.AccessControlMaxAgeSec = resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.AccessControlMaxAgeSec
+					accessControlMaxAgeSecCopy := int64(*resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.AccessControlMaxAgeSec)
+					f2f5f4.AccessControlMaxAgeSec = &accessControlMaxAgeSecCopy
 				}
 				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.IncludeSubdomains != nil {
 					f2f5f4.IncludeSubdomains = resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.IncludeSubdomains
@@ -326,7 +311,7 @@ func (rm *resourceManager) newDescribeRequestPayload(
 	res := &svcsdk.GetResponseHeadersPolicyInput{}
 
 	if r.ko.Status.ID != nil {
-		res.SetId(*r.ko.Status.ID)
+		res.Id = r.ko.Status.ID
 	}
 
 	return res, nil
@@ -353,7 +338,7 @@ func (rm *resourceManager) sdkCreate(
 
 	var resp *svcsdk.CreateResponseHeadersPolicyOutput
 	_ = resp
-	resp, err = rm.sdkapi.CreateResponseHeadersPolicyWithContext(ctx, input)
+	resp, err = rm.sdkapi.CreateResponseHeadersPolicy(ctx, input)
 	rm.metrics.RecordAPICall("CREATE", "CreateResponseHeadersPolicy", err)
 	if err != nil {
 		return nil, err
@@ -385,13 +370,7 @@ func (rm *resourceManager) sdkCreate(
 			if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowHeaders != nil {
 				f2f1f1 := &svcapitypes.ResponseHeadersPolicyAccessControlAllowHeaders{}
 				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowHeaders.Items != nil {
-					f2f1f1f0 := []*string{}
-					for _, f2f1f1f0iter := range resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowHeaders.Items {
-						var f2f1f1f0elem string
-						f2f1f1f0elem = *f2f1f1f0iter
-						f2f1f1f0 = append(f2f1f1f0, &f2f1f1f0elem)
-					}
-					f2f1f1.Items = f2f1f1f0
+					f2f1f1.Items = aws.StringSlice(resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowHeaders.Items)
 				}
 				f2f1.AccessControlAllowHeaders = f2f1f1
 			}
@@ -400,9 +379,9 @@ func (rm *resourceManager) sdkCreate(
 				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowMethods.Items != nil {
 					f2f1f2f0 := []*string{}
 					for _, f2f1f2f0iter := range resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowMethods.Items {
-						var f2f1f2f0elem string
-						f2f1f2f0elem = *f2f1f2f0iter
-						f2f1f2f0 = append(f2f1f2f0, &f2f1f2f0elem)
+						var f2f1f2f0elem *string
+						f2f1f2f0elem = aws.String(string(f2f1f2f0iter))
+						f2f1f2f0 = append(f2f1f2f0, f2f1f2f0elem)
 					}
 					f2f1f2.Items = f2f1f2f0
 				}
@@ -411,31 +390,20 @@ func (rm *resourceManager) sdkCreate(
 			if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowOrigins != nil {
 				f2f1f3 := &svcapitypes.ResponseHeadersPolicyAccessControlAllowOrigins{}
 				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowOrigins.Items != nil {
-					f2f1f3f0 := []*string{}
-					for _, f2f1f3f0iter := range resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowOrigins.Items {
-						var f2f1f3f0elem string
-						f2f1f3f0elem = *f2f1f3f0iter
-						f2f1f3f0 = append(f2f1f3f0, &f2f1f3f0elem)
-					}
-					f2f1f3.Items = f2f1f3f0
+					f2f1f3.Items = aws.StringSlice(resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlAllowOrigins.Items)
 				}
 				f2f1.AccessControlAllowOrigins = f2f1f3
 			}
 			if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlExposeHeaders != nil {
 				f2f1f4 := &svcapitypes.ResponseHeadersPolicyAccessControlExposeHeaders{}
 				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlExposeHeaders.Items != nil {
-					f2f1f4f0 := []*string{}
-					for _, f2f1f4f0iter := range resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlExposeHeaders.Items {
-						var f2f1f4f0elem string
-						f2f1f4f0elem = *f2f1f4f0iter
-						f2f1f4f0 = append(f2f1f4f0, &f2f1f4f0elem)
-					}
-					f2f1f4.Items = f2f1f4f0
+					f2f1f4.Items = aws.StringSlice(resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlExposeHeaders.Items)
 				}
 				f2f1.AccessControlExposeHeaders = f2f1f4
 			}
 			if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlMaxAgeSec != nil {
-				f2f1.AccessControlMaxAgeSec = resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlMaxAgeSec
+				accessControlMaxAgeSecCopy := int64(*resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.AccessControlMaxAgeSec)
+				f2f1.AccessControlMaxAgeSec = &accessControlMaxAgeSecCopy
 			}
 			if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.OriginOverride != nil {
 				f2f1.OriginOverride = resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.CorsConfig.OriginOverride
@@ -502,8 +470,8 @@ func (rm *resourceManager) sdkCreate(
 			}
 			if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions != nil {
 				f2f5f2 := &svcapitypes.ResponseHeadersPolicyFrameOptions{}
-				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.FrameOption != nil {
-					f2f5f2.FrameOption = resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.FrameOption
+				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.FrameOption != "" {
+					f2f5f2.FrameOption = aws.String(string(resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.FrameOption))
 				}
 				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.Override != nil {
 					f2f5f2.Override = resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.Override
@@ -515,15 +483,16 @@ func (rm *resourceManager) sdkCreate(
 				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.Override != nil {
 					f2f5f3.Override = resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.Override
 				}
-				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.ReferrerPolicy != nil {
-					f2f5f3.ReferrerPolicy = resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.ReferrerPolicy
+				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.ReferrerPolicy != "" {
+					f2f5f3.ReferrerPolicy = aws.String(string(resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.ReferrerPolicy))
 				}
 				f2f5.ReferrerPolicy = f2f5f3
 			}
 			if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity != nil {
 				f2f5f4 := &svcapitypes.ResponseHeadersPolicyStrictTransportSecurity{}
 				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.AccessControlMaxAgeSec != nil {
-					f2f5f4.AccessControlMaxAgeSec = resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.AccessControlMaxAgeSec
+					accessControlMaxAgeSecCopy := int64(*resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.AccessControlMaxAgeSec)
+					f2f5f4.AccessControlMaxAgeSec = &accessControlMaxAgeSecCopy
 				}
 				if resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.IncludeSubdomains != nil {
 					f2f5f4.IncludeSubdomains = resp.ResponseHeadersPolicy.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.IncludeSubdomains
@@ -590,198 +559,190 @@ func (rm *resourceManager) newCreateRequestPayload(
 	res := &svcsdk.CreateResponseHeadersPolicyInput{}
 
 	if r.ko.Spec.ResponseHeadersPolicyConfig != nil {
-		f0 := &svcsdk.ResponseHeadersPolicyConfig{}
+		f0 := &svcsdktypes.ResponseHeadersPolicyConfig{}
 		if r.ko.Spec.ResponseHeadersPolicyConfig.Comment != nil {
-			f0.SetComment(*r.ko.Spec.ResponseHeadersPolicyConfig.Comment)
+			f0.Comment = r.ko.Spec.ResponseHeadersPolicyConfig.Comment
 		}
 		if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig != nil {
-			f0f1 := &svcsdk.ResponseHeadersPolicyCorsConfig{}
+			f0f1 := &svcsdktypes.ResponseHeadersPolicyCorsConfig{}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowCredentials != nil {
-				f0f1.SetAccessControlAllowCredentials(*r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowCredentials)
+				f0f1.AccessControlAllowCredentials = r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowCredentials
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowHeaders != nil {
-				f0f1f1 := &svcsdk.ResponseHeadersPolicyAccessControlAllowHeaders{}
+				f0f1f1 := &svcsdktypes.ResponseHeadersPolicyAccessControlAllowHeaders{}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowHeaders.Items != nil {
-					f0f1f1f0 := []*string{}
-					for _, f0f1f1f0iter := range r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowHeaders.Items {
-						var f0f1f1f0elem string
-						f0f1f1f0elem = *f0f1f1f0iter
-						f0f1f1f0 = append(f0f1f1f0, &f0f1f1f0elem)
-					}
-					f0f1f1.SetItems(f0f1f1f0)
+					f0f1f1.Items = aws.ToStringSlice(r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowHeaders.Items)
 				}
-				f0f1.SetAccessControlAllowHeaders(f0f1f1)
+				f0f1.AccessControlAllowHeaders = f0f1f1
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowMethods != nil {
-				f0f1f2 := &svcsdk.ResponseHeadersPolicyAccessControlAllowMethods{}
+				f0f1f2 := &svcsdktypes.ResponseHeadersPolicyAccessControlAllowMethods{}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowMethods.Items != nil {
-					f0f1f2f0 := []*string{}
+					f0f1f2f0 := []svcsdktypes.ResponseHeadersPolicyAccessControlAllowMethodsValues{}
 					for _, f0f1f2f0iter := range r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowMethods.Items {
 						var f0f1f2f0elem string
-						f0f1f2f0elem = *f0f1f2f0iter
-						f0f1f2f0 = append(f0f1f2f0, &f0f1f2f0elem)
+						f0f1f2f0elem = string(*f0f1f2f0iter)
+						f0f1f2f0 = append(f0f1f2f0, svcsdktypes.ResponseHeadersPolicyAccessControlAllowMethodsValues(f0f1f2f0elem))
 					}
-					f0f1f2.SetItems(f0f1f2f0)
+					f0f1f2.Items = f0f1f2f0
 				}
-				f0f1.SetAccessControlAllowMethods(f0f1f2)
+				f0f1.AccessControlAllowMethods = f0f1f2
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowOrigins != nil {
-				f0f1f3 := &svcsdk.ResponseHeadersPolicyAccessControlAllowOrigins{}
+				f0f1f3 := &svcsdktypes.ResponseHeadersPolicyAccessControlAllowOrigins{}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowOrigins.Items != nil {
-					f0f1f3f0 := []*string{}
-					for _, f0f1f3f0iter := range r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowOrigins.Items {
-						var f0f1f3f0elem string
-						f0f1f3f0elem = *f0f1f3f0iter
-						f0f1f3f0 = append(f0f1f3f0, &f0f1f3f0elem)
-					}
-					f0f1f3.SetItems(f0f1f3f0)
+					f0f1f3.Items = aws.ToStringSlice(r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowOrigins.Items)
 				}
-				f0f1.SetAccessControlAllowOrigins(f0f1f3)
+				f0f1.AccessControlAllowOrigins = f0f1f3
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlExposeHeaders != nil {
-				f0f1f4 := &svcsdk.ResponseHeadersPolicyAccessControlExposeHeaders{}
+				f0f1f4 := &svcsdktypes.ResponseHeadersPolicyAccessControlExposeHeaders{}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlExposeHeaders.Items != nil {
-					f0f1f4f0 := []*string{}
-					for _, f0f1f4f0iter := range r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlExposeHeaders.Items {
-						var f0f1f4f0elem string
-						f0f1f4f0elem = *f0f1f4f0iter
-						f0f1f4f0 = append(f0f1f4f0, &f0f1f4f0elem)
-					}
-					f0f1f4.SetItems(f0f1f4f0)
+					f0f1f4.Items = aws.ToStringSlice(r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlExposeHeaders.Items)
 				}
-				f0f1.SetAccessControlExposeHeaders(f0f1f4)
+				f0f1.AccessControlExposeHeaders = f0f1f4
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlMaxAgeSec != nil {
-				f0f1.SetAccessControlMaxAgeSec(*r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlMaxAgeSec)
+				accessControlMaxAgeSecCopy0 := *r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlMaxAgeSec
+				if accessControlMaxAgeSecCopy0 > math.MaxInt32 || accessControlMaxAgeSecCopy0 < math.MinInt32 {
+					return nil, fmt.Errorf("error: field AccessControlMaxAgeSec is of type int32")
+				}
+				accessControlMaxAgeSecCopy := int32(accessControlMaxAgeSecCopy0)
+				f0f1.AccessControlMaxAgeSec = &accessControlMaxAgeSecCopy
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.OriginOverride != nil {
-				f0f1.SetOriginOverride(*r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.OriginOverride)
+				f0f1.OriginOverride = r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.OriginOverride
 			}
-			f0.SetCorsConfig(f0f1)
+			f0.CorsConfig = f0f1
 		}
 		if r.ko.Spec.ResponseHeadersPolicyConfig.CustomHeadersConfig != nil {
-			f0f2 := &svcsdk.ResponseHeadersPolicyCustomHeadersConfig{}
+			f0f2 := &svcsdktypes.ResponseHeadersPolicyCustomHeadersConfig{}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.CustomHeadersConfig.Items != nil {
-				f0f2f0 := []*svcsdk.ResponseHeadersPolicyCustomHeader{}
+				f0f2f0 := []svcsdktypes.ResponseHeadersPolicyCustomHeader{}
 				for _, f0f2f0iter := range r.ko.Spec.ResponseHeadersPolicyConfig.CustomHeadersConfig.Items {
-					f0f2f0elem := &svcsdk.ResponseHeadersPolicyCustomHeader{}
+					f0f2f0elem := &svcsdktypes.ResponseHeadersPolicyCustomHeader{}
 					if f0f2f0iter.Header != nil {
-						f0f2f0elem.SetHeader(*f0f2f0iter.Header)
+						f0f2f0elem.Header = f0f2f0iter.Header
 					}
 					if f0f2f0iter.Override != nil {
-						f0f2f0elem.SetOverride(*f0f2f0iter.Override)
+						f0f2f0elem.Override = f0f2f0iter.Override
 					}
 					if f0f2f0iter.Value != nil {
-						f0f2f0elem.SetValue(*f0f2f0iter.Value)
+						f0f2f0elem.Value = f0f2f0iter.Value
 					}
-					f0f2f0 = append(f0f2f0, f0f2f0elem)
+					f0f2f0 = append(f0f2f0, *f0f2f0elem)
 				}
-				f0f2.SetItems(f0f2f0)
+				f0f2.Items = f0f2f0
 			}
-			f0.SetCustomHeadersConfig(f0f2)
+			f0.CustomHeadersConfig = f0f2
 		}
 		if r.ko.Spec.ResponseHeadersPolicyConfig.Name != nil {
-			f0.SetName(*r.ko.Spec.ResponseHeadersPolicyConfig.Name)
+			f0.Name = r.ko.Spec.ResponseHeadersPolicyConfig.Name
 		}
 		if r.ko.Spec.ResponseHeadersPolicyConfig.RemoveHeadersConfig != nil {
-			f0f4 := &svcsdk.ResponseHeadersPolicyRemoveHeadersConfig{}
+			f0f4 := &svcsdktypes.ResponseHeadersPolicyRemoveHeadersConfig{}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.RemoveHeadersConfig.Items != nil {
-				f0f4f0 := []*svcsdk.ResponseHeadersPolicyRemoveHeader{}
+				f0f4f0 := []svcsdktypes.ResponseHeadersPolicyRemoveHeader{}
 				for _, f0f4f0iter := range r.ko.Spec.ResponseHeadersPolicyConfig.RemoveHeadersConfig.Items {
-					f0f4f0elem := &svcsdk.ResponseHeadersPolicyRemoveHeader{}
+					f0f4f0elem := &svcsdktypes.ResponseHeadersPolicyRemoveHeader{}
 					if f0f4f0iter.Header != nil {
-						f0f4f0elem.SetHeader(*f0f4f0iter.Header)
+						f0f4f0elem.Header = f0f4f0iter.Header
 					}
-					f0f4f0 = append(f0f4f0, f0f4f0elem)
+					f0f4f0 = append(f0f4f0, *f0f4f0elem)
 				}
-				f0f4.SetItems(f0f4f0)
+				f0f4.Items = f0f4f0
 			}
-			f0.SetRemoveHeadersConfig(f0f4)
+			f0.RemoveHeadersConfig = f0f4
 		}
 		if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig != nil {
-			f0f5 := &svcsdk.ResponseHeadersPolicySecurityHeadersConfig{}
+			f0f5 := &svcsdktypes.ResponseHeadersPolicySecurityHeadersConfig{}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentSecurityPolicy != nil {
-				f0f5f0 := &svcsdk.ResponseHeadersPolicyContentSecurityPolicy{}
+				f0f5f0 := &svcsdktypes.ResponseHeadersPolicyContentSecurityPolicy{}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentSecurityPolicy.ContentSecurityPolicy != nil {
-					f0f5f0.SetContentSecurityPolicy(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentSecurityPolicy.ContentSecurityPolicy)
+					f0f5f0.ContentSecurityPolicy = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentSecurityPolicy.ContentSecurityPolicy
 				}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentSecurityPolicy.Override != nil {
-					f0f5f0.SetOverride(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentSecurityPolicy.Override)
+					f0f5f0.Override = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentSecurityPolicy.Override
 				}
-				f0f5.SetContentSecurityPolicy(f0f5f0)
+				f0f5.ContentSecurityPolicy = f0f5f0
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentTypeOptions != nil {
-				f0f5f1 := &svcsdk.ResponseHeadersPolicyContentTypeOptions{}
+				f0f5f1 := &svcsdktypes.ResponseHeadersPolicyContentTypeOptions{}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentTypeOptions.Override != nil {
-					f0f5f1.SetOverride(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentTypeOptions.Override)
+					f0f5f1.Override = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentTypeOptions.Override
 				}
-				f0f5.SetContentTypeOptions(f0f5f1)
+				f0f5.ContentTypeOptions = f0f5f1
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions != nil {
-				f0f5f2 := &svcsdk.ResponseHeadersPolicyFrameOptions{}
+				f0f5f2 := &svcsdktypes.ResponseHeadersPolicyFrameOptions{}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.FrameOption != nil {
-					f0f5f2.SetFrameOption(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.FrameOption)
+					f0f5f2.FrameOption = svcsdktypes.FrameOptionsList(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.FrameOption)
 				}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.Override != nil {
-					f0f5f2.SetOverride(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.Override)
+					f0f5f2.Override = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.Override
 				}
-				f0f5.SetFrameOptions(f0f5f2)
+				f0f5.FrameOptions = f0f5f2
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy != nil {
-				f0f5f3 := &svcsdk.ResponseHeadersPolicyReferrerPolicy{}
+				f0f5f3 := &svcsdktypes.ResponseHeadersPolicyReferrerPolicy{}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.Override != nil {
-					f0f5f3.SetOverride(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.Override)
+					f0f5f3.Override = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.Override
 				}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.ReferrerPolicy != nil {
-					f0f5f3.SetReferrerPolicy(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.ReferrerPolicy)
+					f0f5f3.ReferrerPolicy = svcsdktypes.ReferrerPolicyList(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.ReferrerPolicy)
 				}
-				f0f5.SetReferrerPolicy(f0f5f3)
+				f0f5.ReferrerPolicy = f0f5f3
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity != nil {
-				f0f5f4 := &svcsdk.ResponseHeadersPolicyStrictTransportSecurity{}
+				f0f5f4 := &svcsdktypes.ResponseHeadersPolicyStrictTransportSecurity{}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.AccessControlMaxAgeSec != nil {
-					f0f5f4.SetAccessControlMaxAgeSec(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.AccessControlMaxAgeSec)
+					accessControlMaxAgeSecCopy0 := *r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.AccessControlMaxAgeSec
+					if accessControlMaxAgeSecCopy0 > math.MaxInt32 || accessControlMaxAgeSecCopy0 < math.MinInt32 {
+						return nil, fmt.Errorf("error: field AccessControlMaxAgeSec is of type int32")
+					}
+					accessControlMaxAgeSecCopy := int32(accessControlMaxAgeSecCopy0)
+					f0f5f4.AccessControlMaxAgeSec = &accessControlMaxAgeSecCopy
 				}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.IncludeSubdomains != nil {
-					f0f5f4.SetIncludeSubdomains(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.IncludeSubdomains)
+					f0f5f4.IncludeSubdomains = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.IncludeSubdomains
 				}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.Override != nil {
-					f0f5f4.SetOverride(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.Override)
+					f0f5f4.Override = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.Override
 				}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.Preload != nil {
-					f0f5f4.SetPreload(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.Preload)
+					f0f5f4.Preload = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.Preload
 				}
-				f0f5.SetStrictTransportSecurity(f0f5f4)
+				f0f5.StrictTransportSecurity = f0f5f4
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection != nil {
-				f0f5f5 := &svcsdk.ResponseHeadersPolicyXSSProtection{}
+				f0f5f5 := &svcsdktypes.ResponseHeadersPolicyXSSProtection{}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.ModeBlock != nil {
-					f0f5f5.SetModeBlock(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.ModeBlock)
+					f0f5f5.ModeBlock = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.ModeBlock
 				}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.Override != nil {
-					f0f5f5.SetOverride(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.Override)
+					f0f5f5.Override = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.Override
 				}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.Protection != nil {
-					f0f5f5.SetProtection(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.Protection)
+					f0f5f5.Protection = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.Protection
 				}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.ReportURI != nil {
-					f0f5f5.SetReportUri(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.ReportURI)
+					f0f5f5.ReportUri = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.ReportURI
 				}
-				f0f5.SetXSSProtection(f0f5f5)
+				f0f5.XSSProtection = f0f5f5
 			}
-			f0.SetSecurityHeadersConfig(f0f5)
+			f0.SecurityHeadersConfig = f0f5
 		}
 		if r.ko.Spec.ResponseHeadersPolicyConfig.ServerTimingHeadersConfig != nil {
-			f0f6 := &svcsdk.ResponseHeadersPolicyServerTimingHeadersConfig{}
+			f0f6 := &svcsdktypes.ResponseHeadersPolicyServerTimingHeadersConfig{}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.ServerTimingHeadersConfig.Enabled != nil {
-				f0f6.SetEnabled(*r.ko.Spec.ResponseHeadersPolicyConfig.ServerTimingHeadersConfig.Enabled)
+				f0f6.Enabled = r.ko.Spec.ResponseHeadersPolicyConfig.ServerTimingHeadersConfig.Enabled
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.ServerTimingHeadersConfig.SamplingRate != nil {
-				f0f6.SetSamplingRate(*r.ko.Spec.ResponseHeadersPolicyConfig.ServerTimingHeadersConfig.SamplingRate)
+				f0f6.SamplingRate = r.ko.Spec.ResponseHeadersPolicyConfig.ServerTimingHeadersConfig.SamplingRate
 			}
-			f0.SetServerTimingHeadersConfig(f0f6)
+			f0.ServerTimingHeadersConfig = f0f6
 		}
-		res.SetResponseHeadersPolicyConfig(f0)
+		res.ResponseHeadersPolicyConfig = f0
 	}
 
 	return res, nil
@@ -807,14 +768,14 @@ func (rm *resourceManager) sdkUpdate(
 	// If we don't do this, we get the following on every update call:
 	// InvalidIfMatchVersion: The If-Match version is missing or not valid for the resource.
 	if latest.ko.Status.ETag != nil {
-		input.SetIfMatch(*latest.ko.Status.ETag)
+		input.IfMatch = latest.ko.Status.ETag
 	}
 	// ¯\\\_(ツ)_/¯
 	setQuantityFields(input.ResponseHeadersPolicyConfig)
 
 	var resp *svcsdk.UpdateResponseHeadersPolicyOutput
 	_ = resp
-	resp, err = rm.sdkapi.UpdateResponseHeadersPolicyWithContext(ctx, input)
+	resp, err = rm.sdkapi.UpdateResponseHeadersPolicy(ctx, input)
 	rm.metrics.RecordAPICall("UPDATE", "UpdateResponseHeadersPolicy", err)
 	if err != nil {
 		return nil, err
@@ -851,201 +812,193 @@ func (rm *resourceManager) newUpdateRequestPayload(
 	res := &svcsdk.UpdateResponseHeadersPolicyInput{}
 
 	if r.ko.Status.ID != nil {
-		res.SetId(*r.ko.Status.ID)
+		res.Id = r.ko.Status.ID
 	}
 	if r.ko.Spec.ResponseHeadersPolicyConfig != nil {
-		f2 := &svcsdk.ResponseHeadersPolicyConfig{}
+		f2 := &svcsdktypes.ResponseHeadersPolicyConfig{}
 		if r.ko.Spec.ResponseHeadersPolicyConfig.Comment != nil {
-			f2.SetComment(*r.ko.Spec.ResponseHeadersPolicyConfig.Comment)
+			f2.Comment = r.ko.Spec.ResponseHeadersPolicyConfig.Comment
 		}
 		if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig != nil {
-			f2f1 := &svcsdk.ResponseHeadersPolicyCorsConfig{}
+			f2f1 := &svcsdktypes.ResponseHeadersPolicyCorsConfig{}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowCredentials != nil {
-				f2f1.SetAccessControlAllowCredentials(*r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowCredentials)
+				f2f1.AccessControlAllowCredentials = r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowCredentials
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowHeaders != nil {
-				f2f1f1 := &svcsdk.ResponseHeadersPolicyAccessControlAllowHeaders{}
+				f2f1f1 := &svcsdktypes.ResponseHeadersPolicyAccessControlAllowHeaders{}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowHeaders.Items != nil {
-					f2f1f1f0 := []*string{}
-					for _, f2f1f1f0iter := range r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowHeaders.Items {
-						var f2f1f1f0elem string
-						f2f1f1f0elem = *f2f1f1f0iter
-						f2f1f1f0 = append(f2f1f1f0, &f2f1f1f0elem)
-					}
-					f2f1f1.SetItems(f2f1f1f0)
+					f2f1f1.Items = aws.ToStringSlice(r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowHeaders.Items)
 				}
-				f2f1.SetAccessControlAllowHeaders(f2f1f1)
+				f2f1.AccessControlAllowHeaders = f2f1f1
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowMethods != nil {
-				f2f1f2 := &svcsdk.ResponseHeadersPolicyAccessControlAllowMethods{}
+				f2f1f2 := &svcsdktypes.ResponseHeadersPolicyAccessControlAllowMethods{}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowMethods.Items != nil {
-					f2f1f2f0 := []*string{}
+					f2f1f2f0 := []svcsdktypes.ResponseHeadersPolicyAccessControlAllowMethodsValues{}
 					for _, f2f1f2f0iter := range r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowMethods.Items {
 						var f2f1f2f0elem string
-						f2f1f2f0elem = *f2f1f2f0iter
-						f2f1f2f0 = append(f2f1f2f0, &f2f1f2f0elem)
+						f2f1f2f0elem = string(*f2f1f2f0iter)
+						f2f1f2f0 = append(f2f1f2f0, svcsdktypes.ResponseHeadersPolicyAccessControlAllowMethodsValues(f2f1f2f0elem))
 					}
-					f2f1f2.SetItems(f2f1f2f0)
+					f2f1f2.Items = f2f1f2f0
 				}
-				f2f1.SetAccessControlAllowMethods(f2f1f2)
+				f2f1.AccessControlAllowMethods = f2f1f2
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowOrigins != nil {
-				f2f1f3 := &svcsdk.ResponseHeadersPolicyAccessControlAllowOrigins{}
+				f2f1f3 := &svcsdktypes.ResponseHeadersPolicyAccessControlAllowOrigins{}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowOrigins.Items != nil {
-					f2f1f3f0 := []*string{}
-					for _, f2f1f3f0iter := range r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowOrigins.Items {
-						var f2f1f3f0elem string
-						f2f1f3f0elem = *f2f1f3f0iter
-						f2f1f3f0 = append(f2f1f3f0, &f2f1f3f0elem)
-					}
-					f2f1f3.SetItems(f2f1f3f0)
+					f2f1f3.Items = aws.ToStringSlice(r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlAllowOrigins.Items)
 				}
-				f2f1.SetAccessControlAllowOrigins(f2f1f3)
+				f2f1.AccessControlAllowOrigins = f2f1f3
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlExposeHeaders != nil {
-				f2f1f4 := &svcsdk.ResponseHeadersPolicyAccessControlExposeHeaders{}
+				f2f1f4 := &svcsdktypes.ResponseHeadersPolicyAccessControlExposeHeaders{}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlExposeHeaders.Items != nil {
-					f2f1f4f0 := []*string{}
-					for _, f2f1f4f0iter := range r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlExposeHeaders.Items {
-						var f2f1f4f0elem string
-						f2f1f4f0elem = *f2f1f4f0iter
-						f2f1f4f0 = append(f2f1f4f0, &f2f1f4f0elem)
-					}
-					f2f1f4.SetItems(f2f1f4f0)
+					f2f1f4.Items = aws.ToStringSlice(r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlExposeHeaders.Items)
 				}
-				f2f1.SetAccessControlExposeHeaders(f2f1f4)
+				f2f1.AccessControlExposeHeaders = f2f1f4
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlMaxAgeSec != nil {
-				f2f1.SetAccessControlMaxAgeSec(*r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlMaxAgeSec)
+				accessControlMaxAgeSecCopy0 := *r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.AccessControlMaxAgeSec
+				if accessControlMaxAgeSecCopy0 > math.MaxInt32 || accessControlMaxAgeSecCopy0 < math.MinInt32 {
+					return nil, fmt.Errorf("error: field AccessControlMaxAgeSec is of type int32")
+				}
+				accessControlMaxAgeSecCopy := int32(accessControlMaxAgeSecCopy0)
+				f2f1.AccessControlMaxAgeSec = &accessControlMaxAgeSecCopy
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.OriginOverride != nil {
-				f2f1.SetOriginOverride(*r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.OriginOverride)
+				f2f1.OriginOverride = r.ko.Spec.ResponseHeadersPolicyConfig.CORSConfig.OriginOverride
 			}
-			f2.SetCorsConfig(f2f1)
+			f2.CorsConfig = f2f1
 		}
 		if r.ko.Spec.ResponseHeadersPolicyConfig.CustomHeadersConfig != nil {
-			f2f2 := &svcsdk.ResponseHeadersPolicyCustomHeadersConfig{}
+			f2f2 := &svcsdktypes.ResponseHeadersPolicyCustomHeadersConfig{}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.CustomHeadersConfig.Items != nil {
-				f2f2f0 := []*svcsdk.ResponseHeadersPolicyCustomHeader{}
+				f2f2f0 := []svcsdktypes.ResponseHeadersPolicyCustomHeader{}
 				for _, f2f2f0iter := range r.ko.Spec.ResponseHeadersPolicyConfig.CustomHeadersConfig.Items {
-					f2f2f0elem := &svcsdk.ResponseHeadersPolicyCustomHeader{}
+					f2f2f0elem := &svcsdktypes.ResponseHeadersPolicyCustomHeader{}
 					if f2f2f0iter.Header != nil {
-						f2f2f0elem.SetHeader(*f2f2f0iter.Header)
+						f2f2f0elem.Header = f2f2f0iter.Header
 					}
 					if f2f2f0iter.Override != nil {
-						f2f2f0elem.SetOverride(*f2f2f0iter.Override)
+						f2f2f0elem.Override = f2f2f0iter.Override
 					}
 					if f2f2f0iter.Value != nil {
-						f2f2f0elem.SetValue(*f2f2f0iter.Value)
+						f2f2f0elem.Value = f2f2f0iter.Value
 					}
-					f2f2f0 = append(f2f2f0, f2f2f0elem)
+					f2f2f0 = append(f2f2f0, *f2f2f0elem)
 				}
-				f2f2.SetItems(f2f2f0)
+				f2f2.Items = f2f2f0
 			}
-			f2.SetCustomHeadersConfig(f2f2)
+			f2.CustomHeadersConfig = f2f2
 		}
 		if r.ko.Spec.ResponseHeadersPolicyConfig.Name != nil {
-			f2.SetName(*r.ko.Spec.ResponseHeadersPolicyConfig.Name)
+			f2.Name = r.ko.Spec.ResponseHeadersPolicyConfig.Name
 		}
 		if r.ko.Spec.ResponseHeadersPolicyConfig.RemoveHeadersConfig != nil {
-			f2f4 := &svcsdk.ResponseHeadersPolicyRemoveHeadersConfig{}
+			f2f4 := &svcsdktypes.ResponseHeadersPolicyRemoveHeadersConfig{}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.RemoveHeadersConfig.Items != nil {
-				f2f4f0 := []*svcsdk.ResponseHeadersPolicyRemoveHeader{}
+				f2f4f0 := []svcsdktypes.ResponseHeadersPolicyRemoveHeader{}
 				for _, f2f4f0iter := range r.ko.Spec.ResponseHeadersPolicyConfig.RemoveHeadersConfig.Items {
-					f2f4f0elem := &svcsdk.ResponseHeadersPolicyRemoveHeader{}
+					f2f4f0elem := &svcsdktypes.ResponseHeadersPolicyRemoveHeader{}
 					if f2f4f0iter.Header != nil {
-						f2f4f0elem.SetHeader(*f2f4f0iter.Header)
+						f2f4f0elem.Header = f2f4f0iter.Header
 					}
-					f2f4f0 = append(f2f4f0, f2f4f0elem)
+					f2f4f0 = append(f2f4f0, *f2f4f0elem)
 				}
-				f2f4.SetItems(f2f4f0)
+				f2f4.Items = f2f4f0
 			}
-			f2.SetRemoveHeadersConfig(f2f4)
+			f2.RemoveHeadersConfig = f2f4
 		}
 		if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig != nil {
-			f2f5 := &svcsdk.ResponseHeadersPolicySecurityHeadersConfig{}
+			f2f5 := &svcsdktypes.ResponseHeadersPolicySecurityHeadersConfig{}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentSecurityPolicy != nil {
-				f2f5f0 := &svcsdk.ResponseHeadersPolicyContentSecurityPolicy{}
+				f2f5f0 := &svcsdktypes.ResponseHeadersPolicyContentSecurityPolicy{}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentSecurityPolicy.ContentSecurityPolicy != nil {
-					f2f5f0.SetContentSecurityPolicy(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentSecurityPolicy.ContentSecurityPolicy)
+					f2f5f0.ContentSecurityPolicy = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentSecurityPolicy.ContentSecurityPolicy
 				}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentSecurityPolicy.Override != nil {
-					f2f5f0.SetOverride(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentSecurityPolicy.Override)
+					f2f5f0.Override = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentSecurityPolicy.Override
 				}
-				f2f5.SetContentSecurityPolicy(f2f5f0)
+				f2f5.ContentSecurityPolicy = f2f5f0
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentTypeOptions != nil {
-				f2f5f1 := &svcsdk.ResponseHeadersPolicyContentTypeOptions{}
+				f2f5f1 := &svcsdktypes.ResponseHeadersPolicyContentTypeOptions{}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentTypeOptions.Override != nil {
-					f2f5f1.SetOverride(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentTypeOptions.Override)
+					f2f5f1.Override = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentTypeOptions.Override
 				}
-				f2f5.SetContentTypeOptions(f2f5f1)
+				f2f5.ContentTypeOptions = f2f5f1
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions != nil {
-				f2f5f2 := &svcsdk.ResponseHeadersPolicyFrameOptions{}
+				f2f5f2 := &svcsdktypes.ResponseHeadersPolicyFrameOptions{}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.FrameOption != nil {
-					f2f5f2.SetFrameOption(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.FrameOption)
+					f2f5f2.FrameOption = svcsdktypes.FrameOptionsList(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.FrameOption)
 				}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.Override != nil {
-					f2f5f2.SetOverride(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.Override)
+					f2f5f2.Override = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.FrameOptions.Override
 				}
-				f2f5.SetFrameOptions(f2f5f2)
+				f2f5.FrameOptions = f2f5f2
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy != nil {
-				f2f5f3 := &svcsdk.ResponseHeadersPolicyReferrerPolicy{}
+				f2f5f3 := &svcsdktypes.ResponseHeadersPolicyReferrerPolicy{}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.Override != nil {
-					f2f5f3.SetOverride(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.Override)
+					f2f5f3.Override = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.Override
 				}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.ReferrerPolicy != nil {
-					f2f5f3.SetReferrerPolicy(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.ReferrerPolicy)
+					f2f5f3.ReferrerPolicy = svcsdktypes.ReferrerPolicyList(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ReferrerPolicy.ReferrerPolicy)
 				}
-				f2f5.SetReferrerPolicy(f2f5f3)
+				f2f5.ReferrerPolicy = f2f5f3
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity != nil {
-				f2f5f4 := &svcsdk.ResponseHeadersPolicyStrictTransportSecurity{}
+				f2f5f4 := &svcsdktypes.ResponseHeadersPolicyStrictTransportSecurity{}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.AccessControlMaxAgeSec != nil {
-					f2f5f4.SetAccessControlMaxAgeSec(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.AccessControlMaxAgeSec)
+					accessControlMaxAgeSecCopy0 := *r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.AccessControlMaxAgeSec
+					if accessControlMaxAgeSecCopy0 > math.MaxInt32 || accessControlMaxAgeSecCopy0 < math.MinInt32 {
+						return nil, fmt.Errorf("error: field AccessControlMaxAgeSec is of type int32")
+					}
+					accessControlMaxAgeSecCopy := int32(accessControlMaxAgeSecCopy0)
+					f2f5f4.AccessControlMaxAgeSec = &accessControlMaxAgeSecCopy
 				}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.IncludeSubdomains != nil {
-					f2f5f4.SetIncludeSubdomains(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.IncludeSubdomains)
+					f2f5f4.IncludeSubdomains = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.IncludeSubdomains
 				}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.Override != nil {
-					f2f5f4.SetOverride(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.Override)
+					f2f5f4.Override = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.Override
 				}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.Preload != nil {
-					f2f5f4.SetPreload(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.Preload)
+					f2f5f4.Preload = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.StrictTransportSecurity.Preload
 				}
-				f2f5.SetStrictTransportSecurity(f2f5f4)
+				f2f5.StrictTransportSecurity = f2f5f4
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection != nil {
-				f2f5f5 := &svcsdk.ResponseHeadersPolicyXSSProtection{}
+				f2f5f5 := &svcsdktypes.ResponseHeadersPolicyXSSProtection{}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.ModeBlock != nil {
-					f2f5f5.SetModeBlock(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.ModeBlock)
+					f2f5f5.ModeBlock = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.ModeBlock
 				}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.Override != nil {
-					f2f5f5.SetOverride(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.Override)
+					f2f5f5.Override = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.Override
 				}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.Protection != nil {
-					f2f5f5.SetProtection(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.Protection)
+					f2f5f5.Protection = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.Protection
 				}
 				if r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.ReportURI != nil {
-					f2f5f5.SetReportUri(*r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.ReportURI)
+					f2f5f5.ReportUri = r.ko.Spec.ResponseHeadersPolicyConfig.SecurityHeadersConfig.XSSProtection.ReportURI
 				}
-				f2f5.SetXSSProtection(f2f5f5)
+				f2f5.XSSProtection = f2f5f5
 			}
-			f2.SetSecurityHeadersConfig(f2f5)
+			f2.SecurityHeadersConfig = f2f5
 		}
 		if r.ko.Spec.ResponseHeadersPolicyConfig.ServerTimingHeadersConfig != nil {
-			f2f6 := &svcsdk.ResponseHeadersPolicyServerTimingHeadersConfig{}
+			f2f6 := &svcsdktypes.ResponseHeadersPolicyServerTimingHeadersConfig{}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.ServerTimingHeadersConfig.Enabled != nil {
-				f2f6.SetEnabled(*r.ko.Spec.ResponseHeadersPolicyConfig.ServerTimingHeadersConfig.Enabled)
+				f2f6.Enabled = r.ko.Spec.ResponseHeadersPolicyConfig.ServerTimingHeadersConfig.Enabled
 			}
 			if r.ko.Spec.ResponseHeadersPolicyConfig.ServerTimingHeadersConfig.SamplingRate != nil {
-				f2f6.SetSamplingRate(*r.ko.Spec.ResponseHeadersPolicyConfig.ServerTimingHeadersConfig.SamplingRate)
+				f2f6.SamplingRate = r.ko.Spec.ResponseHeadersPolicyConfig.ServerTimingHeadersConfig.SamplingRate
 			}
-			f2.SetServerTimingHeadersConfig(f2f6)
+			f2.ServerTimingHeadersConfig = f2f6
 		}
-		res.SetResponseHeadersPolicyConfig(f2)
+		res.ResponseHeadersPolicyConfig = f2
 	}
 
 	return res, nil
@@ -1068,12 +1021,12 @@ func (rm *resourceManager) sdkDelete(
 	// If we don't do this, we get the following on every delete call:
 	// InvalidIfMatchVersion: The If-Match version is missing or not valid for the resource.
 	if r.ko.Status.ETag != nil {
-		input.SetIfMatch(*r.ko.Status.ETag)
+		input.IfMatch = r.ko.Status.ETag
 	}
 
 	var resp *svcsdk.DeleteResponseHeadersPolicyOutput
 	_ = resp
-	resp, err = rm.sdkapi.DeleteResponseHeadersPolicyWithContext(ctx, input)
+	resp, err = rm.sdkapi.DeleteResponseHeadersPolicy(ctx, input)
 	rm.metrics.RecordAPICall("DELETE", "DeleteResponseHeadersPolicy", err)
 	return nil, err
 }
@@ -1086,7 +1039,7 @@ func (rm *resourceManager) newDeleteRequestPayload(
 	res := &svcsdk.DeleteResponseHeadersPolicyInput{}
 
 	if r.ko.Status.ID != nil {
-		res.SetId(*r.ko.Status.ID)
+		res.Id = r.ko.Status.ID
 	}
 
 	return res, nil

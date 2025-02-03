@@ -94,6 +94,34 @@ type AllowedMethods struct {
 	Items         []*string      `json:"items,omitempty"`
 }
 
+// An Anycast static IP list.
+type AnycastIPList struct {
+	ARN              *string      `json:"arn,omitempty"`
+	ID               *string      `json:"id,omitempty"`
+	IPCount          *int64       `json:"ipCount,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+	Status           *string      `json:"status,omitempty"`
+}
+
+// The Anycast static IP list collection.
+type AnycastIPListCollection struct {
+	IsTruncated *bool   `json:"isTruncated,omitempty"`
+	Marker      *string `json:"marker,omitempty"`
+	MaxItems    *int64  `json:"maxItems,omitempty"`
+	NextMarker  *string `json:"nextMarker,omitempty"`
+	Quantity    *int64  `json:"quantity,omitempty"`
+}
+
+// An abbreviated version of the AnycastIpList structure. Omits the allocated
+// static IP addresses (AnycastIpList$AnycastIps).
+type AnycastIPListSummary struct {
+	ARN              *string      `json:"arn,omitempty"`
+	ID               *string      `json:"id,omitempty"`
+	IPCount          *int64       `json:"ipCount,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+	Status           *string      `json:"status,omitempty"`
+}
+
 // A complex type that describes how CloudFront processes requests.
 //
 // You must create at least as many cache behaviors (including the default cache
@@ -108,7 +136,8 @@ type AllowedMethods struct {
 // in the Amazon CloudFront Developer Guide.
 //
 // If you don't want to specify any cache behaviors, include only an empty CacheBehaviors
-// element. Don't include an empty CacheBehavior element because this is invalid.
+// element. Don't specify an empty individual CacheBehavior element, because
+// this is invalid. For more information, see CacheBehaviors (https://docs.aws.amazon.com/cloudfront/latest/APIReference/API_CacheBehaviors.html).
 //
 // To delete all cache behaviors in an existing distribution, update the distribution
 // configuration and include only an empty CacheBehaviors element.
@@ -156,8 +185,8 @@ type CacheBehavior struct {
 	// and HTTP headers.
 	ForwardedValues *ForwardedValues `json:"forwardedValues,omitempty"`
 	// A list of CloudFront functions that are associated with a cache behavior
-	// in a CloudFront distribution. CloudFront functions must be published to the
-	// LIVE stage to associate them with a cache behavior.
+	// in a CloudFront distribution. Your functions must be published to the LIVE
+	// stage to associate them with a cache behavior.
 	FunctionAssociations *FunctionAssociations `json:"functionAssociations,omitempty"`
 	// A complex type that specifies a list of Lambda@Edge functions associations
 	// for a cache behavior.
@@ -522,8 +551,8 @@ type DefaultCacheBehavior struct {
 	// and HTTP headers.
 	ForwardedValues *ForwardedValues `json:"forwardedValues,omitempty"`
 	// A list of CloudFront functions that are associated with a cache behavior
-	// in a CloudFront distribution. CloudFront functions must be published to the
-	// LIVE stage to associate them with a cache behavior.
+	// in a CloudFront distribution. Your functions must be published to the LIVE
+	// stage to associate them with a cache behavior.
 	FunctionAssociations *FunctionAssociations `json:"functionAssociations,omitempty"`
 	// A complex type that specifies a list of Lambda@Edge functions associations
 	// for a cache behavior.
@@ -582,7 +611,16 @@ type DistributionConfig struct {
 	Enabled              *bool                 `json:"enabled,omitempty"`
 	HTTPVersion          *string               `json:"httpVersion,omitempty"`
 	IsIPV6Enabled        *bool                 `json:"isIPV6Enabled,omitempty"`
-	// A complex type that controls whether access logs are written for the distribution.
+	// A complex type that specifies whether access logs are written for the distribution.
+	//
+	// If you already enabled standard logging (legacy) and you want to enable standard
+	// logging (v2) to send your access logs to Amazon S3, we recommend that you
+	// specify a different Amazon S3 bucket or use a separate path in the same bucket
+	// (for example, use a log prefix or partitioning). This helps you keep track
+	// of which log files are associated with which logging subscription and prevents
+	// log files from overwriting each other. For more information, see Standard
+	// logging (access logs) (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html)
+	// in the Amazon CloudFront Developer Guide.
 	Logging *LoggingConfig `json:"logging,omitempty"`
 	// A complex data type for the origin groups specified for a distribution.
 	OriginGroups *OriginGroups `json:"originGroups,omitempty"`
@@ -668,7 +706,8 @@ type DistributionSummary struct {
 	AliasICPRecordals []*AliasICPRecordal `json:"aliasICPRecordals,omitempty"`
 	// A complex type that contains information about CNAMEs (alternate domain names),
 	// if any, for this distribution.
-	Aliases *Aliases `json:"aliases,omitempty"`
+	Aliases         *Aliases `json:"aliases,omitempty"`
+	AnycastIPListID *string  `json:"anycastIPListID,omitempty"`
 	// A complex type that contains zero or more CacheBehavior elements.
 	CacheBehaviors *CacheBehaviors `json:"cacheBehaviors,omitempty"`
 	Comment        *string         `json:"comment,omitempty"`
@@ -801,7 +840,7 @@ type FieldLevelEncryptionConfig struct {
 	Comment         *string `json:"comment,omitempty"`
 }
 
-// List of field-level encrpytion configurations.
+// List of field-level encryption configurations.
 type FieldLevelEncryptionList struct {
 	MaxItems   *int64  `json:"maxItems,omitempty"`
 	NextMarker *string `json:"nextMarker,omitempty"`
@@ -903,8 +942,8 @@ type FunctionAssociation struct {
 }
 
 // A list of CloudFront functions that are associated with a cache behavior
-// in a CloudFront distribution. CloudFront functions must be published to the
-// LIVE stage to associate them with a cache behavior.
+// in a CloudFront distribution. Your functions must be published to the LIVE
+// stage to associate them with a cache behavior.
 type FunctionAssociations struct {
 	Items []*FunctionAssociation `json:"items,omitempty"`
 }
@@ -941,6 +980,20 @@ type FunctionSummary struct {
 	Status           *string           `json:"status,omitempty"`
 }
 
+// Amazon CloudFront supports gRPC, an open-source remote procedure call (RPC)
+// framework built on HTTP/2. gRPC offers bi-directional streaming and binary
+// protocol that buffers payloads, making it suitable for applications that
+// require low latency communications.
+//
+// To enable your distribution to handle gRPC requests, you must include HTTP/2
+// as one of the supported HTTP versions and allow HTTP methods, including POST.
+//
+// For more information, see Using gRPC with CloudFront distributions (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-using-grpc.html)
+// in the Amazon CloudFront Developer Guide.
+type GRPCConfig struct {
+	Enabled *bool `json:"enabled,omitempty"`
+}
+
 // A complex type that controls the countries in which your content is distributed.
 // CloudFront determines the location of your users using MaxMind GeoIP databases.
 type GeoRestriction struct {
@@ -951,6 +1004,11 @@ type GeoRestriction struct {
 // Contains a list of HTTP header names.
 type Headers struct {
 	Items []*string `json:"items,omitempty"`
+}
+
+// The import source for the key value store.
+type ImportSource struct {
+	SourceARN *string `json:"sourceARN,omitempty"`
 }
 
 // An invalidation.
@@ -1023,6 +1081,30 @@ type KeyPairIDs struct {
 	Quantity *int64    `json:"quantity,omitempty"`
 }
 
+// The key value store. Use this to separate data from function code, allowing
+// you to update data without having to publish a new version of a function.
+// The key value store holds keys and their corresponding values.
+type KeyValueStore struct {
+	ARN              *string      `json:"arn,omitempty"`
+	Comment          *string      `json:"comment,omitempty"`
+	ID               *string      `json:"id,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+	Name             *string      `json:"name,omitempty"`
+	Status           *string      `json:"status,omitempty"`
+}
+
+// The key value store associations.
+type KeyValueStoreAssociations struct {
+	Quantity *int64 `json:"quantity,omitempty"`
+}
+
+// The key value store list.
+type KeyValueStoreList struct {
+	MaxItems   *int64  `json:"maxItems,omitempty"`
+	NextMarker *string `json:"nextMarker,omitempty"`
+	Quantity   *int64  `json:"quantity,omitempty"`
+}
+
 // Contains information about the Amazon Kinesis data stream where you are sending
 // real-time log data.
 type KinesisStreamConfig struct {
@@ -1052,7 +1134,16 @@ type LambdaFunctionAssociations struct {
 	Items []*LambdaFunctionAssociation `json:"items,omitempty"`
 }
 
-// A complex type that controls whether access logs are written for the distribution.
+// A complex type that specifies whether access logs are written for the distribution.
+//
+// If you already enabled standard logging (legacy) and you want to enable standard
+// logging (v2) to send your access logs to Amazon S3, we recommend that you
+// specify a different Amazon S3 bucket or use a separate path in the same bucket
+// (for example, use a log prefix or partitioning). This helps you keep track
+// of which log files are associated with which logging subscription and prevents
+// log files from overwriting each other. For more information, see Standard
+// logging (access logs) (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html)
+// in the Amazon CloudFront Developer Guide.
 type LoggingConfig struct {
 	Bucket         *string `json:"bucket,omitempty"`
 	Enabled        *bool   `json:"enabled,omitempty"`
@@ -1070,9 +1161,9 @@ type LoggingConfig struct {
 //
 //   - Use CustomOriginConfig to specify all other kinds of origins, including:
 //     An Amazon S3 bucket that is configured with static website hosting An
-//     Elastic Load Balancing load balancer An AWS Elemental MediaPackage endpoint
-//     An AWS Elemental MediaStore container Any other HTTP server, running on
-//     an Amazon EC2 instance or any other kind of host
+//     Elastic Load Balancing load balancer An Elemental MediaPackage endpoint
+//     An Elemental MediaStore container Any other HTTP server, running on an
+//     Amazon EC2 instance or any other kind of host
 //
 // For the current maximum number of origins that you can specify per distribution,
 // see General Quotas on Web Distributions (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html#limits-web-distributions)
@@ -1181,12 +1272,15 @@ type OriginCustomHeader struct {
 	HeaderValue *string `json:"headerValue,omitempty"`
 }
 
-// An origin group includes two origins (a primary origin and a second origin
+// An origin group includes two origins (a primary origin and a secondary origin
 // to failover to) and a failover criteria that you specify. You create an origin
 // group to support origin failover in CloudFront. When you create or update
-// a distribution, you can specifiy the origin group instead of a single origin,
-// and CloudFront will failover from the primary origin to the second origin
+// a distribution, you can specify the origin group instead of a single origin,
+// and CloudFront will failover from the primary origin to the secondary origin
 // under the failover conditions that you've chosen.
+//
+// Optionally, you can choose selection criteria for your origin group to specify
+// how your origins are selected when your distribution routes viewer requests.
 type OriginGroup struct {
 	// A complex data type that includes information about the failover criteria
 	// for an origin group, including the status codes for which CloudFront will
@@ -1986,6 +2080,52 @@ type TrustedKeyGroups struct {
 type TrustedSigners struct {
 	Enabled *bool     `json:"enabled,omitempty"`
 	Items   []*string `json:"items,omitempty"`
+}
+
+// An Amazon CloudFront VPC origin.
+type VPCOrigin struct {
+	ARN              *string      `json:"arn,omitempty"`
+	CreatedTime      *metav1.Time `json:"createdTime,omitempty"`
+	ID               *string      `json:"id,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+	Status           *string      `json:"status,omitempty"`
+}
+
+// An Amazon CloudFront VPC origin configuration.
+type VPCOriginConfig struct {
+	VPCOriginID *string `json:"vpcOriginID,omitempty"`
+}
+
+// An Amazon CloudFront VPC origin endpoint configuration.
+type VPCOriginEndpointConfig struct {
+	ARN                  *string `json:"arn,omitempty"`
+	HTTPPort             *int64  `json:"httpPort,omitempty"`
+	HTTPSPort            *int64  `json:"httpSPort,omitempty"`
+	Name                 *string `json:"name,omitempty"`
+	OriginProtocolPolicy *string `json:"originProtocolPolicy,omitempty"`
+	// A complex type that contains information about the SSL/TLS protocols that
+	// CloudFront can use when establishing an HTTPS connection with your origin.
+	OriginSSLProtocols *OriginSSLProtocols `json:"originSSLProtocols,omitempty"`
+}
+
+// A list of CloudFront VPC origins.
+type VPCOriginList struct {
+	IsTruncated *bool   `json:"isTruncated,omitempty"`
+	Marker      *string `json:"marker,omitempty"`
+	MaxItems    *int64  `json:"maxItems,omitempty"`
+	NextMarker  *string `json:"nextMarker,omitempty"`
+	Quantity    *int64  `json:"quantity,omitempty"`
+}
+
+// A summary of the CloudFront VPC origin.
+type VPCOriginSummary struct {
+	ARN               *string      `json:"arn,omitempty"`
+	CreatedTime       *metav1.Time `json:"createdTime,omitempty"`
+	ID                *string      `json:"id,omitempty"`
+	LastModifiedTime  *metav1.Time `json:"lastModifiedTime,omitempty"`
+	Name              *string      `json:"name,omitempty"`
+	OriginEndpointARN *string      `json:"originEndpointARN,omitempty"`
+	Status            *string      `json:"status,omitempty"`
 }
 
 // A complex type that determines the distribution's SSL/TLS configuration for

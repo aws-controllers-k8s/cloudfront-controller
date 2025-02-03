@@ -16,10 +16,10 @@ package function
 import (
 	"context"
 
-	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
-	svcsdk "github.com/aws/aws-sdk-go/service/cloudfront"
-
 	"github.com/aws-controllers-k8s/cloudfront-controller/apis/v1alpha1"
+	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
+	svcsdk "github.com/aws/aws-sdk-go-v2/service/cloudfront"
+	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 )
 
 // setResourceAdditionalFields sets any additional fields that are not returned
@@ -43,11 +43,11 @@ func (rm *resourceManager) setFunctionCode(ctx context.Context, r *v1alpha1.Func
 	exit := rlog.Trace("rm.setFunctionCode")
 	defer exit(err)
 
-	output, err := rm.sdkapi.GetFunctionWithContext(
+	output, err := rm.sdkapi.GetFunction(
 		ctx,
 		&svcsdk.GetFunctionInput{
 			Name:  r.Spec.Name,
-			Stage: r.Status.FunctionSummary.FunctionMetadata.Stage,
+			Stage: svcsdktypes.FunctionStage(*r.Status.FunctionSummary.FunctionMetadata.Stage),
 		},
 	)
 	rm.metrics.RecordAPICall("GET", "GetFunction", err)

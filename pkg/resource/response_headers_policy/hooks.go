@@ -14,7 +14,8 @@
 package response_headers_policy
 
 import (
-	svcsdk "github.com/aws/aws-sdk-go/service/cloudfront"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 )
 
 // setQuantityFields simply goes through the input shape and sets the Quantity
@@ -22,28 +23,28 @@ import (
 // This is necessary because CloudFront's API will return an
 // `InconsistentQuantities` error message if Quantity != len(Items). This is
 // why we can't have nice things, apparently.
-func setQuantityFields(rhp *svcsdk.ResponseHeadersPolicyConfig) {
+func setQuantityFields(rhp *svcsdktypes.ResponseHeadersPolicyConfig) {
 	if rhp == nil {
 		return
 	}
 	if rhp.CorsConfig != nil {
 		if rhp.CorsConfig.AccessControlAllowHeaders != nil && rhp.CorsConfig.AccessControlAllowHeaders.Items != nil {
-			rhp.CorsConfig.AccessControlAllowHeaders.SetQuantity(int64(len(rhp.CorsConfig.AccessControlAllowHeaders.Items)))
+			rhp.CorsConfig.AccessControlAllowHeaders.Quantity = aws.Int32(int32(len(rhp.CorsConfig.AccessControlAllowHeaders.Items)))
 		}
 		if rhp.CorsConfig.AccessControlAllowMethods != nil && rhp.CorsConfig.AccessControlAllowMethods.Items != nil {
-			rhp.CorsConfig.AccessControlAllowMethods.SetQuantity(int64(len(rhp.CorsConfig.AccessControlAllowMethods.Items)))
+			rhp.CorsConfig.AccessControlAllowMethods.Quantity = aws.Int32(int32(len(rhp.CorsConfig.AccessControlAllowMethods.Items)))
 		}
 		if rhp.CorsConfig.AccessControlAllowOrigins != nil && rhp.CorsConfig.AccessControlAllowOrigins.Items != nil {
-			rhp.CorsConfig.AccessControlAllowOrigins.SetQuantity(int64(len(rhp.CorsConfig.AccessControlAllowOrigins.Items)))
+			rhp.CorsConfig.AccessControlAllowOrigins.Quantity = aws.Int32(int32(len(rhp.CorsConfig.AccessControlAllowOrigins.Items)))
 		}
 		if rhp.CorsConfig.AccessControlExposeHeaders != nil && rhp.CorsConfig.AccessControlExposeHeaders.Items != nil {
-			rhp.CorsConfig.AccessControlExposeHeaders.SetQuantity(int64(len(rhp.CorsConfig.AccessControlExposeHeaders.Items)))
+			rhp.CorsConfig.AccessControlExposeHeaders.Quantity = aws.Int32(int32(len(rhp.CorsConfig.AccessControlExposeHeaders.Items)))
 		}
 	}
 	if rhp.CustomHeadersConfig != nil && rhp.CustomHeadersConfig.Items != nil {
-		rhp.CustomHeadersConfig.SetQuantity(int64(len(rhp.CustomHeadersConfig.Items)))
+		rhp.CustomHeadersConfig.Quantity = aws.Int32(int32(len(rhp.CustomHeadersConfig.Items)))
 	}
 	if rhp.RemoveHeadersConfig != nil && rhp.RemoveHeadersConfig.Items != nil {
-		rhp.RemoveHeadersConfig.SetQuantity(int64(len(rhp.RemoveHeadersConfig.Items)))
+		rhp.RemoveHeadersConfig.Quantity = aws.Int32(int32(len(rhp.RemoveHeadersConfig.Items)))
 	}
 }

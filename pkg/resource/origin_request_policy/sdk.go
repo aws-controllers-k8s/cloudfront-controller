@@ -28,8 +28,10 @@ import (
 	ackerr "github.com/aws-controllers-k8s/runtime/pkg/errors"
 	ackrequeue "github.com/aws-controllers-k8s/runtime/pkg/requeue"
 	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
-	"github.com/aws/aws-sdk-go/aws"
-	svcsdk "github.com/aws/aws-sdk-go/service/cloudfront"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	svcsdk "github.com/aws/aws-sdk-go-v2/service/cloudfront"
+	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
+	smithy "github.com/aws/smithy-go"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -40,8 +42,7 @@ import (
 var (
 	_ = &metav1.Time{}
 	_ = strings.ToLower("")
-	_ = &aws.JSONValue{}
-	_ = &svcsdk.CloudFront{}
+	_ = &svcsdk.Client{}
 	_ = &svcapitypes.OriginRequestPolicy{}
 	_ = ackv1alpha1.AWSAccountID("")
 	_ = &ackerr.NotFound
@@ -49,6 +50,7 @@ var (
 	_ = &reflect.Value{}
 	_ = fmt.Sprintf("")
 	_ = &ackrequeue.NoRequeue{}
+	_ = &aws.Config{}
 )
 
 // sdkFind returns SDK-specific information about a supplied resource
@@ -74,13 +76,11 @@ func (rm *resourceManager) sdkFind(
 	}
 
 	var resp *svcsdk.GetOriginRequestPolicyOutput
-	resp, err = rm.sdkapi.GetOriginRequestPolicyWithContext(ctx, input)
+	resp, err = rm.sdkapi.GetOriginRequestPolicy(ctx, input)
 	rm.metrics.RecordAPICall("READ_ONE", "GetOriginRequestPolicy", err)
 	if err != nil {
-		if reqErr, ok := ackerr.AWSRequestFailure(err); ok && reqErr.StatusCode() == 404 {
-			return nil, ackerr.NotFound
-		}
-		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "NoSuchOriginRequestPolicy" {
+		var awsErr smithy.APIError
+		if errors.As(err, &awsErr) && awsErr.ErrorCode() == "NoSuchOriginRequestPolicy" {
 			return nil, ackerr.NotFound
 		}
 		return nil, err
@@ -107,19 +107,13 @@ func (rm *resourceManager) sdkFind(
 		}
 		if resp.OriginRequestPolicy.OriginRequestPolicyConfig.CookiesConfig != nil {
 			f2f1 := &svcapitypes.OriginRequestPolicyCookiesConfig{}
-			if resp.OriginRequestPolicy.OriginRequestPolicyConfig.CookiesConfig.CookieBehavior != nil {
-				f2f1.CookieBehavior = resp.OriginRequestPolicy.OriginRequestPolicyConfig.CookiesConfig.CookieBehavior
+			if resp.OriginRequestPolicy.OriginRequestPolicyConfig.CookiesConfig.CookieBehavior != "" {
+				f2f1.CookieBehavior = aws.String(string(resp.OriginRequestPolicy.OriginRequestPolicyConfig.CookiesConfig.CookieBehavior))
 			}
 			if resp.OriginRequestPolicy.OriginRequestPolicyConfig.CookiesConfig.Cookies != nil {
 				f2f1f1 := &svcapitypes.CookieNames{}
 				if resp.OriginRequestPolicy.OriginRequestPolicyConfig.CookiesConfig.Cookies.Items != nil {
-					f2f1f1f0 := []*string{}
-					for _, f2f1f1f0iter := range resp.OriginRequestPolicy.OriginRequestPolicyConfig.CookiesConfig.Cookies.Items {
-						var f2f1f1f0elem string
-						f2f1f1f0elem = *f2f1f1f0iter
-						f2f1f1f0 = append(f2f1f1f0, &f2f1f1f0elem)
-					}
-					f2f1f1.Items = f2f1f1f0
+					f2f1f1.Items = aws.StringSlice(resp.OriginRequestPolicy.OriginRequestPolicyConfig.CookiesConfig.Cookies.Items)
 				}
 				f2f1.Cookies = f2f1f1
 			}
@@ -127,19 +121,13 @@ func (rm *resourceManager) sdkFind(
 		}
 		if resp.OriginRequestPolicy.OriginRequestPolicyConfig.HeadersConfig != nil {
 			f2f2 := &svcapitypes.OriginRequestPolicyHeadersConfig{}
-			if resp.OriginRequestPolicy.OriginRequestPolicyConfig.HeadersConfig.HeaderBehavior != nil {
-				f2f2.HeaderBehavior = resp.OriginRequestPolicy.OriginRequestPolicyConfig.HeadersConfig.HeaderBehavior
+			if resp.OriginRequestPolicy.OriginRequestPolicyConfig.HeadersConfig.HeaderBehavior != "" {
+				f2f2.HeaderBehavior = aws.String(string(resp.OriginRequestPolicy.OriginRequestPolicyConfig.HeadersConfig.HeaderBehavior))
 			}
 			if resp.OriginRequestPolicy.OriginRequestPolicyConfig.HeadersConfig.Headers != nil {
 				f2f2f1 := &svcapitypes.Headers{}
 				if resp.OriginRequestPolicy.OriginRequestPolicyConfig.HeadersConfig.Headers.Items != nil {
-					f2f2f1f0 := []*string{}
-					for _, f2f2f1f0iter := range resp.OriginRequestPolicy.OriginRequestPolicyConfig.HeadersConfig.Headers.Items {
-						var f2f2f1f0elem string
-						f2f2f1f0elem = *f2f2f1f0iter
-						f2f2f1f0 = append(f2f2f1f0, &f2f2f1f0elem)
-					}
-					f2f2f1.Items = f2f2f1f0
+					f2f2f1.Items = aws.StringSlice(resp.OriginRequestPolicy.OriginRequestPolicyConfig.HeadersConfig.Headers.Items)
 				}
 				f2f2.Headers = f2f2f1
 			}
@@ -150,19 +138,13 @@ func (rm *resourceManager) sdkFind(
 		}
 		if resp.OriginRequestPolicy.OriginRequestPolicyConfig.QueryStringsConfig != nil {
 			f2f4 := &svcapitypes.OriginRequestPolicyQueryStringsConfig{}
-			if resp.OriginRequestPolicy.OriginRequestPolicyConfig.QueryStringsConfig.QueryStringBehavior != nil {
-				f2f4.QueryStringBehavior = resp.OriginRequestPolicy.OriginRequestPolicyConfig.QueryStringsConfig.QueryStringBehavior
+			if resp.OriginRequestPolicy.OriginRequestPolicyConfig.QueryStringsConfig.QueryStringBehavior != "" {
+				f2f4.QueryStringBehavior = aws.String(string(resp.OriginRequestPolicy.OriginRequestPolicyConfig.QueryStringsConfig.QueryStringBehavior))
 			}
 			if resp.OriginRequestPolicy.OriginRequestPolicyConfig.QueryStringsConfig.QueryStrings != nil {
 				f2f4f1 := &svcapitypes.QueryStringNames{}
 				if resp.OriginRequestPolicy.OriginRequestPolicyConfig.QueryStringsConfig.QueryStrings.Items != nil {
-					f2f4f1f0 := []*string{}
-					for _, f2f4f1f0iter := range resp.OriginRequestPolicy.OriginRequestPolicyConfig.QueryStringsConfig.QueryStrings.Items {
-						var f2f4f1f0elem string
-						f2f4f1f0elem = *f2f4f1f0iter
-						f2f4f1f0 = append(f2f4f1f0, &f2f4f1f0elem)
-					}
-					f2f4f1.Items = f2f4f1f0
+					f2f4f1.Items = aws.StringSlice(resp.OriginRequestPolicy.OriginRequestPolicyConfig.QueryStringsConfig.QueryStrings.Items)
 				}
 				f2f4.QueryStrings = f2f4f1
 			}
@@ -202,7 +184,7 @@ func (rm *resourceManager) newDescribeRequestPayload(
 	res := &svcsdk.GetOriginRequestPolicyInput{}
 
 	if r.ko.Status.ID != nil {
-		res.SetId(*r.ko.Status.ID)
+		res.Id = r.ko.Status.ID
 	}
 
 	return res, nil
@@ -229,7 +211,7 @@ func (rm *resourceManager) sdkCreate(
 
 	var resp *svcsdk.CreateOriginRequestPolicyOutput
 	_ = resp
-	resp, err = rm.sdkapi.CreateOriginRequestPolicyWithContext(ctx, input)
+	resp, err = rm.sdkapi.CreateOriginRequestPolicy(ctx, input)
 	rm.metrics.RecordAPICall("CREATE", "CreateOriginRequestPolicy", err)
 	if err != nil {
 		return nil, err
@@ -255,19 +237,13 @@ func (rm *resourceManager) sdkCreate(
 		}
 		if resp.OriginRequestPolicy.OriginRequestPolicyConfig.CookiesConfig != nil {
 			f2f1 := &svcapitypes.OriginRequestPolicyCookiesConfig{}
-			if resp.OriginRequestPolicy.OriginRequestPolicyConfig.CookiesConfig.CookieBehavior != nil {
-				f2f1.CookieBehavior = resp.OriginRequestPolicy.OriginRequestPolicyConfig.CookiesConfig.CookieBehavior
+			if resp.OriginRequestPolicy.OriginRequestPolicyConfig.CookiesConfig.CookieBehavior != "" {
+				f2f1.CookieBehavior = aws.String(string(resp.OriginRequestPolicy.OriginRequestPolicyConfig.CookiesConfig.CookieBehavior))
 			}
 			if resp.OriginRequestPolicy.OriginRequestPolicyConfig.CookiesConfig.Cookies != nil {
 				f2f1f1 := &svcapitypes.CookieNames{}
 				if resp.OriginRequestPolicy.OriginRequestPolicyConfig.CookiesConfig.Cookies.Items != nil {
-					f2f1f1f0 := []*string{}
-					for _, f2f1f1f0iter := range resp.OriginRequestPolicy.OriginRequestPolicyConfig.CookiesConfig.Cookies.Items {
-						var f2f1f1f0elem string
-						f2f1f1f0elem = *f2f1f1f0iter
-						f2f1f1f0 = append(f2f1f1f0, &f2f1f1f0elem)
-					}
-					f2f1f1.Items = f2f1f1f0
+					f2f1f1.Items = aws.StringSlice(resp.OriginRequestPolicy.OriginRequestPolicyConfig.CookiesConfig.Cookies.Items)
 				}
 				f2f1.Cookies = f2f1f1
 			}
@@ -275,19 +251,13 @@ func (rm *resourceManager) sdkCreate(
 		}
 		if resp.OriginRequestPolicy.OriginRequestPolicyConfig.HeadersConfig != nil {
 			f2f2 := &svcapitypes.OriginRequestPolicyHeadersConfig{}
-			if resp.OriginRequestPolicy.OriginRequestPolicyConfig.HeadersConfig.HeaderBehavior != nil {
-				f2f2.HeaderBehavior = resp.OriginRequestPolicy.OriginRequestPolicyConfig.HeadersConfig.HeaderBehavior
+			if resp.OriginRequestPolicy.OriginRequestPolicyConfig.HeadersConfig.HeaderBehavior != "" {
+				f2f2.HeaderBehavior = aws.String(string(resp.OriginRequestPolicy.OriginRequestPolicyConfig.HeadersConfig.HeaderBehavior))
 			}
 			if resp.OriginRequestPolicy.OriginRequestPolicyConfig.HeadersConfig.Headers != nil {
 				f2f2f1 := &svcapitypes.Headers{}
 				if resp.OriginRequestPolicy.OriginRequestPolicyConfig.HeadersConfig.Headers.Items != nil {
-					f2f2f1f0 := []*string{}
-					for _, f2f2f1f0iter := range resp.OriginRequestPolicy.OriginRequestPolicyConfig.HeadersConfig.Headers.Items {
-						var f2f2f1f0elem string
-						f2f2f1f0elem = *f2f2f1f0iter
-						f2f2f1f0 = append(f2f2f1f0, &f2f2f1f0elem)
-					}
-					f2f2f1.Items = f2f2f1f0
+					f2f2f1.Items = aws.StringSlice(resp.OriginRequestPolicy.OriginRequestPolicyConfig.HeadersConfig.Headers.Items)
 				}
 				f2f2.Headers = f2f2f1
 			}
@@ -298,19 +268,13 @@ func (rm *resourceManager) sdkCreate(
 		}
 		if resp.OriginRequestPolicy.OriginRequestPolicyConfig.QueryStringsConfig != nil {
 			f2f4 := &svcapitypes.OriginRequestPolicyQueryStringsConfig{}
-			if resp.OriginRequestPolicy.OriginRequestPolicyConfig.QueryStringsConfig.QueryStringBehavior != nil {
-				f2f4.QueryStringBehavior = resp.OriginRequestPolicy.OriginRequestPolicyConfig.QueryStringsConfig.QueryStringBehavior
+			if resp.OriginRequestPolicy.OriginRequestPolicyConfig.QueryStringsConfig.QueryStringBehavior != "" {
+				f2f4.QueryStringBehavior = aws.String(string(resp.OriginRequestPolicy.OriginRequestPolicyConfig.QueryStringsConfig.QueryStringBehavior))
 			}
 			if resp.OriginRequestPolicy.OriginRequestPolicyConfig.QueryStringsConfig.QueryStrings != nil {
 				f2f4f1 := &svcapitypes.QueryStringNames{}
 				if resp.OriginRequestPolicy.OriginRequestPolicyConfig.QueryStringsConfig.QueryStrings.Items != nil {
-					f2f4f1f0 := []*string{}
-					for _, f2f4f1f0iter := range resp.OriginRequestPolicy.OriginRequestPolicyConfig.QueryStringsConfig.QueryStrings.Items {
-						var f2f4f1f0elem string
-						f2f4f1f0elem = *f2f4f1f0iter
-						f2f4f1f0 = append(f2f4f1f0, &f2f4f1f0elem)
-					}
-					f2f4f1.Items = f2f4f1f0
+					f2f4f1.Items = aws.StringSlice(resp.OriginRequestPolicy.OriginRequestPolicyConfig.QueryStringsConfig.QueryStrings.Items)
 				}
 				f2f4.QueryStrings = f2f4f1
 			}
@@ -342,74 +306,56 @@ func (rm *resourceManager) newCreateRequestPayload(
 	res := &svcsdk.CreateOriginRequestPolicyInput{}
 
 	if r.ko.Spec.OriginRequestPolicyConfig != nil {
-		f0 := &svcsdk.OriginRequestPolicyConfig{}
+		f0 := &svcsdktypes.OriginRequestPolicyConfig{}
 		if r.ko.Spec.OriginRequestPolicyConfig.Comment != nil {
-			f0.SetComment(*r.ko.Spec.OriginRequestPolicyConfig.Comment)
+			f0.Comment = r.ko.Spec.OriginRequestPolicyConfig.Comment
 		}
 		if r.ko.Spec.OriginRequestPolicyConfig.CookiesConfig != nil {
-			f0f1 := &svcsdk.OriginRequestPolicyCookiesConfig{}
+			f0f1 := &svcsdktypes.OriginRequestPolicyCookiesConfig{}
 			if r.ko.Spec.OriginRequestPolicyConfig.CookiesConfig.CookieBehavior != nil {
-				f0f1.SetCookieBehavior(*r.ko.Spec.OriginRequestPolicyConfig.CookiesConfig.CookieBehavior)
+				f0f1.CookieBehavior = svcsdktypes.OriginRequestPolicyCookieBehavior(*r.ko.Spec.OriginRequestPolicyConfig.CookiesConfig.CookieBehavior)
 			}
 			if r.ko.Spec.OriginRequestPolicyConfig.CookiesConfig.Cookies != nil {
-				f0f1f1 := &svcsdk.CookieNames{}
+				f0f1f1 := &svcsdktypes.CookieNames{}
 				if r.ko.Spec.OriginRequestPolicyConfig.CookiesConfig.Cookies.Items != nil {
-					f0f1f1f0 := []*string{}
-					for _, f0f1f1f0iter := range r.ko.Spec.OriginRequestPolicyConfig.CookiesConfig.Cookies.Items {
-						var f0f1f1f0elem string
-						f0f1f1f0elem = *f0f1f1f0iter
-						f0f1f1f0 = append(f0f1f1f0, &f0f1f1f0elem)
-					}
-					f0f1f1.SetItems(f0f1f1f0)
+					f0f1f1.Items = aws.ToStringSlice(r.ko.Spec.OriginRequestPolicyConfig.CookiesConfig.Cookies.Items)
 				}
-				f0f1.SetCookies(f0f1f1)
+				f0f1.Cookies = f0f1f1
 			}
-			f0.SetCookiesConfig(f0f1)
+			f0.CookiesConfig = f0f1
 		}
 		if r.ko.Spec.OriginRequestPolicyConfig.HeadersConfig != nil {
-			f0f2 := &svcsdk.OriginRequestPolicyHeadersConfig{}
+			f0f2 := &svcsdktypes.OriginRequestPolicyHeadersConfig{}
 			if r.ko.Spec.OriginRequestPolicyConfig.HeadersConfig.HeaderBehavior != nil {
-				f0f2.SetHeaderBehavior(*r.ko.Spec.OriginRequestPolicyConfig.HeadersConfig.HeaderBehavior)
+				f0f2.HeaderBehavior = svcsdktypes.OriginRequestPolicyHeaderBehavior(*r.ko.Spec.OriginRequestPolicyConfig.HeadersConfig.HeaderBehavior)
 			}
 			if r.ko.Spec.OriginRequestPolicyConfig.HeadersConfig.Headers != nil {
-				f0f2f1 := &svcsdk.Headers{}
+				f0f2f1 := &svcsdktypes.Headers{}
 				if r.ko.Spec.OriginRequestPolicyConfig.HeadersConfig.Headers.Items != nil {
-					f0f2f1f0 := []*string{}
-					for _, f0f2f1f0iter := range r.ko.Spec.OriginRequestPolicyConfig.HeadersConfig.Headers.Items {
-						var f0f2f1f0elem string
-						f0f2f1f0elem = *f0f2f1f0iter
-						f0f2f1f0 = append(f0f2f1f0, &f0f2f1f0elem)
-					}
-					f0f2f1.SetItems(f0f2f1f0)
+					f0f2f1.Items = aws.ToStringSlice(r.ko.Spec.OriginRequestPolicyConfig.HeadersConfig.Headers.Items)
 				}
-				f0f2.SetHeaders(f0f2f1)
+				f0f2.Headers = f0f2f1
 			}
-			f0.SetHeadersConfig(f0f2)
+			f0.HeadersConfig = f0f2
 		}
 		if r.ko.Spec.OriginRequestPolicyConfig.Name != nil {
-			f0.SetName(*r.ko.Spec.OriginRequestPolicyConfig.Name)
+			f0.Name = r.ko.Spec.OriginRequestPolicyConfig.Name
 		}
 		if r.ko.Spec.OriginRequestPolicyConfig.QueryStringsConfig != nil {
-			f0f4 := &svcsdk.OriginRequestPolicyQueryStringsConfig{}
+			f0f4 := &svcsdktypes.OriginRequestPolicyQueryStringsConfig{}
 			if r.ko.Spec.OriginRequestPolicyConfig.QueryStringsConfig.QueryStringBehavior != nil {
-				f0f4.SetQueryStringBehavior(*r.ko.Spec.OriginRequestPolicyConfig.QueryStringsConfig.QueryStringBehavior)
+				f0f4.QueryStringBehavior = svcsdktypes.OriginRequestPolicyQueryStringBehavior(*r.ko.Spec.OriginRequestPolicyConfig.QueryStringsConfig.QueryStringBehavior)
 			}
 			if r.ko.Spec.OriginRequestPolicyConfig.QueryStringsConfig.QueryStrings != nil {
-				f0f4f1 := &svcsdk.QueryStringNames{}
+				f0f4f1 := &svcsdktypes.QueryStringNames{}
 				if r.ko.Spec.OriginRequestPolicyConfig.QueryStringsConfig.QueryStrings.Items != nil {
-					f0f4f1f0 := []*string{}
-					for _, f0f4f1f0iter := range r.ko.Spec.OriginRequestPolicyConfig.QueryStringsConfig.QueryStrings.Items {
-						var f0f4f1f0elem string
-						f0f4f1f0elem = *f0f4f1f0iter
-						f0f4f1f0 = append(f0f4f1f0, &f0f4f1f0elem)
-					}
-					f0f4f1.SetItems(f0f4f1f0)
+					f0f4f1.Items = aws.ToStringSlice(r.ko.Spec.OriginRequestPolicyConfig.QueryStringsConfig.QueryStrings.Items)
 				}
-				f0f4.SetQueryStrings(f0f4f1)
+				f0f4.QueryStrings = f0f4f1
 			}
-			f0.SetQueryStringsConfig(f0f4)
+			f0.QueryStringsConfig = f0f4
 		}
-		res.SetOriginRequestPolicyConfig(f0)
+		res.OriginRequestPolicyConfig = f0
 	}
 
 	return res, nil
@@ -435,14 +381,14 @@ func (rm *resourceManager) sdkUpdate(
 	// If we don't do this, we get the following on every update call:
 	// InvalidIfMatchVersion: The If-Match version is missing or not valid for the resource.
 	if latest.ko.Status.ETag != nil {
-		input.SetIfMatch(*latest.ko.Status.ETag)
+		input.IfMatch = latest.ko.Status.ETag
 	}
 	// ¯\\\_(ツ)_/¯
 	setQuantityFields(input.OriginRequestPolicyConfig)
 
 	var resp *svcsdk.UpdateOriginRequestPolicyOutput
 	_ = resp
-	resp, err = rm.sdkapi.UpdateOriginRequestPolicyWithContext(ctx, input)
+	resp, err = rm.sdkapi.UpdateOriginRequestPolicy(ctx, input)
 	rm.metrics.RecordAPICall("UPDATE", "UpdateOriginRequestPolicy", err)
 	if err != nil {
 		return nil, err
@@ -479,77 +425,59 @@ func (rm *resourceManager) newUpdateRequestPayload(
 	res := &svcsdk.UpdateOriginRequestPolicyInput{}
 
 	if r.ko.Status.ID != nil {
-		res.SetId(*r.ko.Status.ID)
+		res.Id = r.ko.Status.ID
 	}
 	if r.ko.Spec.OriginRequestPolicyConfig != nil {
-		f2 := &svcsdk.OriginRequestPolicyConfig{}
+		f2 := &svcsdktypes.OriginRequestPolicyConfig{}
 		if r.ko.Spec.OriginRequestPolicyConfig.Comment != nil {
-			f2.SetComment(*r.ko.Spec.OriginRequestPolicyConfig.Comment)
+			f2.Comment = r.ko.Spec.OriginRequestPolicyConfig.Comment
 		}
 		if r.ko.Spec.OriginRequestPolicyConfig.CookiesConfig != nil {
-			f2f1 := &svcsdk.OriginRequestPolicyCookiesConfig{}
+			f2f1 := &svcsdktypes.OriginRequestPolicyCookiesConfig{}
 			if r.ko.Spec.OriginRequestPolicyConfig.CookiesConfig.CookieBehavior != nil {
-				f2f1.SetCookieBehavior(*r.ko.Spec.OriginRequestPolicyConfig.CookiesConfig.CookieBehavior)
+				f2f1.CookieBehavior = svcsdktypes.OriginRequestPolicyCookieBehavior(*r.ko.Spec.OriginRequestPolicyConfig.CookiesConfig.CookieBehavior)
 			}
 			if r.ko.Spec.OriginRequestPolicyConfig.CookiesConfig.Cookies != nil {
-				f2f1f1 := &svcsdk.CookieNames{}
+				f2f1f1 := &svcsdktypes.CookieNames{}
 				if r.ko.Spec.OriginRequestPolicyConfig.CookiesConfig.Cookies.Items != nil {
-					f2f1f1f0 := []*string{}
-					for _, f2f1f1f0iter := range r.ko.Spec.OriginRequestPolicyConfig.CookiesConfig.Cookies.Items {
-						var f2f1f1f0elem string
-						f2f1f1f0elem = *f2f1f1f0iter
-						f2f1f1f0 = append(f2f1f1f0, &f2f1f1f0elem)
-					}
-					f2f1f1.SetItems(f2f1f1f0)
+					f2f1f1.Items = aws.ToStringSlice(r.ko.Spec.OriginRequestPolicyConfig.CookiesConfig.Cookies.Items)
 				}
-				f2f1.SetCookies(f2f1f1)
+				f2f1.Cookies = f2f1f1
 			}
-			f2.SetCookiesConfig(f2f1)
+			f2.CookiesConfig = f2f1
 		}
 		if r.ko.Spec.OriginRequestPolicyConfig.HeadersConfig != nil {
-			f2f2 := &svcsdk.OriginRequestPolicyHeadersConfig{}
+			f2f2 := &svcsdktypes.OriginRequestPolicyHeadersConfig{}
 			if r.ko.Spec.OriginRequestPolicyConfig.HeadersConfig.HeaderBehavior != nil {
-				f2f2.SetHeaderBehavior(*r.ko.Spec.OriginRequestPolicyConfig.HeadersConfig.HeaderBehavior)
+				f2f2.HeaderBehavior = svcsdktypes.OriginRequestPolicyHeaderBehavior(*r.ko.Spec.OriginRequestPolicyConfig.HeadersConfig.HeaderBehavior)
 			}
 			if r.ko.Spec.OriginRequestPolicyConfig.HeadersConfig.Headers != nil {
-				f2f2f1 := &svcsdk.Headers{}
+				f2f2f1 := &svcsdktypes.Headers{}
 				if r.ko.Spec.OriginRequestPolicyConfig.HeadersConfig.Headers.Items != nil {
-					f2f2f1f0 := []*string{}
-					for _, f2f2f1f0iter := range r.ko.Spec.OriginRequestPolicyConfig.HeadersConfig.Headers.Items {
-						var f2f2f1f0elem string
-						f2f2f1f0elem = *f2f2f1f0iter
-						f2f2f1f0 = append(f2f2f1f0, &f2f2f1f0elem)
-					}
-					f2f2f1.SetItems(f2f2f1f0)
+					f2f2f1.Items = aws.ToStringSlice(r.ko.Spec.OriginRequestPolicyConfig.HeadersConfig.Headers.Items)
 				}
-				f2f2.SetHeaders(f2f2f1)
+				f2f2.Headers = f2f2f1
 			}
-			f2.SetHeadersConfig(f2f2)
+			f2.HeadersConfig = f2f2
 		}
 		if r.ko.Spec.OriginRequestPolicyConfig.Name != nil {
-			f2.SetName(*r.ko.Spec.OriginRequestPolicyConfig.Name)
+			f2.Name = r.ko.Spec.OriginRequestPolicyConfig.Name
 		}
 		if r.ko.Spec.OriginRequestPolicyConfig.QueryStringsConfig != nil {
-			f2f4 := &svcsdk.OriginRequestPolicyQueryStringsConfig{}
+			f2f4 := &svcsdktypes.OriginRequestPolicyQueryStringsConfig{}
 			if r.ko.Spec.OriginRequestPolicyConfig.QueryStringsConfig.QueryStringBehavior != nil {
-				f2f4.SetQueryStringBehavior(*r.ko.Spec.OriginRequestPolicyConfig.QueryStringsConfig.QueryStringBehavior)
+				f2f4.QueryStringBehavior = svcsdktypes.OriginRequestPolicyQueryStringBehavior(*r.ko.Spec.OriginRequestPolicyConfig.QueryStringsConfig.QueryStringBehavior)
 			}
 			if r.ko.Spec.OriginRequestPolicyConfig.QueryStringsConfig.QueryStrings != nil {
-				f2f4f1 := &svcsdk.QueryStringNames{}
+				f2f4f1 := &svcsdktypes.QueryStringNames{}
 				if r.ko.Spec.OriginRequestPolicyConfig.QueryStringsConfig.QueryStrings.Items != nil {
-					f2f4f1f0 := []*string{}
-					for _, f2f4f1f0iter := range r.ko.Spec.OriginRequestPolicyConfig.QueryStringsConfig.QueryStrings.Items {
-						var f2f4f1f0elem string
-						f2f4f1f0elem = *f2f4f1f0iter
-						f2f4f1f0 = append(f2f4f1f0, &f2f4f1f0elem)
-					}
-					f2f4f1.SetItems(f2f4f1f0)
+					f2f4f1.Items = aws.ToStringSlice(r.ko.Spec.OriginRequestPolicyConfig.QueryStringsConfig.QueryStrings.Items)
 				}
-				f2f4.SetQueryStrings(f2f4f1)
+				f2f4.QueryStrings = f2f4f1
 			}
-			f2.SetQueryStringsConfig(f2f4)
+			f2.QueryStringsConfig = f2f4
 		}
-		res.SetOriginRequestPolicyConfig(f2)
+		res.OriginRequestPolicyConfig = f2
 	}
 
 	return res, nil
@@ -572,12 +500,12 @@ func (rm *resourceManager) sdkDelete(
 	// If we don't do this, we get the following on every delete call:
 	// InvalidIfMatchVersion: The If-Match version is missing or not valid for the resource.
 	if r.ko.Status.ETag != nil {
-		input.SetIfMatch(*r.ko.Status.ETag)
+		input.IfMatch = r.ko.Status.ETag
 	}
 
 	var resp *svcsdk.DeleteOriginRequestPolicyOutput
 	_ = resp
-	resp, err = rm.sdkapi.DeleteOriginRequestPolicyWithContext(ctx, input)
+	resp, err = rm.sdkapi.DeleteOriginRequestPolicy(ctx, input)
 	rm.metrics.RecordAPICall("DELETE", "DeleteOriginRequestPolicy", err)
 	return nil, err
 }
@@ -590,7 +518,7 @@ func (rm *resourceManager) newDeleteRequestPayload(
 	res := &svcsdk.DeleteOriginRequestPolicyInput{}
 
 	if r.ko.Status.ID != nil {
-		res.SetId(*r.ko.Status.ID)
+		res.Id = r.ko.Status.ID
 	}
 
 	return res, nil

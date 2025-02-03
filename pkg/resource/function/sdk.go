@@ -28,8 +28,10 @@ import (
 	ackerr "github.com/aws-controllers-k8s/runtime/pkg/errors"
 	ackrequeue "github.com/aws-controllers-k8s/runtime/pkg/requeue"
 	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
-	"github.com/aws/aws-sdk-go/aws"
-	svcsdk "github.com/aws/aws-sdk-go/service/cloudfront"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	svcsdk "github.com/aws/aws-sdk-go-v2/service/cloudfront"
+	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
+	smithy "github.com/aws/smithy-go"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -40,8 +42,7 @@ import (
 var (
 	_ = &metav1.Time{}
 	_ = strings.ToLower("")
-	_ = &aws.JSONValue{}
-	_ = &svcsdk.CloudFront{}
+	_ = &svcsdk.Client{}
 	_ = &svcapitypes.Function{}
 	_ = ackv1alpha1.AWSAccountID("")
 	_ = &ackerr.NotFound
@@ -49,6 +50,7 @@ var (
 	_ = &reflect.Value{}
 	_ = fmt.Sprintf("")
 	_ = &ackrequeue.NoRequeue{}
+	_ = &aws.Config{}
 )
 
 // sdkFind returns SDK-specific information about a supplied resource
@@ -74,13 +76,11 @@ func (rm *resourceManager) sdkFind(
 	}
 
 	var resp *svcsdk.DescribeFunctionOutput
-	resp, err = rm.sdkapi.DescribeFunctionWithContext(ctx, input)
+	resp, err = rm.sdkapi.DescribeFunction(ctx, input)
 	rm.metrics.RecordAPICall("READ_ONE", "DescribeFunction", err)
 	if err != nil {
-		if reqErr, ok := ackerr.AWSRequestFailure(err); ok && reqErr.StatusCode() == 404 {
-			return nil, ackerr.NotFound
-		}
-		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "NoSuchFunctionExists" {
+		var awsErr smithy.APIError
+		if errors.As(err, &awsErr) && awsErr.ErrorCode() == "NoSuchFunctionExists" {
 			return nil, ackerr.NotFound
 		}
 		return nil, err
@@ -102,8 +102,8 @@ func (rm *resourceManager) sdkFind(
 			if resp.FunctionSummary.FunctionConfig.Comment != nil {
 				f1f0.Comment = resp.FunctionSummary.FunctionConfig.Comment
 			}
-			if resp.FunctionSummary.FunctionConfig.Runtime != nil {
-				f1f0.Runtime = resp.FunctionSummary.FunctionConfig.Runtime
+			if resp.FunctionSummary.FunctionConfig.Runtime != "" {
+				f1f0.Runtime = aws.String(string(resp.FunctionSummary.FunctionConfig.Runtime))
 			}
 			f1.FunctionConfig = f1f0
 		}
@@ -118,8 +118,8 @@ func (rm *resourceManager) sdkFind(
 			if resp.FunctionSummary.FunctionMetadata.LastModifiedTime != nil {
 				f1f1.LastModifiedTime = &metav1.Time{*resp.FunctionSummary.FunctionMetadata.LastModifiedTime}
 			}
-			if resp.FunctionSummary.FunctionMetadata.Stage != nil {
-				f1f1.Stage = resp.FunctionSummary.FunctionMetadata.Stage
+			if resp.FunctionSummary.FunctionMetadata.Stage != "" {
+				f1f1.Stage = aws.String(string(resp.FunctionSummary.FunctionMetadata.Stage))
 			}
 			f1.FunctionMetadata = f1f1
 		}
@@ -141,8 +141,8 @@ func (rm *resourceManager) sdkFind(
 				ko.Status.ACKResourceMetadata.ARN = (*ackv1alpha1.AWSResourceName)(resp.FunctionSummary.FunctionMetadata.FunctionARN)
 			}
 			if resp.FunctionSummary.FunctionConfig != nil {
-				if resp.FunctionSummary.FunctionConfig.Runtime != nil {
-					ko.Spec.FunctionConfig.Runtime = resp.FunctionSummary.FunctionConfig.Runtime
+				if resp.FunctionSummary.FunctionConfig.Runtime != "" {
+					ko.Spec.FunctionConfig.Runtime = aws.String(string(resp.FunctionSummary.FunctionConfig.Runtime))
 				}
 				if resp.FunctionSummary.FunctionConfig.Comment != nil {
 					ko.Spec.FunctionConfig.Comment = resp.FunctionSummary.FunctionConfig.Comment
@@ -175,7 +175,7 @@ func (rm *resourceManager) newDescribeRequestPayload(
 	res := &svcsdk.DescribeFunctionInput{}
 
 	if r.ko.Spec.Name != nil {
-		res.SetName(*r.ko.Spec.Name)
+		res.Name = r.ko.Spec.Name
 	}
 
 	return res, nil
@@ -200,7 +200,7 @@ func (rm *resourceManager) sdkCreate(
 
 	var resp *svcsdk.CreateFunctionOutput
 	_ = resp
-	resp, err = rm.sdkapi.CreateFunctionWithContext(ctx, input)
+	resp, err = rm.sdkapi.CreateFunction(ctx, input)
 	rm.metrics.RecordAPICall("CREATE", "CreateFunction", err)
 	if err != nil {
 		return nil, err
@@ -221,8 +221,8 @@ func (rm *resourceManager) sdkCreate(
 			if resp.FunctionSummary.FunctionConfig.Comment != nil {
 				f1f0.Comment = resp.FunctionSummary.FunctionConfig.Comment
 			}
-			if resp.FunctionSummary.FunctionConfig.Runtime != nil {
-				f1f0.Runtime = resp.FunctionSummary.FunctionConfig.Runtime
+			if resp.FunctionSummary.FunctionConfig.Runtime != "" {
+				f1f0.Runtime = aws.String(string(resp.FunctionSummary.FunctionConfig.Runtime))
 			}
 			f1.FunctionConfig = f1f0
 		}
@@ -237,8 +237,8 @@ func (rm *resourceManager) sdkCreate(
 			if resp.FunctionSummary.FunctionMetadata.LastModifiedTime != nil {
 				f1f1.LastModifiedTime = &metav1.Time{*resp.FunctionSummary.FunctionMetadata.LastModifiedTime}
 			}
-			if resp.FunctionSummary.FunctionMetadata.Stage != nil {
-				f1f1.Stage = resp.FunctionSummary.FunctionMetadata.Stage
+			if resp.FunctionSummary.FunctionMetadata.Stage != "" {
+				f1f1.Stage = aws.String(string(resp.FunctionSummary.FunctionMetadata.Stage))
 			}
 			f1.FunctionMetadata = f1f1
 		}
@@ -271,20 +271,20 @@ func (rm *resourceManager) newCreateRequestPayload(
 	res := &svcsdk.CreateFunctionInput{}
 
 	if r.ko.Spec.FunctionCode != nil {
-		res.SetFunctionCode(r.ko.Spec.FunctionCode)
+		res.FunctionCode = r.ko.Spec.FunctionCode
 	}
 	if r.ko.Spec.FunctionConfig != nil {
-		f1 := &svcsdk.FunctionConfig{}
+		f1 := &svcsdktypes.FunctionConfig{}
 		if r.ko.Spec.FunctionConfig.Comment != nil {
-			f1.SetComment(*r.ko.Spec.FunctionConfig.Comment)
+			f1.Comment = r.ko.Spec.FunctionConfig.Comment
 		}
 		if r.ko.Spec.FunctionConfig.Runtime != nil {
-			f1.SetRuntime(*r.ko.Spec.FunctionConfig.Runtime)
+			f1.Runtime = svcsdktypes.FunctionRuntime(*r.ko.Spec.FunctionConfig.Runtime)
 		}
-		res.SetFunctionConfig(f1)
+		res.FunctionConfig = f1
 	}
 	if r.ko.Spec.Name != nil {
-		res.SetName(*r.ko.Spec.Name)
+		res.Name = r.ko.Spec.Name
 	}
 
 	return res, nil
@@ -310,7 +310,7 @@ func (rm *resourceManager) sdkUpdate(
 
 	var resp *svcsdk.UpdateFunctionOutput
 	_ = resp
-	resp, err = rm.sdkapi.UpdateFunctionWithContext(ctx, input)
+	resp, err = rm.sdkapi.UpdateFunction(ctx, input)
 	rm.metrics.RecordAPICall("UPDATE", "UpdateFunction", err)
 	if err != nil {
 		return nil, err
@@ -331,8 +331,8 @@ func (rm *resourceManager) sdkUpdate(
 			if resp.FunctionSummary.FunctionConfig.Comment != nil {
 				f1f0.Comment = resp.FunctionSummary.FunctionConfig.Comment
 			}
-			if resp.FunctionSummary.FunctionConfig.Runtime != nil {
-				f1f0.Runtime = resp.FunctionSummary.FunctionConfig.Runtime
+			if resp.FunctionSummary.FunctionConfig.Runtime != "" {
+				f1f0.Runtime = aws.String(string(resp.FunctionSummary.FunctionConfig.Runtime))
 			}
 			f1.FunctionConfig = f1f0
 		}
@@ -347,8 +347,8 @@ func (rm *resourceManager) sdkUpdate(
 			if resp.FunctionSummary.FunctionMetadata.LastModifiedTime != nil {
 				f1f1.LastModifiedTime = &metav1.Time{*resp.FunctionSummary.FunctionMetadata.LastModifiedTime}
 			}
-			if resp.FunctionSummary.FunctionMetadata.Stage != nil {
-				f1f1.Stage = resp.FunctionSummary.FunctionMetadata.Stage
+			if resp.FunctionSummary.FunctionMetadata.Stage != "" {
+				f1f1.Stage = aws.String(string(resp.FunctionSummary.FunctionMetadata.Stage))
 			}
 			f1.FunctionMetadata = f1f1
 		}
@@ -377,23 +377,23 @@ func (rm *resourceManager) newUpdateRequestPayload(
 	res := &svcsdk.UpdateFunctionInput{}
 
 	if r.ko.Spec.FunctionCode != nil {
-		res.SetFunctionCode(r.ko.Spec.FunctionCode)
+		res.FunctionCode = r.ko.Spec.FunctionCode
 	}
 	if r.ko.Spec.FunctionConfig != nil {
-		f1 := &svcsdk.FunctionConfig{}
+		f1 := &svcsdktypes.FunctionConfig{}
 		if r.ko.Spec.FunctionConfig.Comment != nil {
-			f1.SetComment(*r.ko.Spec.FunctionConfig.Comment)
+			f1.Comment = r.ko.Spec.FunctionConfig.Comment
 		}
 		if r.ko.Spec.FunctionConfig.Runtime != nil {
-			f1.SetRuntime(*r.ko.Spec.FunctionConfig.Runtime)
+			f1.Runtime = svcsdktypes.FunctionRuntime(*r.ko.Spec.FunctionConfig.Runtime)
 		}
-		res.SetFunctionConfig(f1)
+		res.FunctionConfig = f1
 	}
 	if r.ko.Status.ETag != nil {
-		res.SetIfMatch(*r.ko.Status.ETag)
+		res.IfMatch = r.ko.Status.ETag
 	}
 	if r.ko.Spec.Name != nil {
-		res.SetName(*r.ko.Spec.Name)
+		res.Name = r.ko.Spec.Name
 	}
 
 	return res, nil
@@ -415,7 +415,7 @@ func (rm *resourceManager) sdkDelete(
 	}
 	var resp *svcsdk.DeleteFunctionOutput
 	_ = resp
-	resp, err = rm.sdkapi.DeleteFunctionWithContext(ctx, input)
+	resp, err = rm.sdkapi.DeleteFunction(ctx, input)
 	rm.metrics.RecordAPICall("DELETE", "DeleteFunction", err)
 	return nil, err
 }
@@ -428,10 +428,10 @@ func (rm *resourceManager) newDeleteRequestPayload(
 	res := &svcsdk.DeleteFunctionInput{}
 
 	if r.ko.Status.ETag != nil {
-		res.SetIfMatch(*r.ko.Status.ETag)
+		res.IfMatch = r.ko.Status.ETag
 	}
 	if r.ko.Spec.Name != nil {
-		res.SetName(*r.ko.Spec.Name)
+		res.Name = r.ko.Spec.Name
 	}
 
 	return res, nil
