@@ -14,7 +14,8 @@
 package cache_policy
 
 import (
-	svcsdk "github.com/aws/aws-sdk-go/service/cloudfront"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 )
 
 // setQuantityFields simply goes through the input shape and sets the Quantity
@@ -22,7 +23,7 @@ import (
 // This is necessary because CloudFront's API will return an
 // `InconsistentQuantities` error message if Quantity != len(Items). This is
 // why we can't have nice things, apparently.
-func setQuantityFields(cp *svcsdk.CachePolicyConfig) {
+func setQuantityFields(cp *svcsdktypes.CachePolicyConfig) {
 	if cp == nil {
 		return
 	}
@@ -30,17 +31,17 @@ func setQuantityFields(cp *svcsdk.CachePolicyConfig) {
 		cpp := cp.ParametersInCacheKeyAndForwardedToOrigin
 		if cpp.CookiesConfig != nil {
 			if cpp.CookiesConfig.Cookies != nil {
-				cpp.CookiesConfig.Cookies.SetQuantity(int64(len(cpp.CookiesConfig.Cookies.Items)))
+				cpp.CookiesConfig.Cookies.Quantity = aws.Int32(int32(len(cpp.CookiesConfig.Cookies.Items)))
 			}
 		}
 		if cpp.HeadersConfig != nil {
 			if cpp.HeadersConfig.Headers != nil {
-				cpp.HeadersConfig.Headers.SetQuantity(int64(len(cpp.HeadersConfig.Headers.Items)))
+				cpp.HeadersConfig.Headers.Quantity = aws.Int32(int32(len(cpp.HeadersConfig.Headers.Items)))
 			}
 		}
 		if cpp.QueryStringsConfig != nil {
 			if cpp.QueryStringsConfig.QueryStrings != nil {
-				cpp.QueryStringsConfig.QueryStrings.SetQuantity(int64(len(cpp.QueryStringsConfig.QueryStrings.Items)))
+				cpp.QueryStringsConfig.QueryStrings.Quantity = aws.Int32(int32(len(cpp.QueryStringsConfig.QueryStrings.Items)))
 			}
 		}
 	}

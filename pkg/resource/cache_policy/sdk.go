@@ -28,8 +28,10 @@ import (
 	ackerr "github.com/aws-controllers-k8s/runtime/pkg/errors"
 	ackrequeue "github.com/aws-controllers-k8s/runtime/pkg/requeue"
 	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
-	"github.com/aws/aws-sdk-go/aws"
-	svcsdk "github.com/aws/aws-sdk-go/service/cloudfront"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	svcsdk "github.com/aws/aws-sdk-go-v2/service/cloudfront"
+	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
+	smithy "github.com/aws/smithy-go"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -40,8 +42,7 @@ import (
 var (
 	_ = &metav1.Time{}
 	_ = strings.ToLower("")
-	_ = &aws.JSONValue{}
-	_ = &svcsdk.CloudFront{}
+	_ = &svcsdk.Client{}
 	_ = &svcapitypes.CachePolicy{}
 	_ = ackv1alpha1.AWSAccountID("")
 	_ = &ackerr.NotFound
@@ -49,6 +50,7 @@ var (
 	_ = &reflect.Value{}
 	_ = fmt.Sprintf("")
 	_ = &ackrequeue.NoRequeue{}
+	_ = &aws.Config{}
 )
 
 // sdkFind returns SDK-specific information about a supplied resource
@@ -74,13 +76,11 @@ func (rm *resourceManager) sdkFind(
 	}
 
 	var resp *svcsdk.GetCachePolicyOutput
-	resp, err = rm.sdkapi.GetCachePolicyWithContext(ctx, input)
+	resp, err = rm.sdkapi.GetCachePolicy(ctx, input)
 	rm.metrics.RecordAPICall("READ_ONE", "GetCachePolicy", err)
 	if err != nil {
-		if reqErr, ok := ackerr.AWSRequestFailure(err); ok && reqErr.StatusCode() == 404 {
-			return nil, ackerr.NotFound
-		}
-		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "NoSuchCachePolicy" {
+		var awsErr smithy.APIError
+		if errors.As(err, &awsErr) && awsErr.ErrorCode() == "NoSuchCachePolicy" {
 			return nil, ackerr.NotFound
 		}
 		return nil, err
@@ -111,19 +111,13 @@ func (rm *resourceManager) sdkFind(
 			f0f5 := &svcapitypes.ParametersInCacheKeyAndForwardedToOrigin{}
 			if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig != nil {
 				f0f5f0 := &svcapitypes.CachePolicyCookiesConfig{}
-				if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.CookieBehavior != nil {
-					f0f5f0.CookieBehavior = resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.CookieBehavior
+				if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.CookieBehavior != "" {
+					f0f5f0.CookieBehavior = aws.String(string(resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.CookieBehavior))
 				}
 				if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies != nil {
 					f0f5f0f1 := &svcapitypes.CookieNames{}
 					if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Items != nil {
-						f0f5f0f1f0 := []*string{}
-						for _, f0f5f0f1f0iter := range resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Items {
-							var f0f5f0f1f0elem string
-							f0f5f0f1f0elem = *f0f5f0f1f0iter
-							f0f5f0f1f0 = append(f0f5f0f1f0, &f0f5f0f1f0elem)
-						}
-						f0f5f0f1.Items = f0f5f0f1f0
+						f0f5f0f1.Items = aws.StringSlice(resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Items)
 					}
 					f0f5f0.Cookies = f0f5f0f1
 				}
@@ -137,19 +131,13 @@ func (rm *resourceManager) sdkFind(
 			}
 			if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig != nil {
 				f0f5f3 := &svcapitypes.CachePolicyHeadersConfig{}
-				if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.HeaderBehavior != nil {
-					f0f5f3.HeaderBehavior = resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.HeaderBehavior
+				if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.HeaderBehavior != "" {
+					f0f5f3.HeaderBehavior = aws.String(string(resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.HeaderBehavior))
 				}
 				if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers != nil {
 					f0f5f3f1 := &svcapitypes.Headers{}
 					if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers.Items != nil {
-						f0f5f3f1f0 := []*string{}
-						for _, f0f5f3f1f0iter := range resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers.Items {
-							var f0f5f3f1f0elem string
-							f0f5f3f1f0elem = *f0f5f3f1f0iter
-							f0f5f3f1f0 = append(f0f5f3f1f0, &f0f5f3f1f0elem)
-						}
-						f0f5f3f1.Items = f0f5f3f1f0
+						f0f5f3f1.Items = aws.StringSlice(resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers.Items)
 					}
 					f0f5f3.Headers = f0f5f3f1
 				}
@@ -157,19 +145,13 @@ func (rm *resourceManager) sdkFind(
 			}
 			if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig != nil {
 				f0f5f4 := &svcapitypes.CachePolicyQueryStringsConfig{}
-				if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStringBehavior != nil {
-					f0f5f4.QueryStringBehavior = resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStringBehavior
+				if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStringBehavior != "" {
+					f0f5f4.QueryStringBehavior = aws.String(string(resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStringBehavior))
 				}
 				if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings != nil {
 					f0f5f4f1 := &svcapitypes.QueryStringNames{}
 					if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings.Items != nil {
-						f0f5f4f1f0 := []*string{}
-						for _, f0f5f4f1f0iter := range resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings.Items {
-							var f0f5f4f1f0elem string
-							f0f5f4f1f0elem = *f0f5f4f1f0iter
-							f0f5f4f1f0 = append(f0f5f4f1f0, &f0f5f4f1f0elem)
-						}
-						f0f5f4f1.Items = f0f5f4f1f0
+						f0f5f4f1.Items = aws.StringSlice(resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings.Items)
 					}
 					f0f5f4.QueryStrings = f0f5f4f1
 				}
@@ -222,7 +204,7 @@ func (rm *resourceManager) newDescribeRequestPayload(
 	res := &svcsdk.GetCachePolicyInput{}
 
 	if r.ko.Status.ID != nil {
-		res.SetId(*r.ko.Status.ID)
+		res.Id = r.ko.Status.ID
 	}
 
 	return res, nil
@@ -249,7 +231,7 @@ func (rm *resourceManager) sdkCreate(
 
 	var resp *svcsdk.CreateCachePolicyOutput
 	_ = resp
-	resp, err = rm.sdkapi.CreateCachePolicyWithContext(ctx, input)
+	resp, err = rm.sdkapi.CreateCachePolicy(ctx, input)
 	rm.metrics.RecordAPICall("CREATE", "CreateCachePolicy", err)
 	if err != nil {
 		return nil, err
@@ -279,19 +261,13 @@ func (rm *resourceManager) sdkCreate(
 			f0f5 := &svcapitypes.ParametersInCacheKeyAndForwardedToOrigin{}
 			if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig != nil {
 				f0f5f0 := &svcapitypes.CachePolicyCookiesConfig{}
-				if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.CookieBehavior != nil {
-					f0f5f0.CookieBehavior = resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.CookieBehavior
+				if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.CookieBehavior != "" {
+					f0f5f0.CookieBehavior = aws.String(string(resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.CookieBehavior))
 				}
 				if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies != nil {
 					f0f5f0f1 := &svcapitypes.CookieNames{}
 					if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Items != nil {
-						f0f5f0f1f0 := []*string{}
-						for _, f0f5f0f1f0iter := range resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Items {
-							var f0f5f0f1f0elem string
-							f0f5f0f1f0elem = *f0f5f0f1f0iter
-							f0f5f0f1f0 = append(f0f5f0f1f0, &f0f5f0f1f0elem)
-						}
-						f0f5f0f1.Items = f0f5f0f1f0
+						f0f5f0f1.Items = aws.StringSlice(resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Items)
 					}
 					f0f5f0.Cookies = f0f5f0f1
 				}
@@ -305,19 +281,13 @@ func (rm *resourceManager) sdkCreate(
 			}
 			if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig != nil {
 				f0f5f3 := &svcapitypes.CachePolicyHeadersConfig{}
-				if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.HeaderBehavior != nil {
-					f0f5f3.HeaderBehavior = resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.HeaderBehavior
+				if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.HeaderBehavior != "" {
+					f0f5f3.HeaderBehavior = aws.String(string(resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.HeaderBehavior))
 				}
 				if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers != nil {
 					f0f5f3f1 := &svcapitypes.Headers{}
 					if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers.Items != nil {
-						f0f5f3f1f0 := []*string{}
-						for _, f0f5f3f1f0iter := range resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers.Items {
-							var f0f5f3f1f0elem string
-							f0f5f3f1f0elem = *f0f5f3f1f0iter
-							f0f5f3f1f0 = append(f0f5f3f1f0, &f0f5f3f1f0elem)
-						}
-						f0f5f3f1.Items = f0f5f3f1f0
+						f0f5f3f1.Items = aws.StringSlice(resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers.Items)
 					}
 					f0f5f3.Headers = f0f5f3f1
 				}
@@ -325,19 +295,13 @@ func (rm *resourceManager) sdkCreate(
 			}
 			if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig != nil {
 				f0f5f4 := &svcapitypes.CachePolicyQueryStringsConfig{}
-				if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStringBehavior != nil {
-					f0f5f4.QueryStringBehavior = resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStringBehavior
+				if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStringBehavior != "" {
+					f0f5f4.QueryStringBehavior = aws.String(string(resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStringBehavior))
 				}
 				if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings != nil {
 					f0f5f4f1 := &svcapitypes.QueryStringNames{}
 					if resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings.Items != nil {
-						f0f5f4f1f0 := []*string{}
-						for _, f0f5f4f1f0iter := range resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings.Items {
-							var f0f5f4f1f0elem string
-							f0f5f4f1f0elem = *f0f5f4f1f0iter
-							f0f5f4f1f0 = append(f0f5f4f1f0, &f0f5f4f1f0elem)
-						}
-						f0f5f4f1.Items = f0f5f4f1f0
+						f0f5f4f1.Items = aws.StringSlice(resp.CachePolicy.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings.Items)
 					}
 					f0f5f4.QueryStrings = f0f5f4f1
 				}
@@ -381,93 +345,75 @@ func (rm *resourceManager) newCreateRequestPayload(
 	res := &svcsdk.CreateCachePolicyInput{}
 
 	if r.ko.Spec.CachePolicyConfig != nil {
-		f0 := &svcsdk.CachePolicyConfig{}
+		f0 := &svcsdktypes.CachePolicyConfig{}
 		if r.ko.Spec.CachePolicyConfig.Comment != nil {
-			f0.SetComment(*r.ko.Spec.CachePolicyConfig.Comment)
+			f0.Comment = r.ko.Spec.CachePolicyConfig.Comment
 		}
 		if r.ko.Spec.CachePolicyConfig.DefaultTTL != nil {
-			f0.SetDefaultTTL(*r.ko.Spec.CachePolicyConfig.DefaultTTL)
+			f0.DefaultTTL = r.ko.Spec.CachePolicyConfig.DefaultTTL
 		}
 		if r.ko.Spec.CachePolicyConfig.MaxTTL != nil {
-			f0.SetMaxTTL(*r.ko.Spec.CachePolicyConfig.MaxTTL)
+			f0.MaxTTL = r.ko.Spec.CachePolicyConfig.MaxTTL
 		}
 		if r.ko.Spec.CachePolicyConfig.MinTTL != nil {
-			f0.SetMinTTL(*r.ko.Spec.CachePolicyConfig.MinTTL)
+			f0.MinTTL = r.ko.Spec.CachePolicyConfig.MinTTL
 		}
 		if r.ko.Spec.CachePolicyConfig.Name != nil {
-			f0.SetName(*r.ko.Spec.CachePolicyConfig.Name)
+			f0.Name = r.ko.Spec.CachePolicyConfig.Name
 		}
 		if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin != nil {
-			f0f5 := &svcsdk.ParametersInCacheKeyAndForwardedToOrigin{}
+			f0f5 := &svcsdktypes.ParametersInCacheKeyAndForwardedToOrigin{}
 			if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig != nil {
-				f0f5f0 := &svcsdk.CachePolicyCookiesConfig{}
+				f0f5f0 := &svcsdktypes.CachePolicyCookiesConfig{}
 				if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.CookieBehavior != nil {
-					f0f5f0.SetCookieBehavior(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.CookieBehavior)
+					f0f5f0.CookieBehavior = svcsdktypes.CachePolicyCookieBehavior(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.CookieBehavior)
 				}
 				if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies != nil {
-					f0f5f0f1 := &svcsdk.CookieNames{}
+					f0f5f0f1 := &svcsdktypes.CookieNames{}
 					if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Items != nil {
-						f0f5f0f1f0 := []*string{}
-						for _, f0f5f0f1f0iter := range r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Items {
-							var f0f5f0f1f0elem string
-							f0f5f0f1f0elem = *f0f5f0f1f0iter
-							f0f5f0f1f0 = append(f0f5f0f1f0, &f0f5f0f1f0elem)
-						}
-						f0f5f0f1.SetItems(f0f5f0f1f0)
+						f0f5f0f1.Items = aws.ToStringSlice(r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Items)
 					}
-					f0f5f0.SetCookies(f0f5f0f1)
+					f0f5f0.Cookies = f0f5f0f1
 				}
-				f0f5.SetCookiesConfig(f0f5f0)
+				f0f5.CookiesConfig = f0f5f0
 			}
 			if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.EnableAcceptEncodingBrotli != nil {
-				f0f5.SetEnableAcceptEncodingBrotli(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.EnableAcceptEncodingBrotli)
+				f0f5.EnableAcceptEncodingBrotli = r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.EnableAcceptEncodingBrotli
 			}
 			if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.EnableAcceptEncodingGzip != nil {
-				f0f5.SetEnableAcceptEncodingGzip(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.EnableAcceptEncodingGzip)
+				f0f5.EnableAcceptEncodingGzip = r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.EnableAcceptEncodingGzip
 			}
 			if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig != nil {
-				f0f5f3 := &svcsdk.CachePolicyHeadersConfig{}
+				f0f5f3 := &svcsdktypes.CachePolicyHeadersConfig{}
 				if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.HeaderBehavior != nil {
-					f0f5f3.SetHeaderBehavior(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.HeaderBehavior)
+					f0f5f3.HeaderBehavior = svcsdktypes.CachePolicyHeaderBehavior(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.HeaderBehavior)
 				}
 				if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers != nil {
-					f0f5f3f1 := &svcsdk.Headers{}
+					f0f5f3f1 := &svcsdktypes.Headers{}
 					if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers.Items != nil {
-						f0f5f3f1f0 := []*string{}
-						for _, f0f5f3f1f0iter := range r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers.Items {
-							var f0f5f3f1f0elem string
-							f0f5f3f1f0elem = *f0f5f3f1f0iter
-							f0f5f3f1f0 = append(f0f5f3f1f0, &f0f5f3f1f0elem)
-						}
-						f0f5f3f1.SetItems(f0f5f3f1f0)
+						f0f5f3f1.Items = aws.ToStringSlice(r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers.Items)
 					}
-					f0f5f3.SetHeaders(f0f5f3f1)
+					f0f5f3.Headers = f0f5f3f1
 				}
-				f0f5.SetHeadersConfig(f0f5f3)
+				f0f5.HeadersConfig = f0f5f3
 			}
 			if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig != nil {
-				f0f5f4 := &svcsdk.CachePolicyQueryStringsConfig{}
+				f0f5f4 := &svcsdktypes.CachePolicyQueryStringsConfig{}
 				if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStringBehavior != nil {
-					f0f5f4.SetQueryStringBehavior(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStringBehavior)
+					f0f5f4.QueryStringBehavior = svcsdktypes.CachePolicyQueryStringBehavior(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStringBehavior)
 				}
 				if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings != nil {
-					f0f5f4f1 := &svcsdk.QueryStringNames{}
+					f0f5f4f1 := &svcsdktypes.QueryStringNames{}
 					if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings.Items != nil {
-						f0f5f4f1f0 := []*string{}
-						for _, f0f5f4f1f0iter := range r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings.Items {
-							var f0f5f4f1f0elem string
-							f0f5f4f1f0elem = *f0f5f4f1f0iter
-							f0f5f4f1f0 = append(f0f5f4f1f0, &f0f5f4f1f0elem)
-						}
-						f0f5f4f1.SetItems(f0f5f4f1f0)
+						f0f5f4f1.Items = aws.ToStringSlice(r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings.Items)
 					}
-					f0f5f4.SetQueryStrings(f0f5f4f1)
+					f0f5f4.QueryStrings = f0f5f4f1
 				}
-				f0f5.SetQueryStringsConfig(f0f5f4)
+				f0f5.QueryStringsConfig = f0f5f4
 			}
-			f0.SetParametersInCacheKeyAndForwardedToOrigin(f0f5)
+			f0.ParametersInCacheKeyAndForwardedToOrigin = f0f5
 		}
-		res.SetCachePolicyConfig(f0)
+		res.CachePolicyConfig = f0
 	}
 
 	return res, nil
@@ -493,14 +439,14 @@ func (rm *resourceManager) sdkUpdate(
 	// If we don't do this, we get the following on every update call:
 	// InvalidIfMatchVersion: The If-Match version is missing or not valid for the resource.
 	if latest.ko.Status.ETag != nil {
-		input.SetIfMatch(*latest.ko.Status.ETag)
+		input.IfMatch = latest.ko.Status.ETag
 	}
 	// ¯\\\_(ツ)_/¯
 	setQuantityFields(input.CachePolicyConfig)
 
 	var resp *svcsdk.UpdateCachePolicyOutput
 	_ = resp
-	resp, err = rm.sdkapi.UpdateCachePolicyWithContext(ctx, input)
+	resp, err = rm.sdkapi.UpdateCachePolicy(ctx, input)
 	rm.metrics.RecordAPICall("UPDATE", "UpdateCachePolicy", err)
 	if err != nil {
 		return nil, err
@@ -537,96 +483,78 @@ func (rm *resourceManager) newUpdateRequestPayload(
 	res := &svcsdk.UpdateCachePolicyInput{}
 
 	if r.ko.Spec.CachePolicyConfig != nil {
-		f0 := &svcsdk.CachePolicyConfig{}
+		f0 := &svcsdktypes.CachePolicyConfig{}
 		if r.ko.Spec.CachePolicyConfig.Comment != nil {
-			f0.SetComment(*r.ko.Spec.CachePolicyConfig.Comment)
+			f0.Comment = r.ko.Spec.CachePolicyConfig.Comment
 		}
 		if r.ko.Spec.CachePolicyConfig.DefaultTTL != nil {
-			f0.SetDefaultTTL(*r.ko.Spec.CachePolicyConfig.DefaultTTL)
+			f0.DefaultTTL = r.ko.Spec.CachePolicyConfig.DefaultTTL
 		}
 		if r.ko.Spec.CachePolicyConfig.MaxTTL != nil {
-			f0.SetMaxTTL(*r.ko.Spec.CachePolicyConfig.MaxTTL)
+			f0.MaxTTL = r.ko.Spec.CachePolicyConfig.MaxTTL
 		}
 		if r.ko.Spec.CachePolicyConfig.MinTTL != nil {
-			f0.SetMinTTL(*r.ko.Spec.CachePolicyConfig.MinTTL)
+			f0.MinTTL = r.ko.Spec.CachePolicyConfig.MinTTL
 		}
 		if r.ko.Spec.CachePolicyConfig.Name != nil {
-			f0.SetName(*r.ko.Spec.CachePolicyConfig.Name)
+			f0.Name = r.ko.Spec.CachePolicyConfig.Name
 		}
 		if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin != nil {
-			f0f5 := &svcsdk.ParametersInCacheKeyAndForwardedToOrigin{}
+			f0f5 := &svcsdktypes.ParametersInCacheKeyAndForwardedToOrigin{}
 			if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig != nil {
-				f0f5f0 := &svcsdk.CachePolicyCookiesConfig{}
+				f0f5f0 := &svcsdktypes.CachePolicyCookiesConfig{}
 				if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.CookieBehavior != nil {
-					f0f5f0.SetCookieBehavior(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.CookieBehavior)
+					f0f5f0.CookieBehavior = svcsdktypes.CachePolicyCookieBehavior(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.CookieBehavior)
 				}
 				if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies != nil {
-					f0f5f0f1 := &svcsdk.CookieNames{}
+					f0f5f0f1 := &svcsdktypes.CookieNames{}
 					if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Items != nil {
-						f0f5f0f1f0 := []*string{}
-						for _, f0f5f0f1f0iter := range r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Items {
-							var f0f5f0f1f0elem string
-							f0f5f0f1f0elem = *f0f5f0f1f0iter
-							f0f5f0f1f0 = append(f0f5f0f1f0, &f0f5f0f1f0elem)
-						}
-						f0f5f0f1.SetItems(f0f5f0f1f0)
+						f0f5f0f1.Items = aws.ToStringSlice(r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.CookiesConfig.Cookies.Items)
 					}
-					f0f5f0.SetCookies(f0f5f0f1)
+					f0f5f0.Cookies = f0f5f0f1
 				}
-				f0f5.SetCookiesConfig(f0f5f0)
+				f0f5.CookiesConfig = f0f5f0
 			}
 			if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.EnableAcceptEncodingBrotli != nil {
-				f0f5.SetEnableAcceptEncodingBrotli(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.EnableAcceptEncodingBrotli)
+				f0f5.EnableAcceptEncodingBrotli = r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.EnableAcceptEncodingBrotli
 			}
 			if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.EnableAcceptEncodingGzip != nil {
-				f0f5.SetEnableAcceptEncodingGzip(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.EnableAcceptEncodingGzip)
+				f0f5.EnableAcceptEncodingGzip = r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.EnableAcceptEncodingGzip
 			}
 			if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig != nil {
-				f0f5f3 := &svcsdk.CachePolicyHeadersConfig{}
+				f0f5f3 := &svcsdktypes.CachePolicyHeadersConfig{}
 				if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.HeaderBehavior != nil {
-					f0f5f3.SetHeaderBehavior(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.HeaderBehavior)
+					f0f5f3.HeaderBehavior = svcsdktypes.CachePolicyHeaderBehavior(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.HeaderBehavior)
 				}
 				if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers != nil {
-					f0f5f3f1 := &svcsdk.Headers{}
+					f0f5f3f1 := &svcsdktypes.Headers{}
 					if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers.Items != nil {
-						f0f5f3f1f0 := []*string{}
-						for _, f0f5f3f1f0iter := range r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers.Items {
-							var f0f5f3f1f0elem string
-							f0f5f3f1f0elem = *f0f5f3f1f0iter
-							f0f5f3f1f0 = append(f0f5f3f1f0, &f0f5f3f1f0elem)
-						}
-						f0f5f3f1.SetItems(f0f5f3f1f0)
+						f0f5f3f1.Items = aws.ToStringSlice(r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.HeadersConfig.Headers.Items)
 					}
-					f0f5f3.SetHeaders(f0f5f3f1)
+					f0f5f3.Headers = f0f5f3f1
 				}
-				f0f5.SetHeadersConfig(f0f5f3)
+				f0f5.HeadersConfig = f0f5f3
 			}
 			if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig != nil {
-				f0f5f4 := &svcsdk.CachePolicyQueryStringsConfig{}
+				f0f5f4 := &svcsdktypes.CachePolicyQueryStringsConfig{}
 				if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStringBehavior != nil {
-					f0f5f4.SetQueryStringBehavior(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStringBehavior)
+					f0f5f4.QueryStringBehavior = svcsdktypes.CachePolicyQueryStringBehavior(*r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStringBehavior)
 				}
 				if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings != nil {
-					f0f5f4f1 := &svcsdk.QueryStringNames{}
+					f0f5f4f1 := &svcsdktypes.QueryStringNames{}
 					if r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings.Items != nil {
-						f0f5f4f1f0 := []*string{}
-						for _, f0f5f4f1f0iter := range r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings.Items {
-							var f0f5f4f1f0elem string
-							f0f5f4f1f0elem = *f0f5f4f1f0iter
-							f0f5f4f1f0 = append(f0f5f4f1f0, &f0f5f4f1f0elem)
-						}
-						f0f5f4f1.SetItems(f0f5f4f1f0)
+						f0f5f4f1.Items = aws.ToStringSlice(r.ko.Spec.CachePolicyConfig.ParametersInCacheKeyAndForwardedToOrigin.QueryStringsConfig.QueryStrings.Items)
 					}
-					f0f5f4.SetQueryStrings(f0f5f4f1)
+					f0f5f4.QueryStrings = f0f5f4f1
 				}
-				f0f5.SetQueryStringsConfig(f0f5f4)
+				f0f5.QueryStringsConfig = f0f5f4
 			}
-			f0.SetParametersInCacheKeyAndForwardedToOrigin(f0f5)
+			f0.ParametersInCacheKeyAndForwardedToOrigin = f0f5
 		}
-		res.SetCachePolicyConfig(f0)
+		res.CachePolicyConfig = f0
 	}
 	if r.ko.Status.ID != nil {
-		res.SetId(*r.ko.Status.ID)
+		res.Id = r.ko.Status.ID
 	}
 
 	return res, nil
@@ -649,12 +577,12 @@ func (rm *resourceManager) sdkDelete(
 	// If we don't do this, we get the following on every delete call:
 	// InvalidIfMatchVersion: The If-Match version is missing or not valid for the resource.
 	if r.ko.Status.ETag != nil {
-		input.SetIfMatch(*r.ko.Status.ETag)
+		input.IfMatch = r.ko.Status.ETag
 	}
 
 	var resp *svcsdk.DeleteCachePolicyOutput
 	_ = resp
-	resp, err = rm.sdkapi.DeleteCachePolicyWithContext(ctx, input)
+	resp, err = rm.sdkapi.DeleteCachePolicy(ctx, input)
 	rm.metrics.RecordAPICall("DELETE", "DeleteCachePolicy", err)
 	return nil, err
 }
@@ -667,7 +595,7 @@ func (rm *resourceManager) newDeleteRequestPayload(
 	res := &svcsdk.DeleteCachePolicyInput{}
 
 	if r.ko.Status.ID != nil {
-		res.SetId(*r.ko.Status.ID)
+		res.Id = r.ko.Status.ID
 	}
 
 	return res, nil
@@ -775,11 +703,12 @@ func (rm *resourceManager) terminalAWSError(err error) bool {
 	if err == nil {
 		return false
 	}
-	awsErr, ok := ackerr.AWSError(err)
-	if !ok {
+
+	var terminalErr smithy.APIError
+	if !errors.As(err, &terminalErr) {
 		return false
 	}
-	switch awsErr.Code() {
+	switch terminalErr.ErrorCode() {
 	case "IllegalUpdate",
 		"InconsistentQuantities",
 		"InvalidArgument",

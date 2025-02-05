@@ -14,7 +14,8 @@
 package origin_request_policy
 
 import (
-	svcsdk "github.com/aws/aws-sdk-go/service/cloudfront"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 )
 
 // setQuantityFields simply goes through the input shape and sets the Quantity
@@ -22,17 +23,17 @@ import (
 // This is necessary because CloudFront's API will return an
 // `InconsistentQuantities` error message if Quantity != len(Items). This is
 // why we can't have nice things, apparently.
-func setQuantityFields(dc *svcsdk.OriginRequestPolicyConfig) {
+func setQuantityFields(dc *svcsdktypes.OriginRequestPolicyConfig) {
 	if dc == nil {
 		return
 	}
 	if dc.CookiesConfig != nil && dc.CookiesConfig.Cookies != nil {
-		dc.CookiesConfig.Cookies.SetQuantity(int64(len(dc.CookiesConfig.Cookies.Items)))
+		dc.CookiesConfig.Cookies.Quantity = aws.Int32(int32(len(dc.CookiesConfig.Cookies.Items)))
 	}
 	if dc.HeadersConfig != nil && dc.HeadersConfig.Headers != nil {
-		dc.HeadersConfig.Headers.SetQuantity(int64(len(dc.HeadersConfig.Headers.Items)))
+		dc.HeadersConfig.Headers.Quantity = aws.Int32(int32(len(dc.HeadersConfig.Headers.Items)))
 	}
 	if dc.QueryStringsConfig != nil && dc.QueryStringsConfig.QueryStrings != nil {
-		dc.QueryStringsConfig.QueryStrings.SetQuantity(int64(len(dc.QueryStringsConfig.QueryStrings.Items)))
+		dc.QueryStringsConfig.QueryStrings.Quantity = aws.Int32(int32(len(dc.QueryStringsConfig.QueryStrings.Items)))
 	}
 }

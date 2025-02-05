@@ -4,8 +4,8 @@
 				ko.Status.ACKResourceMetadata.ARN = (*ackv1alpha1.AWSResourceName)(resp.FunctionSummary.FunctionMetadata.FunctionARN)
 			}
 			if resp.FunctionSummary.FunctionConfig != nil {
-				if resp.FunctionSummary.FunctionConfig.Runtime != nil {
-					ko.Spec.FunctionConfig.Runtime = resp.FunctionSummary.FunctionConfig.Runtime
+				if resp.FunctionSummary.FunctionConfig.Runtime != "" {
+					ko.Spec.FunctionConfig.Runtime = aws.String(string(resp.FunctionSummary.FunctionConfig.Runtime))
 				}
 				if resp.FunctionSummary.FunctionConfig.Comment != nil {
 					ko.Spec.FunctionConfig.Comment = resp.FunctionSummary.FunctionConfig.Comment

@@ -16,7 +16,8 @@ package distribution
 import (
 	"time"
 
-	svcsdk "github.com/aws/aws-sdk-go/service/cloudfront"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 )
 
 // getIdempotencyToken returns a unique string to be used in certain API calls
@@ -31,9 +32,9 @@ func getIdempotencyToken() string {
 // This is necessary because CloudFront's API will return an
 // `InconsistentQuantities` error message if Quantity != len(Items). This is
 // why we can't have nice things, apparently.
-func setQuantityFields(dc *svcsdk.DistributionConfig) {
+func setQuantityFields(dc *svcsdktypes.DistributionConfig) {
 	if dc.Aliases != nil {
-		dc.Aliases.SetQuantity(int64(len(dc.Aliases.Items)))
+		dc.Aliases.Quantity = aws.Int32(int32(len(dc.Aliases.Items)))
 	}
 	cbs := dc.CacheBehaviors
 	if cbs != nil {
@@ -41,11 +42,11 @@ func setQuantityFields(dc *svcsdk.DistributionConfig) {
 			ams := cb.AllowedMethods
 			if ams != nil {
 				if ams.Items != nil {
-					ams.SetQuantity(int64(len(ams.Items)))
+					ams.Quantity = aws.Int32(int32(len(ams.Items)))
 				}
 				cms := ams.CachedMethods
 				if cms != nil {
-					cms.SetQuantity(int64(len(cms.Items)))
+					cms.Quantity = aws.Int32(int32(len(cms.Items)))
 				}
 			}
 			fvs := cb.ForwardedValues
@@ -54,51 +55,51 @@ func setQuantityFields(dc *svcsdk.DistributionConfig) {
 				if cks != nil && cks.WhitelistedNames != nil {
 					wlns := cks.WhitelistedNames
 					if wlns.Items != nil {
-						wlns.SetQuantity(int64(len(wlns.Items)))
+						wlns.Quantity = aws.Int32(int32(len(wlns.Items)))
 					}
 				}
 				hds := fvs.Headers
 				if hds != nil {
-					hds.SetQuantity(int64(len(hds.Items)))
+					hds.Quantity = aws.Int32(int32(len(hds.Items)))
 				}
 				qscks := fvs.QueryStringCacheKeys
 				if qscks != nil {
-					qscks.SetQuantity(int64(len(qscks.Items)))
+					qscks.Quantity = aws.Int32(int32(len(qscks.Items)))
 				}
 			}
 			fas := cb.FunctionAssociations
 			if fas != nil {
-				fas.SetQuantity(int64(len(fas.Items)))
+				fas.Quantity = aws.Int32(int32(len(fas.Items)))
 			}
 			lfas := cb.LambdaFunctionAssociations
 			if lfas != nil {
-				lfas.SetQuantity(int64(len(lfas.Items)))
+				lfas.Quantity = aws.Int32(int32(len(lfas.Items)))
 			}
 			tkgs := cb.TrustedKeyGroups
 			if tkgs != nil {
-				tkgs.SetQuantity(int64(len(tkgs.Items)))
+				tkgs.Quantity = aws.Int32(int32(len(tkgs.Items)))
 			}
 			tss := cb.TrustedSigners
 			if tss != nil {
-				tss.SetQuantity(int64(len(tss.Items)))
+				tss.Quantity = aws.Int32(int32(len(tss.Items)))
 			}
 		}
-		cbs.SetQuantity(int64(len(cbs.Items)))
+		cbs.Quantity = aws.Int32(int32(len(cbs.Items)))
 	}
 	cers := dc.CustomErrorResponses
 	if cers != nil {
-		cers.SetQuantity(int64(len(cers.Items)))
+		cers.Quantity = aws.Int32(int32(len(cers.Items)))
 	}
 	dcb := dc.DefaultCacheBehavior
 	if dcb != nil {
 		ams := dcb.AllowedMethods
 		if ams != nil {
 			if ams.Items != nil {
-				ams.SetQuantity(int64(len(ams.Items)))
+				ams.Quantity = aws.Int32(int32(len(ams.Items)))
 			}
 			cms := ams.CachedMethods
 			if cms != nil {
-				cms.SetQuantity(int64(len(cms.Items)))
+				cms.Quantity = aws.Int32(int32(len(cms.Items)))
 			}
 		}
 		fvs := dcb.ForwardedValues
@@ -107,33 +108,33 @@ func setQuantityFields(dc *svcsdk.DistributionConfig) {
 			if cks != nil && cks.WhitelistedNames != nil {
 				wlns := cks.WhitelistedNames
 				if wlns.Items != nil {
-					wlns.SetQuantity(int64(len(wlns.Items)))
+					wlns.Quantity = aws.Int32(int32(len(wlns.Items)))
 				}
 			}
 			hds := fvs.Headers
 			if hds != nil {
-				hds.SetQuantity(int64(len(hds.Items)))
+				hds.Quantity = aws.Int32(int32(len(hds.Items)))
 			}
 			qscks := fvs.QueryStringCacheKeys
 			if qscks != nil {
-				qscks.SetQuantity(int64(len(qscks.Items)))
+				qscks.Quantity = aws.Int32(int32(len(qscks.Items)))
 			}
 		}
 		fas := dcb.FunctionAssociations
 		if fas != nil {
-			fas.SetQuantity(int64(len(fas.Items)))
+			fas.Quantity = aws.Int32(int32(len(fas.Items)))
 		}
 		lfas := dcb.LambdaFunctionAssociations
 		if lfas != nil {
-			lfas.SetQuantity(int64(len(lfas.Items)))
+			lfas.Quantity = aws.Int32(int32(len(lfas.Items)))
 		}
 		tkgs := dcb.TrustedKeyGroups
 		if tkgs != nil {
-			tkgs.SetQuantity(int64(len(tkgs.Items)))
+			tkgs.Quantity = aws.Int32(int32(len(tkgs.Items)))
 		}
 		tss := dcb.TrustedSigners
 		if tss != nil {
-			tss.SetQuantity(int64(len(tss.Items)))
+			tss.Quantity = aws.Int32(int32(len(tss.Items)))
 		}
 	}
 	ogs := dc.OriginGroups
@@ -143,37 +144,37 @@ func setQuantityFields(dc *svcsdk.DistributionConfig) {
 			if fc != nil && fc.StatusCodes != nil {
 				scs := fc.StatusCodes
 				if scs.Items != nil {
-					scs.SetQuantity(int64(len(scs.Items)))
+					scs.Quantity = aws.Int32(int32(len(scs.Items)))
 				}
 			}
 			if og.Members != nil {
-				og.Members.SetQuantity(int64(len(og.Members.Items)))
+				og.Members.Quantity = aws.Int32(int32(len(og.Members.Items)))
 			}
 		}
-		ogs.SetQuantity(int64(len(ogs.Items)))
+		ogs.Quantity = aws.Int32(int32(len(ogs.Items)))
 	}
 	os := dc.Origins
 	if os != nil {
 		for _, o := range os.Items {
 			chs := o.CustomHeaders
 			if chs != nil {
-				chs.SetQuantity(int64(len(chs.Items)))
+				chs.Quantity = aws.Int32(int32(len(chs.Items)))
 			}
 			coc := o.CustomOriginConfig
 			if coc != nil {
 				osps := coc.OriginSslProtocols
 				if osps != nil {
-					osps.SetQuantity(int64(len(osps.Items)))
+					osps.Quantity = aws.Int32(int32(len(osps.Items)))
 				}
 			}
 		}
-		os.SetQuantity(int64(len(os.Items)))
+		os.Quantity = aws.Int32(int32(len(os.Items)))
 	}
 	rs := dc.Restrictions
 	if rs != nil {
 		grs := rs.GeoRestriction
 		if grs != nil {
-			grs.SetQuantity(int64(len(grs.Items)))
+			grs.Quantity = aws.Int32(int32(len(grs.Items)))
 		}
 	}
 }

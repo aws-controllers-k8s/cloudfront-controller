@@ -28,8 +28,10 @@ import (
 	ackerr "github.com/aws-controllers-k8s/runtime/pkg/errors"
 	ackrequeue "github.com/aws-controllers-k8s/runtime/pkg/requeue"
 	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
-	"github.com/aws/aws-sdk-go/aws"
-	svcsdk "github.com/aws/aws-sdk-go/service/cloudfront"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	svcsdk "github.com/aws/aws-sdk-go-v2/service/cloudfront"
+	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
+	smithy "github.com/aws/smithy-go"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -40,8 +42,7 @@ import (
 var (
 	_ = &metav1.Time{}
 	_ = strings.ToLower("")
-	_ = &aws.JSONValue{}
-	_ = &svcsdk.CloudFront{}
+	_ = &svcsdk.Client{}
 	_ = &svcapitypes.OriginAccessControl{}
 	_ = ackv1alpha1.AWSAccountID("")
 	_ = &ackerr.NotFound
@@ -49,6 +50,7 @@ var (
 	_ = &reflect.Value{}
 	_ = fmt.Sprintf("")
 	_ = &ackrequeue.NoRequeue{}
+	_ = &aws.Config{}
 )
 
 // sdkFind returns SDK-specific information about a supplied resource
@@ -74,13 +76,11 @@ func (rm *resourceManager) sdkFind(
 	}
 
 	var resp *svcsdk.GetOriginAccessControlOutput
-	resp, err = rm.sdkapi.GetOriginAccessControlWithContext(ctx, input)
+	resp, err = rm.sdkapi.GetOriginAccessControl(ctx, input)
 	rm.metrics.RecordAPICall("READ_ONE", "GetOriginAccessControl", err)
 	if err != nil {
-		if reqErr, ok := ackerr.AWSRequestFailure(err); ok && reqErr.StatusCode() == 404 {
-			return nil, ackerr.NotFound
-		}
-		if awsErr, ok := ackerr.AWSError(err); ok && awsErr.Code() == "NoSuchOriginAccessControl" {
+		var awsErr smithy.APIError
+		if errors.As(err, &awsErr) && awsErr.ErrorCode() == "NoSuchOriginAccessControl" {
 			return nil, ackerr.NotFound
 		}
 		return nil, err
@@ -103,14 +103,14 @@ func (rm *resourceManager) sdkFind(
 		if resp.OriginAccessControl.OriginAccessControlConfig.Name != nil {
 			f1.Name = resp.OriginAccessControl.OriginAccessControlConfig.Name
 		}
-		if resp.OriginAccessControl.OriginAccessControlConfig.OriginAccessControlOriginType != nil {
-			f1.OriginAccessControlOriginType = resp.OriginAccessControl.OriginAccessControlConfig.OriginAccessControlOriginType
+		if resp.OriginAccessControl.OriginAccessControlConfig.OriginAccessControlOriginType != "" {
+			f1.OriginAccessControlOriginType = aws.String(string(resp.OriginAccessControl.OriginAccessControlConfig.OriginAccessControlOriginType))
 		}
-		if resp.OriginAccessControl.OriginAccessControlConfig.SigningBehavior != nil {
-			f1.SigningBehavior = resp.OriginAccessControl.OriginAccessControlConfig.SigningBehavior
+		if resp.OriginAccessControl.OriginAccessControlConfig.SigningBehavior != "" {
+			f1.SigningBehavior = aws.String(string(resp.OriginAccessControl.OriginAccessControlConfig.SigningBehavior))
 		}
-		if resp.OriginAccessControl.OriginAccessControlConfig.SigningProtocol != nil {
-			f1.SigningProtocol = resp.OriginAccessControl.OriginAccessControlConfig.SigningProtocol
+		if resp.OriginAccessControl.OriginAccessControlConfig.SigningProtocol != "" {
+			f1.SigningProtocol = aws.String(string(resp.OriginAccessControl.OriginAccessControlConfig.SigningProtocol))
 		}
 		ko.Spec.OriginAccessControlConfig = f1
 	} else {
@@ -146,7 +146,7 @@ func (rm *resourceManager) newDescribeRequestPayload(
 	res := &svcsdk.GetOriginAccessControlInput{}
 
 	if r.ko.Status.ID != nil {
-		res.SetId(*r.ko.Status.ID)
+		res.Id = r.ko.Status.ID
 	}
 
 	return res, nil
@@ -171,7 +171,7 @@ func (rm *resourceManager) sdkCreate(
 
 	var resp *svcsdk.CreateOriginAccessControlOutput
 	_ = resp
-	resp, err = rm.sdkapi.CreateOriginAccessControlWithContext(ctx, input)
+	resp, err = rm.sdkapi.CreateOriginAccessControl(ctx, input)
 	rm.metrics.RecordAPICall("CREATE", "CreateOriginAccessControl", err)
 	if err != nil {
 		return nil, err
@@ -193,14 +193,14 @@ func (rm *resourceManager) sdkCreate(
 		if resp.OriginAccessControl.OriginAccessControlConfig.Name != nil {
 			f1.Name = resp.OriginAccessControl.OriginAccessControlConfig.Name
 		}
-		if resp.OriginAccessControl.OriginAccessControlConfig.OriginAccessControlOriginType != nil {
-			f1.OriginAccessControlOriginType = resp.OriginAccessControl.OriginAccessControlConfig.OriginAccessControlOriginType
+		if resp.OriginAccessControl.OriginAccessControlConfig.OriginAccessControlOriginType != "" {
+			f1.OriginAccessControlOriginType = aws.String(string(resp.OriginAccessControl.OriginAccessControlConfig.OriginAccessControlOriginType))
 		}
-		if resp.OriginAccessControl.OriginAccessControlConfig.SigningBehavior != nil {
-			f1.SigningBehavior = resp.OriginAccessControl.OriginAccessControlConfig.SigningBehavior
+		if resp.OriginAccessControl.OriginAccessControlConfig.SigningBehavior != "" {
+			f1.SigningBehavior = aws.String(string(resp.OriginAccessControl.OriginAccessControlConfig.SigningBehavior))
 		}
-		if resp.OriginAccessControl.OriginAccessControlConfig.SigningProtocol != nil {
-			f1.SigningProtocol = resp.OriginAccessControl.OriginAccessControlConfig.SigningProtocol
+		if resp.OriginAccessControl.OriginAccessControlConfig.SigningProtocol != "" {
+			f1.SigningProtocol = aws.String(string(resp.OriginAccessControl.OriginAccessControlConfig.SigningProtocol))
 		}
 		ko.Spec.OriginAccessControlConfig = f1
 	} else {
@@ -228,23 +228,23 @@ func (rm *resourceManager) newCreateRequestPayload(
 	res := &svcsdk.CreateOriginAccessControlInput{}
 
 	if r.ko.Spec.OriginAccessControlConfig != nil {
-		f0 := &svcsdk.OriginAccessControlConfig{}
+		f0 := &svcsdktypes.OriginAccessControlConfig{}
 		if r.ko.Spec.OriginAccessControlConfig.Description != nil {
-			f0.SetDescription(*r.ko.Spec.OriginAccessControlConfig.Description)
+			f0.Description = r.ko.Spec.OriginAccessControlConfig.Description
 		}
 		if r.ko.Spec.OriginAccessControlConfig.Name != nil {
-			f0.SetName(*r.ko.Spec.OriginAccessControlConfig.Name)
+			f0.Name = r.ko.Spec.OriginAccessControlConfig.Name
 		}
 		if r.ko.Spec.OriginAccessControlConfig.OriginAccessControlOriginType != nil {
-			f0.SetOriginAccessControlOriginType(*r.ko.Spec.OriginAccessControlConfig.OriginAccessControlOriginType)
+			f0.OriginAccessControlOriginType = svcsdktypes.OriginAccessControlOriginTypes(*r.ko.Spec.OriginAccessControlConfig.OriginAccessControlOriginType)
 		}
 		if r.ko.Spec.OriginAccessControlConfig.SigningBehavior != nil {
-			f0.SetSigningBehavior(*r.ko.Spec.OriginAccessControlConfig.SigningBehavior)
+			f0.SigningBehavior = svcsdktypes.OriginAccessControlSigningBehaviors(*r.ko.Spec.OriginAccessControlConfig.SigningBehavior)
 		}
 		if r.ko.Spec.OriginAccessControlConfig.SigningProtocol != nil {
-			f0.SetSigningProtocol(*r.ko.Spec.OriginAccessControlConfig.SigningProtocol)
+			f0.SigningProtocol = svcsdktypes.OriginAccessControlSigningProtocols(*r.ko.Spec.OriginAccessControlConfig.SigningProtocol)
 		}
-		res.SetOriginAccessControlConfig(f0)
+		res.OriginAccessControlConfig = f0
 	}
 
 	return res, nil
@@ -270,12 +270,12 @@ func (rm *resourceManager) sdkUpdate(
 	// If we don't do this, we get the following on every update call:
 	// InvalidIfMatchVersion: The If-Match version is missing or not valid for the resource.
 	if latest.ko.Status.ETag != nil {
-		input.SetIfMatch(*latest.ko.Status.ETag)
+		input.IfMatch = latest.ko.Status.ETag
 	}
 
 	var resp *svcsdk.UpdateOriginAccessControlOutput
 	_ = resp
-	resp, err = rm.sdkapi.UpdateOriginAccessControlWithContext(ctx, input)
+	resp, err = rm.sdkapi.UpdateOriginAccessControl(ctx, input)
 	rm.metrics.RecordAPICall("UPDATE", "UpdateOriginAccessControl", err)
 	if err != nil {
 		return nil, err
@@ -312,26 +312,26 @@ func (rm *resourceManager) newUpdateRequestPayload(
 	res := &svcsdk.UpdateOriginAccessControlInput{}
 
 	if r.ko.Status.ID != nil {
-		res.SetId(*r.ko.Status.ID)
+		res.Id = r.ko.Status.ID
 	}
 	if r.ko.Spec.OriginAccessControlConfig != nil {
-		f2 := &svcsdk.OriginAccessControlConfig{}
+		f2 := &svcsdktypes.OriginAccessControlConfig{}
 		if r.ko.Spec.OriginAccessControlConfig.Description != nil {
-			f2.SetDescription(*r.ko.Spec.OriginAccessControlConfig.Description)
+			f2.Description = r.ko.Spec.OriginAccessControlConfig.Description
 		}
 		if r.ko.Spec.OriginAccessControlConfig.Name != nil {
-			f2.SetName(*r.ko.Spec.OriginAccessControlConfig.Name)
+			f2.Name = r.ko.Spec.OriginAccessControlConfig.Name
 		}
 		if r.ko.Spec.OriginAccessControlConfig.OriginAccessControlOriginType != nil {
-			f2.SetOriginAccessControlOriginType(*r.ko.Spec.OriginAccessControlConfig.OriginAccessControlOriginType)
+			f2.OriginAccessControlOriginType = svcsdktypes.OriginAccessControlOriginTypes(*r.ko.Spec.OriginAccessControlConfig.OriginAccessControlOriginType)
 		}
 		if r.ko.Spec.OriginAccessControlConfig.SigningBehavior != nil {
-			f2.SetSigningBehavior(*r.ko.Spec.OriginAccessControlConfig.SigningBehavior)
+			f2.SigningBehavior = svcsdktypes.OriginAccessControlSigningBehaviors(*r.ko.Spec.OriginAccessControlConfig.SigningBehavior)
 		}
 		if r.ko.Spec.OriginAccessControlConfig.SigningProtocol != nil {
-			f2.SetSigningProtocol(*r.ko.Spec.OriginAccessControlConfig.SigningProtocol)
+			f2.SigningProtocol = svcsdktypes.OriginAccessControlSigningProtocols(*r.ko.Spec.OriginAccessControlConfig.SigningProtocol)
 		}
-		res.SetOriginAccessControlConfig(f2)
+		res.OriginAccessControlConfig = f2
 	}
 
 	return res, nil
@@ -354,12 +354,12 @@ func (rm *resourceManager) sdkDelete(
 	// If we don't do this, we get the following on every delete call:
 	// InvalidIfMatchVersion: The If-Match version is missing or not valid for the resource.
 	if r.ko.Status.ETag != nil {
-		input.SetIfMatch(*r.ko.Status.ETag)
+		input.IfMatch = r.ko.Status.ETag
 	}
 
 	var resp *svcsdk.DeleteOriginAccessControlOutput
 	_ = resp
-	resp, err = rm.sdkapi.DeleteOriginAccessControlWithContext(ctx, input)
+	resp, err = rm.sdkapi.DeleteOriginAccessControl(ctx, input)
 	rm.metrics.RecordAPICall("DELETE", "DeleteOriginAccessControl", err)
 	return nil, err
 }
@@ -372,7 +372,7 @@ func (rm *resourceManager) newDeleteRequestPayload(
 	res := &svcsdk.DeleteOriginAccessControlInput{}
 
 	if r.ko.Status.ID != nil {
-		res.SetId(*r.ko.Status.ID)
+		res.Id = r.ko.Status.ID
 	}
 
 	return res, nil
