@@ -6,7 +6,7 @@ toolchain go1.23.5
 
 require (
 	github.com/aws-controllers-k8s/acm-controller v0.0.13
-	github.com/aws-controllers-k8s/runtime v0.42.0
+	github.com/aws-controllers-k8s/runtime v0.43.0
 	github.com/aws/aws-sdk-go v1.49.0
 	github.com/aws/aws-sdk-go-v2 v1.36.0
 	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.44.8
