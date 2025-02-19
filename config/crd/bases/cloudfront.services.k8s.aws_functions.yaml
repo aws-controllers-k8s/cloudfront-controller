@@ -40,16 +40,11 @@ spec:
             description: FunctionSpec defines the desired state of Function.
             properties:
               functionCode:
-                description: |-
-                  The function code. For more information about writing a CloudFront function,
-                  see Writing function code for CloudFront Functions (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/writing-function-code.html)
-                  in the Amazon CloudFront Developer Guide.
                 format: byte
                 type: string
               functionConfig:
-                description: |-
-                  Configuration information about the function, including an optional comment
-                  and the function's runtime.
+                description: Contains configuration information about a CloudFront
+                  function.
                 properties:
                   comment:
                     type: string
@@ -57,7 +52,6 @@ spec:
                     type: string
                 type: object
               name:
-                description: A name to identify the function.
                 type: string
             required:
             - functionCode
@@ -98,7 +92,7 @@ spec:
                 type: object
               conditions:
                 description: |-
-                  All CRS managed by ACK have a common `Status.Conditions` member that
+                  All CRs managed by ACK have a common `Status.Conditions` member that
                   contains a collection of `ackv1alpha1.Condition` objects that describe
                   the various terminal states of the CR and its backend AWS service API
                   resource
