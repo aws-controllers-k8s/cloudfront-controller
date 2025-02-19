@@ -31,6 +31,8 @@ type DistributionSpec struct {
 	// +kubebuilder:validation:Required
 
 	DistributionConfig *DistributionConfig `json:"distributionConfig"`
+	// A complex type that contains Tag elements.
+	Tags []*Tag `json:"tags,omitempty"`
 }
 
 // DistributionStatus defines the observed state of Distribution

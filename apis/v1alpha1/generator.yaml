@@ -188,8 +188,6 @@ resources:
         - TooManyOrigins
         - TooManyQueryStringParameters
         - TooManyTrustedSigners
-    tags:
-      ignore: true
     hooks:
       sdk_read_one_post_set_output:
         template_path: hooks/distribution/sdk_read_one_post_set_output.go.tpl
@@ -197,6 +195,8 @@ resources:
         template_path: hooks/distribution/sdk_create_post_build_request.go.tpl
       sdk_create_post_set_output:
         template_path: hooks/distribution/sdk_create_post_set_output.go.tpl
+      sdk_update_pre_build_request:
+        template_path: hooks/distribution/sdk_update_pre_build_request.go.tpl
       sdk_update_post_build_request:
         template_path: hooks/distribution/sdk_update_post_build_request.go.tpl
       sdk_update_post_set_output:
@@ -204,6 +204,10 @@ resources:
       sdk_delete_post_build_request:
         template_path: hooks/distribution/sdk_delete_post_build_request.go.tpl
     fields:
+      Tags:
+        from:
+          operation: TagResource
+          path: Tags.Items
       ETag:
         is_read_only: true
         from:

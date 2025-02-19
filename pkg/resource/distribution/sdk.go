@@ -819,6 +819,7 @@ func (rm *resourceManager) sdkFind(
 		ko.Status.CallerReference = resp.Distribution.DistributionConfig.CallerReference
 	}
 
+	ko.Spec.Tags, err = rm.getTags(ctx, string(*ko.Status.ACKResourceMetadata.ARN))
 	return &resource{ko}, nil
 }
 
@@ -2263,6 +2264,16 @@ func (rm *resourceManager) sdkUpdate(
 	defer func() {
 		exit(err)
 	}()
+	if delta.DifferentAt("Spec.Tags") {
+		err := rm.syncTags(
+			ctx,
+			latest,
+			desired,
+		)
+		if err != nil {
+			return nil, err
+		}
+	}
 	input, err := rm.newUpdateRequestPayload(ctx, desired, delta)
 	if err != nil {
 		return nil, err

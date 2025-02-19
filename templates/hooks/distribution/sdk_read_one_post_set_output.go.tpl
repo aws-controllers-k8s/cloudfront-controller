@@ -10,3 +10,5 @@
 	if resp.Distribution != nil &&  resp.Distribution.DistributionConfig != nil {
 		ko.Status.CallerReference = resp.Distribution.DistributionConfig.CallerReference
 	}
+
+	ko.Spec.Tags, err = rm.getTags(ctx, string(*ko.Status.ACKResourceMetadata.ARN))
