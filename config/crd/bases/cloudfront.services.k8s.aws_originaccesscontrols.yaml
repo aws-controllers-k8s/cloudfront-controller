@@ -44,7 +44,7 @@ spec:
               A CloudFront origin access control, including its unique identifier.
             properties:
               originAccessControlConfig:
-                description: A CloudFront origin access control configuration.
+                description: Contains the origin access control.
                 properties:
                   description:
                     type: string

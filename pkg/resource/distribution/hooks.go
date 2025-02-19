@@ -15,8 +15,10 @@ package distribution
 
 import (
 	"context"
+	"fmt"
 	"time"
 
+	ackrequeue "github.com/aws-controllers-k8s/runtime/pkg/requeue"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 
@@ -198,4 +200,28 @@ func (rm *resourceManager) syncTags(
 	latest *resource,
 ) (err error) {
 	return util.SyncResourceTags(ctx, rm.sdkapi, rm.metrics, string(*latest.ko.Status.ACKResourceMetadata.ARN), desired.ko.Spec.Tags, latest.ko.Spec.Tags)
+}
+
+// distributionDeployed returns true if the supplied distribution is in an active status
+func distributionDeployed(r *resource) bool {
+	if r.ko.Status.Status == nil {
+		return false
+	}
+	ds := *r.ko.Status.Status
+	return ds == "Deployed"
+}
+
+// requeueWaitUntilCanModify returns a `ackrequeue.RequeueNeededAfter` struct
+// explaining the distribution cannot be modified until it reaches an deployed
+// status.
+func requeueWaitUntilCanModify(r *resource) *ackrequeue.RequeueNeededAfter {
+	if r.ko.Status.Status == nil {
+		return nil
+	}
+	status := *r.ko.Status.Status
+	return ackrequeue.NeededAfter(
+		fmt.Errorf("distribution in '%s' state, cannot be modified until '%s'",
+			status, "Deployed"),
+		ackrequeue.DefaultRequeueAfterDuration,
+	)
 }

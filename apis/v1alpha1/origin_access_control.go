@@ -26,9 +26,7 @@ import (
 type OriginAccessControlSpec struct {
 
 	// Contains the origin access control.
-
 	// +kubebuilder:validation:Required
-
 	OriginAccessControlConfig *OriginAccessControlConfig `json:"originAccessControlConfig"`
 }
 

@@ -45,9 +45,7 @@ import (
 type OriginRequestPolicySpec struct {
 
 	// An origin request policy configuration.
-
 	// +kubebuilder:validation:Required
-
 	OriginRequestPolicyConfig *OriginRequestPolicyConfig `json:"originRequestPolicyConfig"`
 }
 

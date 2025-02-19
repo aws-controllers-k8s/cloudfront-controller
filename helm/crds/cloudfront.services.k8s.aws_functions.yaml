@@ -40,11 +40,16 @@ spec:
             description: FunctionSpec defines the desired state of Function.
             properties:
               functionCode:
+                description: |-
+                  The function code. For more information about writing a CloudFront function,
+                  see Writing function code for CloudFront Functions (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/writing-function-code.html)
+                  in the Amazon CloudFront Developer Guide.
                 format: byte
                 type: string
               functionConfig:
-                description: Contains configuration information about a CloudFront
-                  function.
+                description: |-
+                  Configuration information about the function, including an optional comment
+                  and the function's runtime.
                 properties:
                   comment:
                     type: string
@@ -52,6 +57,7 @@ spec:
                     type: string
                 type: object
               name:
+                description: A name to identify the function.
                 type: string
             required:
             - functionCode

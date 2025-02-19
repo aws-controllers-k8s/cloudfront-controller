@@ -44,7 +44,7 @@ spec:
               and the details about how to track and manage content delivery.
             properties:
               distributionConfig:
-                description: A distribution configuration.
+                description: The distribution's configuration information.
                 properties:
                   aliases:
                     description: |-
