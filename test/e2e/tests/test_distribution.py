@@ -20,6 +20,7 @@ import pytest
 from acktest.k8s import condition
 from acktest.k8s import resource as k8s
 from acktest.aws import identity
+from acktest import tags
 from acktest.resources import random_suffix_name
 from e2e import service_marker, CRD_GROUP, CRD_VERSION, load_resource
 from e2e.bootstrap_resources import get_bootstrap_resources
@@ -27,7 +28,7 @@ from e2e.replacement_values import REPLACEMENT_VALUES
 from e2e import distribution
 
 DISTRIBUTION_RESOURCE_PLURAL = "distributions"
-DELETE_WAIT_AFTER_SECONDS = 10
+DELETE_WAIT_AFTER_SECONDS = 120
 CHECK_STATUS_WAIT_SECONDS = 300
 MODIFY_WAIT_AFTER_SECONDS = 300
 
@@ -76,7 +77,6 @@ def simple_distribution():
         period_length=DELETE_WAIT_AFTER_SECONDS,
     )
     assert deleted
-
     distribution.wait_until_deleted(distribution_id)
 
 
@@ -98,13 +98,38 @@ class TestDistribution:
         assert 'enabled' in cr['spec']['distributionConfig']
         assert bool(cr['spec']['distributionConfig']['enabled']) == True
 
-        condition.assert_synced(ref)
+        assert k8s.wait_on_condition(
+            ref,
+            "ACK.ResourceSynced",
+            "True",
+            wait_periods=CHECK_STATUS_WAIT_SECONDS // 10,
+        )
 
         latest = distribution.get(distribution_id)
         assert latest is not None
         assert 'DistributionConfig' in latest
         assert 'Enabled' in latest['DistributionConfig']
         assert bool(latest['DistributionConfig']['Enabled']) == True
+        
+        assert 'status' in cr
+        assert 'ackResourceMetadata' in cr['status']
+        assert 'arn' in cr['status']['ackResourceMetadata']
+        arn = cr['status']['ackResourceMetadata']['arn']
+
+        assert 'tags' in cr['spec']
+        user_tags = cr['spec']['tags']
+
+        response_tags = distribution.get_tags(arn)
+
+        tags.assert_ack_system_tags(
+            tags=response_tags,
+        )
+
+        user_tags = [{"Key": d["key"], "Value": d["value"]} for d in user_tags]
+        tags.assert_equal_without_ack_tags(
+            expected=user_tags,
+            actual=response_tags,
+        )
 
         # We're now going to modify the enabled field of the Distribution, wait
         # some time and verify that the CloudFront server-side resource shows
@@ -116,7 +141,13 @@ class TestDistribution:
             "spec": {
                 "distributionConfig": {
                     "enabled": False
-                }
+                },
+                "tags": [
+                    {
+                        "key": "another",
+                        "value": "here"
+                    }
+                ]
             },
         }
         k8s.patch_custom_resource(ref, updates)
@@ -127,3 +158,25 @@ class TestDistribution:
         assert 'DistributionConfig' in latest
         assert 'Enabled' in latest['DistributionConfig']
         assert bool(latest['DistributionConfig']['Enabled']) == False
+
+        cr = k8s.get_resource(ref)
+
+        assert 'status' in cr
+        assert 'ackResourceMetadata' in cr['status']
+        assert 'arn' in cr['status']['ackResourceMetadata']
+        arn = cr['status']['ackResourceMetadata']['arn']
+
+        assert 'tags' in cr['spec']
+        user_tags = cr['spec']['tags']
+
+        response_tags = distribution.get_tags(arn)
+
+        tags.assert_ack_system_tags(
+            tags=response_tags,
+        )
+
+        user_tags = [{"Key": d["key"], "Value": d["value"]} for d in user_tags]
+        tags.assert_equal_without_ack_tags(
+            expected=user_tags,
+            actual=response_tags,
+        )

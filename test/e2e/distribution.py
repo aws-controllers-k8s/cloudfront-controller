@@ -101,3 +101,15 @@ def get(distribution_id):
         return resp['Distribution']
     except c.exceptions.NoSuchDistribution:
         return None
+
+def get_tags(distribution_arn):
+    """Returns tags for distribution.
+
+    If no such Distribution exists, returns None.
+    """
+    c = boto3.client('cloudfront')
+    try:
+        resp = c.list_tags_for_resource(Resource=distribution_arn)
+        return resp['Tags']['Items']
+    except c.exceptions.NoSuchResource:
+        return None

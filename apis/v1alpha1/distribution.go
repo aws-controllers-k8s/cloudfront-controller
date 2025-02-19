@@ -27,9 +27,7 @@ import (
 type DistributionSpec struct {
 
 	// The distribution's configuration information.
-
 	// +kubebuilder:validation:Required
-
 	DistributionConfig *DistributionConfig `json:"distributionConfig"`
 	// A complex type that contains Tag elements.
 	Tags []*Tag `json:"tags,omitempty"`

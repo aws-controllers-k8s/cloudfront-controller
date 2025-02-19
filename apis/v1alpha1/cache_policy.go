@@ -42,9 +42,7 @@ import (
 type CachePolicySpec struct {
 
 	// A cache policy configuration.
-
 	// +kubebuilder:validation:Required
-
 	CachePolicyConfig *CachePolicyConfig `json:"cachePolicyConfig"`
 }
 

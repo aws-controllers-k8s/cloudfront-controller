@@ -818,8 +818,15 @@ func (rm *resourceManager) sdkFind(
 	if resp.Distribution != nil && resp.Distribution.DistributionConfig != nil {
 		ko.Status.CallerReference = resp.Distribution.DistributionConfig.CallerReference
 	}
-
+	// We need to get the tags that are in the AWS resource
 	ko.Spec.Tags, err = rm.getTags(ctx, string(*ko.Status.ACKResourceMetadata.ARN))
+	if !distributionDeployed(&resource{ko}) {
+		// Setting resource synced condition to false will trigger a requeue of
+		// the resource. No need to return a requeue error here.
+		ackcondition.SetSynced(&resource{ko}, corev1.ConditionFalse, nil, nil)
+	} else {
+		ackcondition.SetSynced(&resource{ko}, corev1.ConditionTrue, nil, nil)
+	}
 	return &resource{ko}, nil
 }
 
@@ -1604,6 +1611,9 @@ func (rm *resourceManager) sdkCreate(
 		ko.Status.ETag = resp.ETag
 	}
 
+	if ko.Spec.Tags != nil {
+		ackcondition.SetSynced(&resource{ko}, corev1.ConditionFalse, nil, nil)
+	}
 	return &resource{ko}, nil
 }
 
@@ -2273,6 +2283,15 @@ func (rm *resourceManager) sdkUpdate(
 		if err != nil {
 			return nil, err
 		}
+	}
+	if !delta.DifferentExcept("Spec.Tags") {
+		return desired, nil
+	}
+
+	if !distributionDeployed(latest) {
+		msg := "Distribution is in '" + *latest.ko.Status.Status + "' status"
+		ackcondition.SetSynced(desired, corev1.ConditionFalse, &msg, nil)
+		return desired, requeueWaitUntilCanModify(latest)
 	}
 	input, err := rm.newUpdateRequestPayload(ctx, desired, delta)
 	if err != nil {
