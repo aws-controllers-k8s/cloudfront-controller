@@ -26,14 +26,20 @@ type FunctionSpec struct {
 	// The function code. For more information about writing a CloudFront function,
 	// see Writing function code for CloudFront Functions (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/writing-function-code.html)
 	// in the Amazon CloudFront Developer Guide.
+
 	// +kubebuilder:validation:Required
+
 	FunctionCode []byte `json:"functionCode"`
 	// Configuration information about the function, including an optional comment
 	// and the function's runtime.
+
 	// +kubebuilder:validation:Required
+
 	FunctionConfig *FunctionConfig `json:"functionConfig"`
 	// A name to identify the function.
+
 	// +kubebuilder:validation:Required
+
 	Name *string `json:"name"`
 }
 
@@ -44,7 +50,7 @@ type FunctionStatus struct {
 	// constructed ARN for the resource
 	// +kubebuilder:validation:Optional
 	ACKResourceMetadata *ackv1alpha1.ResourceMetadata `json:"ackResourceMetadata"`
-	// All CRS managed by ACK have a common `Status.Conditions` member that
+	// All CRs managed by ACK have a common `Status.Conditions` member that
 	// contains a collection of `ackv1alpha1.Condition` objects that describe
 	// the various terminal states of the CR and its backend AWS service API
 	// resource
