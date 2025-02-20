@@ -41,9 +41,7 @@ type ResponseHeadersPolicySpec struct {
 
 	// Contains metadata about the response headers policy, and a set of configurations
 	// that specify the HTTP headers.
-
 	// +kubebuilder:validation:Required
-
 	ResponseHeadersPolicyConfig *ResponseHeadersPolicyConfig `json:"responseHeadersPolicyConfig"`
 }
 

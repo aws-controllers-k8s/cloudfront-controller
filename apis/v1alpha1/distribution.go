@@ -27,9 +27,7 @@ import (
 type DistributionSpec struct {
 
 	// The distribution's configuration information.
-
 	// +kubebuilder:validation:Required
-
 	DistributionConfig *DistributionConfig `json:"distributionConfig"`
 }
 
