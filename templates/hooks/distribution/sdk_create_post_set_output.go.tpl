@@ -5,3 +5,7 @@
 	if resp.ETag != nil {
 		ko.Status.ETag = resp.ETag
 	} 
+
+	if ko.Spec.Tags != nil {
+		ackcondition.SetSynced(&resource{ko}, corev1.ConditionFalse, nil, nil)
+	}
