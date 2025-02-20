@@ -26,20 +26,14 @@ type FunctionSpec struct {
 	// The function code. For more information about writing a CloudFront function,
 	// see Writing function code for CloudFront Functions (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/writing-function-code.html)
 	// in the Amazon CloudFront Developer Guide.
-
 	// +kubebuilder:validation:Required
-
 	FunctionCode []byte `json:"functionCode"`
 	// Configuration information about the function, including an optional comment
 	// and the function's runtime.
-
 	// +kubebuilder:validation:Required
-
 	FunctionConfig *FunctionConfig `json:"functionConfig"`
 	// A name to identify the function.
-
 	// +kubebuilder:validation:Required
-
 	Name *string `json:"name"`
 }
 
