@@ -2059,6 +2059,21 @@ type StreamingLoggingConfig struct {
 	Prefix  *string `json:"prefix,omitempty"`
 }
 
+// A complex type that contains Tag key and Tag value.
+type Tag struct {
+	// A string that contains Tag key.
+	//
+	// The string length should be between 1 and 128 characters. Valid characters
+	// include a-z, A-Z, 0-9, space, and the special characters _ - . : / = + @.
+	Key   *string `json:"key,omitempty"`
+	Value *string `json:"value,omitempty"`
+}
+
+// A complex type that contains zero or more Tag elements.
+type Tags struct {
+	Items []*Tag `json:"items,omitempty"`
+}
+
 // Contains the result of testing a CloudFront function with TestFunction.
 type TestResult struct {
 	ComputeUtilization   *string `json:"computeUtilization,omitempty"`

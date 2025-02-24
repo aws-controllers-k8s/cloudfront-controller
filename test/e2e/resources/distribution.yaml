@@ -20,3 +20,6 @@ spec:
         domainName: $ORIGIN_S3_DOMAIN_NAME
         s3OriginConfig:
           originAccessIdentity: ''
+  tags:
+  - key: hello
+    value: world

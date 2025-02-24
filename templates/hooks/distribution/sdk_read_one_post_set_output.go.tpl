@@ -10,3 +10,12 @@
 	if resp.Distribution != nil &&  resp.Distribution.DistributionConfig != nil {
 		ko.Status.CallerReference = resp.Distribution.DistributionConfig.CallerReference
 	}
+	// We need to get the tags that are in the AWS resource
+	ko.Spec.Tags, err = rm.getTags(ctx, string(*ko.Status.ACKResourceMetadata.ARN))
+	if !distributionDeployed(&resource{ko}) {
+		// Setting resource synced condition to false will trigger a requeue of
+		// the resource. No need to return a requeue error here.
+		ackcondition.SetSynced(&resource{ko}, corev1.ConditionFalse, nil, nil)
+	} else {
+		ackcondition.SetSynced(&resource{ko}, corev1.ConditionTrue, nil, nil)
+	}
