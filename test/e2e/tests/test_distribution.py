@@ -78,6 +78,8 @@ def simple_distribution():
     )
     assert deleted
     distribution.wait_until_deleted(distribution_id)
+    assert deleted
+
 
 
 @service_marker
