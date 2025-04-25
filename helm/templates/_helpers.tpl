@@ -86,6 +86,7 @@ rules:
   - originaccesscontrols
   - originrequestpolicies
   - responseheaderspolicies
+  - vpcorigins
   verbs:
   - create
   - delete
@@ -103,6 +104,7 @@ rules:
   - originaccesscontrols/status
   - originrequestpolicies/status
   - responseheaderspolicies/status
+  - vpcorigins/status
   verbs:
   - get
   - patch

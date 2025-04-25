@@ -679,6 +679,8 @@ type DistributionConfig struct {
 type DistributionConfigWithTags struct {
 	// A distribution configuration.
 	DistributionConfig *DistributionConfig `json:"distributionConfig,omitempty"`
+	// A complex type that contains zero or more Tag elements.
+	Tags *Tags `json:"tags,omitempty"`
 }
 
 // A list of distribution IDs.
@@ -2024,6 +2026,13 @@ type StreamingDistributionConfig struct {
 	TrustedSigners *TrustedSigners `json:"trustedSigners,omitempty"`
 }
 
+// A streaming distribution Configuration and a list of tags to be associated
+// with the streaming distribution.
+type StreamingDistributionConfigWithTags struct {
+	// A complex type that contains zero or more Tag elements.
+	Tags *Tags `json:"tags,omitempty"`
+}
+
 // A streaming distribution list.
 type StreamingDistributionList struct {
 	IsTruncated *bool   `json:"isTruncated,omitempty"`
@@ -2097,15 +2106,6 @@ type TrustedSigners struct {
 	Items   []*string `json:"items,omitempty"`
 }
 
-// An Amazon CloudFront VPC origin.
-type VPCOrigin struct {
-	ARN              *string      `json:"arn,omitempty"`
-	CreatedTime      *metav1.Time `json:"createdTime,omitempty"`
-	ID               *string      `json:"id,omitempty"`
-	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
-	Status           *string      `json:"status,omitempty"`
-}
-
 // An Amazon CloudFront VPC origin configuration.
 type VPCOriginConfig struct {
 	VPCOriginID *string `json:"vpcOriginID,omitempty"`
@@ -2124,12 +2124,13 @@ type VPCOriginEndpointConfig struct {
 }
 
 // A list of CloudFront VPC origins.
-type VPCOriginList struct {
-	IsTruncated *bool   `json:"isTruncated,omitempty"`
-	Marker      *string `json:"marker,omitempty"`
-	MaxItems    *int64  `json:"maxItems,omitempty"`
-	NextMarker  *string `json:"nextMarker,omitempty"`
-	Quantity    *int64  `json:"quantity,omitempty"`
+type VPCOriginList_SDK struct {
+	IsTruncated *bool               `json:"isTruncated,omitempty"`
+	Items       []*VPCOriginSummary `json:"items,omitempty"`
+	Marker      *string             `json:"marker,omitempty"`
+	MaxItems    *int64              `json:"maxItems,omitempty"`
+	NextMarker  *string             `json:"nextMarker,omitempty"`
+	Quantity    *int64              `json:"quantity,omitempty"`
 }
 
 // A summary of the CloudFront VPC origin.
@@ -2141,6 +2142,17 @@ type VPCOriginSummary struct {
 	Name              *string      `json:"name,omitempty"`
 	OriginEndpointARN *string      `json:"originEndpointARN,omitempty"`
 	Status            *string      `json:"status,omitempty"`
+}
+
+// An Amazon CloudFront VPC origin.
+type VPCOrigin_SDK struct {
+	ARN              *string      `json:"arn,omitempty"`
+	CreatedTime      *metav1.Time `json:"createdTime,omitempty"`
+	ID               *string      `json:"id,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+	Status           *string      `json:"status,omitempty"`
+	// An Amazon CloudFront VPC origin endpoint configuration.
+	VPCOriginEndpointConfig *VPCOriginEndpointConfig `json:"vpcOriginEndpointConfig,omitempty"`
 }
 
 // A complex type that determines the distribution's SSL/TLS configuration for

@@ -18,7 +18,7 @@ ignore:
     - RealtimeLogConfig
     #- ResponseHeadersPolicy
     - StreamingDistribution
-    - VpcOrigin
+    # - VpcOrigin
   field_paths:
     # NOTE(jaypipes): This is an idempotency token and handled automatically by
     # the controller; we don't want it as a field on the resource.
@@ -112,6 +112,8 @@ operations:
     resource_name: ResponseHeadersPolicy
     operation_type: READ_ONE
     output_wrapper_field_path: ResponseHeadersPolicy
+  CreateVpcOrigin:
+    output_wrapper_field_path: VpcOrigin
 resources:
   CachePolicy:
     exceptions:
@@ -300,3 +302,10 @@ resources:
         template_path: hooks/response_headers_policy/sdk_update_post_set_output.go.tpl
       sdk_delete_post_build_request:
         template_path: hooks/response_headers_policy/sdk_delete_post_build_request.go.tpl
+  VpcOrigin:
+    fields:
+      Tags:
+        from:
+          operation: TagResource
+          path: Tags.Items
+
