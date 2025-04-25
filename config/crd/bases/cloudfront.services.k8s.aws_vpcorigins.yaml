@@ -43,21 +43,24 @@ spec:
               An Amazon CloudFront VPC origin.
             properties:
               tags:
-                description: A complex type that contains Tag elements.
-                items:
-                  description: A complex type that contains Tag key and Tag value.
-                  properties:
-                    key:
-                      description: |-
-                        A string that contains Tag key.
+                description: A complex type that contains zero or more Tag elements.
+                properties:
+                  items:
+                    items:
+                      description: A complex type that contains Tag key and Tag value.
+                      properties:
+                        key:
+                          description: |-
+                            A string that contains Tag key.
 
-                        The string length should be between 1 and 128 characters. Valid characters
-                        include a-z, A-Z, 0-9, space, and the special characters _ - . : / = + @.
-                      type: string
-                    value:
-                      type: string
-                  type: object
-                type: array
+                            The string length should be between 1 and 128 characters. Valid characters
+                            include a-z, A-Z, 0-9, space, and the special characters _ - . : / = + @.
+                          type: string
+                        value:
+                          type: string
+                      type: object
+                    type: array
+                type: object
               vpcOriginEndpointConfig:
                 description: The VPC origin endpoint configuration.
                 properties:

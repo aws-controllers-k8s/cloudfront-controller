@@ -6018,14 +6018,8 @@ func (in *VPCOriginSpec) DeepCopyInto(out *VPCOriginSpec) {
 	*out = *in
 	if in.Tags != nil {
 		in, out := &in.Tags, &out.Tags
-		*out = make([]*Tag, len(*in))
-		for i := range *in {
-			if (*in)[i] != nil {
-				in, out := &(*in)[i], &(*out)[i]
-				*out = new(Tag)
-				(*in).DeepCopyInto(*out)
-			}
-		}
+		*out = new(Tags)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.VPCOriginEndpointConfig != nil {
 		in, out := &in.VPCOriginEndpointConfig, &out.VPCOriginEndpointConfig

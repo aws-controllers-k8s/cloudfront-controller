@@ -43,10 +43,14 @@ func newResourceDelta(
 		return delta
 	}
 
-	desiredACKTags, _ := convertToOrderedACKTags(a.ko.Spec.Tags)
-	latestACKTags, _ := convertToOrderedACKTags(b.ko.Spec.Tags)
-	if !ackcompare.MapStringStringEqual(desiredACKTags, latestACKTags) {
+	if ackcompare.HasNilDifference(a.ko.Spec.Tags, b.ko.Spec.Tags) {
 		delta.Add("Spec.Tags", a.ko.Spec.Tags, b.ko.Spec.Tags)
+	} else if a.ko.Spec.Tags != nil && b.ko.Spec.Tags != nil {
+		desiredACKTags, _ := convertToOrderedACKTags(a.ko.Spec.Tags.Items)
+		latestACKTags, _ := convertToOrderedACKTags(b.ko.Spec.Tags.Items)
+		if !ackcompare.MapStringStringEqual(desiredACKTags, latestACKTags) {
+			delta.Add("Spec.Tags", a.ko.Spec.Tags.Items, b.ko.Spec.Tags.Items)
+		}
 	}
 	if ackcompare.HasNilDifference(a.ko.Spec.VPCOriginEndpointConfig, b.ko.Spec.VPCOriginEndpointConfig) {
 		delta.Add("Spec.VPCOriginEndpointConfig", a.ko.Spec.VPCOriginEndpointConfig, b.ko.Spec.VPCOriginEndpointConfig)
