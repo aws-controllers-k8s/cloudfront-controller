@@ -114,6 +114,12 @@ operations:
     output_wrapper_field_path: ResponseHeadersPolicy
   CreateVpcOrigin:
     output_wrapper_field_path: VpcOrigin
+    resource_name: VpcOrigin
+    operation_type: CREATE
+  GetVpcOrigin:
+    output_wrapper_field_path: VpcOrigin
+    resource_name: VpcOrigin
+    operation_type: READ_ONE
 resources:
   CachePolicy:
     exceptions:
