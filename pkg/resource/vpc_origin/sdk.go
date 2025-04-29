@@ -156,6 +156,13 @@ func (rm *resourceManager) sdkFind(
 	}
 
 	rm.setStatusDefaults(ko)
+	// We need to do this manually because the ETag field (required for the
+	// IfMatch field when updating or deleting a resource in CloudFront) is
+	// outside the wrapper field of `ResponseHeadersPolicy` in the response
+	// and therefore not picked up by SetResource code generation.
+	if resp.ETag != nil {
+		ko.Status.ETag = resp.ETag
+	}
 	return &resource{ko}, nil
 }
 
@@ -199,6 +206,11 @@ func (rm *resourceManager) sdkCreate(
 	if err != nil {
 		return nil, err
 	}
+	// CloudFront's API uses XML with nested list structures containing 'items' and
+	// 'quantity' fields. To avoid InconsistentQuantities errors (where quantity must
+	// match the number of items), we'll derive the quantity dynamically using
+	// len(items) instead of maintaining it separately.
+	setQuantityFields(input.VpcOriginEndpointConfig)
 
 	var resp *svcsdk.CreateVpcOriginOutput
 	_ = resp
@@ -276,6 +288,14 @@ func (rm *resourceManager) sdkCreate(
 	}
 
 	rm.setStatusDefaults(ko)
+	// We need to do this manually because the ETag field (required for the
+	// IfMatch field when updating or deleting a resource in CloudFront) is
+	// outside the wrapper field of `ResponseHeadersPolicy` in the response
+	// and therefore not picked up by SetResource code generation.
+	if resp.ETag != nil {
+		ko.Status.ETag = resp.ETag
+	}
+
 	return &resource{ko}, nil
 }
 
@@ -368,6 +388,17 @@ func (rm *resourceManager) sdkUpdate(
 	if err != nil {
 		return nil, err
 	}
+	// If we don't do this, we get the following on every update call:
+	// InvalidIfMatchVersion: The If-Match version is missing or not valid for the resource.
+	if latest.ko.Status.ETag != nil {
+		input.IfMatch = latest.ko.Status.ETag
+	}
+
+	// CloudFront's API uses XML with nested list structures containing 'items' and
+	// 'quantity' fields. To avoid InconsistentQuantities errors (where quantity must
+	// match the number of items), we'll derive the quantity dynamically using
+	// len(items) instead of maintaining it separately.
+	setQuantityFields(input.VpcOriginEndpointConfig)
 
 	var resp *svcsdk.UpdateVpcOriginOutput
 	_ = resp
@@ -380,7 +411,21 @@ func (rm *resourceManager) sdkUpdate(
 	// the original Kubernetes object we passed to the function
 	ko := desired.ko.DeepCopy()
 
+	if resp.ETag != nil {
+		ko.Status.ETag = resp.ETag
+	} else {
+		ko.Status.ETag = nil
+	}
+
 	rm.setStatusDefaults(ko)
+	// We need to do this manually because the ETag field (required for the
+	// IfMatch field when updating or deleting a resource in CloudFront) is
+	// outside the wrapper field of `ResponseHeadersPolicy` in the response and
+	// therefore not picked up by SetResource code generation.
+	if resp.ETag != nil {
+		ko.Status.ETag = resp.ETag
+	}
+
 	return &resource{ko}, nil
 }
 
@@ -456,6 +501,12 @@ func (rm *resourceManager) sdkDelete(
 	if err != nil {
 		return nil, err
 	}
+	// If we don't do this, we get the following on every delete call:
+	// InvalidIfMatchVersion: The If-Match version is missing or not valid for the resource.
+	if r.ko.Status.ETag != nil {
+		input.IfMatch = r.ko.Status.ETag
+	}
+
 	var resp *svcsdk.DeleteVpcOriginOutput
 	_ = resp
 	resp, err = rm.sdkapi.DeleteVpcOrigin(ctx, input)

@@ -161,6 +161,8 @@ spec:
                 description: The VPC origin created time.
                 format: date-time
                 type: string
+              eTag:
+                type: string
               id:
                 description: The VPC origin ID.
                 type: string

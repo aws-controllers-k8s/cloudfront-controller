@@ -46,6 +46,8 @@ type VPCOriginStatus struct {
 	// The VPC origin created time.
 	// +kubebuilder:validation:Optional
 	CreatedTime *metav1.Time `json:"createdTime,omitempty"`
+	// +kubebuilder:validation:Optional
+	ETag *string `json:"eTag,omitempty"`
 	// The VPC origin ID.
 	// +kubebuilder:validation:Optional
 	ID *string `json:"id,omitempty"`
