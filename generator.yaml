@@ -315,6 +315,11 @@ resources:
       ETag:
         is_read_only: true
         type: string
+    synced:
+      when:
+        - path: Status.Status
+          in:
+            - Deployed
     hooks:
       sdk_read_one_post_set_output:
         template_path: hooks/vpc_origin/sdk_read_one_post_set_output.go.tpl
