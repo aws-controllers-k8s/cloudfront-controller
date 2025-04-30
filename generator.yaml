@@ -341,8 +341,6 @@ resources:
         template_path: hooks/vpc_origin/sdk_create_post_set_output.go.tpl
       sdk_update_post_build_request:
         template_path: hooks/vpc_origin/sdk_update_post_build_request.go.tpl
-      sdk_update_post_set_output:
-        template_path: hooks/vpc_origin/sdk_update_post_set_output.go.tpl
       sdk_delete_post_build_request:
         template_path: hooks/vpc_origin/sdk_delete_post_build_request.go.tpl
 
