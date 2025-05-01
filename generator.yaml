@@ -120,6 +120,10 @@ operations:
     output_wrapper_field_path: VpcOrigin
     resource_name: VpcOrigin
     operation_type: READ_ONE
+  UpdateVpcOrigin:
+    output_wrapper_field_path: VpcOrigin
+    resource_name: VpcOrigin
+    operation_type: UPDATE
 resources:
   CachePolicy:
     exceptions:
