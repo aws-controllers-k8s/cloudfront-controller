@@ -35,8 +35,8 @@ def simple_vpc_origin():
     vpc_origin_name = random_suffix_name("cloudfront-test-vpc-origin", 32)
     vpc_origin_protocol_policy = "https-only"
     vpc_origin_ssl_protocols_1 = "TLSv1.2"
-    vpc_origin_http_port = 80
-    vpc_origin_https_port = 443
+    vpc_origin_http_port = "80"
+    vpc_origin_https_port = "443"
 
     replacements = REPLACEMENT_VALUES.copy()
     replacements["VPC_ORIGIN_NAME"] = vpc_origin_name
