@@ -1,1 +1,1 @@
-acktest @ git+https://github.com/knottnt/ack-test-infra.git@957c9064f2c4bd69ce3245764c72603c7c1968ff
+acktest @ git+https://github.com/knottnt/ack-test-infra.git@d7e0742c1eea4227f09abcdf43f58ee6f365ab41
