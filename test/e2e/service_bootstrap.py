@@ -43,7 +43,7 @@ def service_bootstrap() -> Resources:
         ),
         NetworkLoadBalancer=NetworkLoadBalancer(
             name_prefix="ack-cloudfront-tests",
-            num_public_subnet=0,
+            num_public_subnet=1,
             num_private_subnet=1,
             apply_security_group=True
         )
