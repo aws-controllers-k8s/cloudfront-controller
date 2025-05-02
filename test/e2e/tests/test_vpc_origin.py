@@ -23,17 +23,20 @@ from e2e import service_marker, CRD_GROUP, CRD_VERSION, load_resource
 from e2e.replacement_values import REPLACEMENT_VALUES
 from e2e.bootstrap_resources import get_bootstrap_resources
 from e2e import vpc_origin
+from logging import getLogger
 
 VPC_ORIGIN_RESOURCE_PLURAL = "vpcorigins"
 DELETE_WAIT_AFTER_SECONDS = 10
 CHECK_STATUS_WAIT_SECONDS = 300
 MODIFY_WAIT_AFTER_SECONDS = 10
 
+logger = getLogger(__name__)
+
 
 @pytest.fixture(scope="module")
 def simple_vpc_origin():
     vpc_origin_name = random_suffix_name("cloudfront-test-vpc-origin", 32)
-    vpc_origin_protocol_policy = "https-only"
+    vpc_origin_protocol_policy = "http-only"
     vpc_origin_ssl_protocols_1 = "TLSv1.2"
     vpc_origin_http_port = "80"
     vpc_origin_https_port = "443"
@@ -58,6 +61,8 @@ def simple_vpc_origin():
         vpc_origin_name,
         namespace="default",
     )
+
+    logger.info("Creating VPCOrigin %s", vpc_origin_name)
     k8s.create_custom_resource(ref, resource_data)
     cr = k8s.wait_resource_consumed_by_controller(ref)
 
@@ -68,9 +73,11 @@ def simple_vpc_origin():
     vpc_origin_id = cr["status"]["id"]
 
     vpc_origin.wait_until_exists(vpc_origin_id)
+    logger.info("VPCOrigin %s exists in cluster", vpc_origin_name)
 
     yield (ref, cr, vpc_origin_id)
 
+    logger.info("Deleting VPCOrigin %s", vpc_origin_name)
     _, deleted = k8s.delete_custom_resource(
         ref,
         period_length=DELETE_WAIT_AFTER_SECONDS,
