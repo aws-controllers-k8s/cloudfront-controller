@@ -98,6 +98,6 @@ def get(vpc_origin_id):
     c = boto3.client("cloudfront")
     try:
         resp = c.get_vpc_origin(Id=vpc_origin_id)
-        return resp["VPCOrigin"]
+        return resp["VpcOrigin"]
     except c.exceptions.EntityNotFound:
         return None

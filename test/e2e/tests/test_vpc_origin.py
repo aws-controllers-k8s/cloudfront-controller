@@ -106,9 +106,9 @@ class TestVpcOrigin:
 
         latest = vpc_origin.get(vpc_origin_id)
         assert latest is not None
-        assert "VPCOriginEndpointConfig" in latest
-        assert "OriginProtocolPolicy" in latest["VPCOriginEndpointConfig"]
-        assert latest["VPCOriginEndpointConfig"]["OriginProtocolPolicy"] == "http-only"
+        assert "VpcOriginEndpointConfig" in latest
+        assert "OriginProtocolPolicy" in latest["VpcOriginEndpointConfig"]
+        assert latest["VpcOriginEndpointConfig"]["OriginProtocolPolicy"] == "http-only"
 
         # Test update
         updates = {
@@ -119,6 +119,6 @@ class TestVpcOrigin:
 
         latest = vpc_origin.get(vpc_origin_id)
         assert latest is not None
-        assert "VPCOriginEndpointConfig" in latest
-        assert "OriginProtocolPolicy" in latest["VPCOriginEndpointConfig"]
-        assert latest["VPCOriginEndpointConfig"]["OriginProtocolPolicy"] == "https-only"
+        assert "VpcOriginEndpointConfig" in latest
+        assert "OriginProtocolPolicy" in latest["VpcOriginEndpointConfig"]
+        assert latest["VpcOriginEndpointConfig"]["OriginProtocolPolicy"] == "https-only"
