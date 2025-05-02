@@ -4,7 +4,7 @@ metadata:
   name: $VPC_ORIGIN_NAME
 spec:
   vpcOriginEndpointConfig:
-    name: $VPC_ORIGIN_ENDPOINT_NAME
+    name: $VPC_ORIGIN_NAME
     arn: $VPC_ORIGIN_ENDPOINT_ARN
     httpPort: $VPC_ORIGIN_HTTP_PORT
     httpSPort: $VPC_ORIGIN_HTTPS_PORT
