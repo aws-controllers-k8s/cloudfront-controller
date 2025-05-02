@@ -27,8 +27,10 @@ from logging import getLogger
 
 VPC_ORIGIN_RESOURCE_PLURAL = "vpcorigins"
 DELETE_WAIT_AFTER_SECONDS = 10
-CHECK_STATUS_WAIT_SECONDS = 300
-MODIFY_WAIT_AFTER_SECONDS = 10
+DELETE_WAIT_PERIODS = 3
+# VPC Origins can take up to 15 minutes to create :(
+CHECK_STATUS_WAIT_SECONDS = 900
+MODIFY_WAIT_AFTER_SECONDS = 30
 
 logger = getLogger(__name__)
 
@@ -80,6 +82,7 @@ def simple_vpc_origin():
     logger.info("Deleting VPCOrigin %s", vpc_origin_name)
     _, deleted = k8s.delete_custom_resource(
         ref,
+        wait_periods=DELETE_WAIT_PERIODS,
         period_length=DELETE_WAIT_AFTER_SECONDS,
     )
     assert deleted
