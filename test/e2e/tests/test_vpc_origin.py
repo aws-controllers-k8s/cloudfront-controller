@@ -42,6 +42,8 @@ def simple_vpc_origin():
     vpc_origin_ssl_protocols_1 = "TLSv1.2"
     vpc_origin_http_port = "80"
     vpc_origin_https_port = "443"
+    vpc_origin_tag_key = "tag1"
+    vpc_origin_tag_value = "value1"
 
     replacements = REPLACEMENT_VALUES.copy()
     replacements["VPC_ORIGIN_NAME"] = vpc_origin_name
@@ -50,6 +52,8 @@ def simple_vpc_origin():
     replacements["VPC_ORIGIN_HTTPS_PORT"] = vpc_origin_https_port
     replacements["VPC_ORIGIN_PROTOCOL_POLICY"] = vpc_origin_protocol_policy
     replacements["SSL_PROTOCOL_1"] = vpc_origin_ssl_protocols_1
+    replacements["TAG_KEY"] = vpc_origin_tag_key
+    replacements["TAG_VALUE"] = vpc_origin_tag_value
 
     resource_data = load_resource(
         "vpc_origin",

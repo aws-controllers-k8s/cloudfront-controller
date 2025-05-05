@@ -12,3 +12,6 @@ spec:
     originSSLProtocols:
       items:
         - "$SSL_PROTOCOL_1"
+  tags:
+    - key: "$TAG_KEY"
+      value: "$TAG_VALUE"
