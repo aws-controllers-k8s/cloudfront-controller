@@ -298,15 +298,10 @@ func (rm *resourceManager) EnsureTags(
 	}
 	defaultTags := ackrt.GetDefaultTags(&rm.cfg, r.ko, md)
 	var existingTags []*svcapitypes.Tag
-	if r.ko.Spec.Tags == nil {
-		existingTags = nil
-	} else {
-		existingTags = r.ko.Spec.Tags.Items
-	}
+	existingTags = r.ko.Spec.Tags
 	resourceTags, keyOrder := convertToOrderedACKTags(existingTags)
 	tags := acktags.Merge(resourceTags, defaultTags)
-	r.ko.Spec.Tags = &svcapitypes.Tags{}
-	r.ko.Spec.Tags.Items = fromACKTags(tags, keyOrder)
+	r.ko.Spec.Tags = fromACKTags(tags, keyOrder)
 	return nil
 }
 
@@ -322,14 +317,10 @@ func (rm *resourceManager) FilterSystemTags(res acktypes.AWSResource) {
 		return
 	}
 	var existingTags []*svcapitypes.Tag
-	if r.ko.Spec.Tags == nil {
-		return
-	}
-	existingTags = r.ko.Spec.Tags.Items
+	existingTags = r.ko.Spec.Tags
 	resourceTags, tagKeyOrder := convertToOrderedACKTags(existingTags)
 	ignoreSystemTags(resourceTags)
-	r.ko.Spec.Tags = &svcapitypes.Tags{}
-	r.ko.Spec.Tags.Items = fromACKTags(resourceTags, tagKeyOrder)
+	r.ko.Spec.Tags = fromACKTags(resourceTags, tagKeyOrder)
 }
 
 // mirrorAWSTags ensures that AWS tags are included in the desired resource
@@ -349,20 +340,12 @@ func mirrorAWSTags(a *resource, b *resource) {
 	}
 	var existingLatestTags []*svcapitypes.Tag
 	var existingDesiredTags []*svcapitypes.Tag
-	if b.ko.Spec.Tags == nil {
-		return
-	}
-	if a.ko.Spec.Tags == nil {
-		existingDesiredTags = nil
-	} else {
-		existingDesiredTags = a.ko.Spec.Tags.Items
-	}
-	existingLatestTags = b.ko.Spec.Tags.Items
+	existingDesiredTags = a.ko.Spec.Tags
+	existingLatestTags = b.ko.Spec.Tags
 	desiredTags, desiredTagKeyOrder := convertToOrderedACKTags(existingDesiredTags)
 	latestTags, _ := convertToOrderedACKTags(existingLatestTags)
 	syncAWSTags(desiredTags, latestTags)
-	a.ko.Spec.Tags = &svcapitypes.Tags{}
-	a.ko.Spec.Tags.Items = fromACKTags(desiredTags, desiredTagKeyOrder)
+	a.ko.Spec.Tags = fromACKTags(desiredTags, desiredTagKeyOrder)
 }
 
 // newResourceManager returns a new struct implementing

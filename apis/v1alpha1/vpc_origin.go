@@ -24,7 +24,9 @@ import (
 //
 // An Amazon CloudFront VPC origin.
 type VPCOriginSpec struct {
-	Tags *Tags `json:"tags,omitempty"`
+
+	// A complex type that contains Tag elements.
+	Tags []*Tag `json:"tags,omitempty"`
 	// The VPC origin endpoint configuration.
 	// +kubebuilder:validation:Required
 	VPCOriginEndpointConfig *VPCOriginEndpointConfig `json:"vpcOriginEndpointConfig"`

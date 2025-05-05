@@ -313,9 +313,11 @@ resources:
       sdk_delete_post_build_request:
         template_path: hooks/response_headers_policy/sdk_delete_post_build_request.go.tpl
   VpcOrigin:
-    tags:
-      path: Tags.Items
     fields:
+      Tags:
+        from:
+          operation: TagResource
+          path: Tags.Items
       ETag:
         is_read_only: true
         type: string
