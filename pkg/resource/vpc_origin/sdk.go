@@ -163,6 +163,9 @@ func (rm *resourceManager) sdkFind(
 	if resp.ETag != nil {
 		ko.Status.ETag = resp.ETag
 	}
+
+	// We need to get the tags that are in the AWS resource
+	ko.Spec.Tags, err = rm.getTags(ctx, string(*ko.Status.ACKResourceMetadata.ARN))
 	return &resource{ko}, nil
 }
 
@@ -211,6 +214,10 @@ func (rm *resourceManager) sdkCreate(
 	// match the number of items), we'll derive the quantity dynamically using
 	// len(items) instead of maintaining it separately.
 	setQuantityFields(input.VpcOriginEndpointConfig)
+
+	// CloudFront supports applying tags on create. However, the code generator
+	// doesn't quite match the shape of the CRD spec to the CreateVpcOriginInput.
+	updateTagsInCreateRequest(desired, input)
 
 	var resp *svcsdk.CreateVpcOriginOutput
 	_ = resp
@@ -307,28 +314,10 @@ func (rm *resourceManager) newCreateRequestPayload(
 ) (*svcsdk.CreateVpcOriginInput, error) {
 	res := &svcsdk.CreateVpcOriginInput{}
 
-	if r.ko.Spec.Tags != nil {
-		f0 := &svcsdktypes.Tags{}
-		if r.ko.Spec.Tags.Items != nil {
-			f0f0 := []svcsdktypes.Tag{}
-			for _, f0f0iter := range r.ko.Spec.Tags.Items {
-				f0f0elem := &svcsdktypes.Tag{}
-				if f0f0iter.Key != nil {
-					f0f0elem.Key = f0f0iter.Key
-				}
-				if f0f0iter.Value != nil {
-					f0f0elem.Value = f0f0iter.Value
-				}
-				f0f0 = append(f0f0, *f0f0elem)
-			}
-			f0.Items = f0f0
-		}
-		res.Tags = f0
-	}
 	if r.ko.Spec.VPCOriginEndpointConfig != nil {
-		f1 := &svcsdktypes.VpcOriginEndpointConfig{}
+		f0 := &svcsdktypes.VpcOriginEndpointConfig{}
 		if r.ko.Spec.VPCOriginEndpointConfig.ARN != nil {
-			f1.Arn = r.ko.Spec.VPCOriginEndpointConfig.ARN
+			f0.Arn = r.ko.Spec.VPCOriginEndpointConfig.ARN
 		}
 		if r.ko.Spec.VPCOriginEndpointConfig.HTTPPort != nil {
 			httpPortCopy0 := *r.ko.Spec.VPCOriginEndpointConfig.HTTPPort
@@ -336,7 +325,7 @@ func (rm *resourceManager) newCreateRequestPayload(
 				return nil, fmt.Errorf("error: field HTTPPort is of type int32")
 			}
 			httpPortCopy := int32(httpPortCopy0)
-			f1.HTTPPort = &httpPortCopy
+			f0.HTTPPort = &httpPortCopy
 		}
 		if r.ko.Spec.VPCOriginEndpointConfig.HTTPSPort != nil {
 			httpSPortCopy0 := *r.ko.Spec.VPCOriginEndpointConfig.HTTPSPort
@@ -344,28 +333,28 @@ func (rm *resourceManager) newCreateRequestPayload(
 				return nil, fmt.Errorf("error: field HTTPSPort is of type int32")
 			}
 			httpSPortCopy := int32(httpSPortCopy0)
-			f1.HTTPSPort = &httpSPortCopy
+			f0.HTTPSPort = &httpSPortCopy
 		}
 		if r.ko.Spec.VPCOriginEndpointConfig.Name != nil {
-			f1.Name = r.ko.Spec.VPCOriginEndpointConfig.Name
+			f0.Name = r.ko.Spec.VPCOriginEndpointConfig.Name
 		}
 		if r.ko.Spec.VPCOriginEndpointConfig.OriginProtocolPolicy != nil {
-			f1.OriginProtocolPolicy = svcsdktypes.OriginProtocolPolicy(*r.ko.Spec.VPCOriginEndpointConfig.OriginProtocolPolicy)
+			f0.OriginProtocolPolicy = svcsdktypes.OriginProtocolPolicy(*r.ko.Spec.VPCOriginEndpointConfig.OriginProtocolPolicy)
 		}
 		if r.ko.Spec.VPCOriginEndpointConfig.OriginSSLProtocols != nil {
-			f1f5 := &svcsdktypes.OriginSslProtocols{}
+			f0f5 := &svcsdktypes.OriginSslProtocols{}
 			if r.ko.Spec.VPCOriginEndpointConfig.OriginSSLProtocols.Items != nil {
-				f1f5f0 := []svcsdktypes.SslProtocol{}
-				for _, f1f5f0iter := range r.ko.Spec.VPCOriginEndpointConfig.OriginSSLProtocols.Items {
-					var f1f5f0elem string
-					f1f5f0elem = string(*f1f5f0iter)
-					f1f5f0 = append(f1f5f0, svcsdktypes.SslProtocol(f1f5f0elem))
+				f0f5f0 := []svcsdktypes.SslProtocol{}
+				for _, f0f5f0iter := range r.ko.Spec.VPCOriginEndpointConfig.OriginSSLProtocols.Items {
+					var f0f5f0elem string
+					f0f5f0elem = string(*f0f5f0iter)
+					f0f5f0 = append(f0f5f0, svcsdktypes.SslProtocol(f0f5f0elem))
 				}
-				f1f5.Items = f1f5f0
+				f0f5.Items = f0f5f0
 			}
-			f1.OriginSslProtocols = f1f5
+			f0.OriginSslProtocols = f0f5
 		}
-		res.VpcOriginEndpointConfig = f1
+		res.VpcOriginEndpointConfig = f0
 	}
 
 	return res, nil
@@ -384,6 +373,19 @@ func (rm *resourceManager) sdkUpdate(
 	defer func() {
 		exit(err)
 	}()
+	if delta.DifferentAt("Spec.Tags") {
+		err := rm.syncTags(
+			ctx,
+			latest,
+			desired,
+		)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if !delta.DifferentExcept("Spec.Tags") {
+		return desired, nil
+	}
 	input, err := rm.newUpdateRequestPayload(ctx, desired, delta)
 	if err != nil {
 		return nil, err

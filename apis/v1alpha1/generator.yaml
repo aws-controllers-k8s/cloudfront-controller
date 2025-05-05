@@ -76,6 +76,7 @@ ignore:
     - CreateFunctionInput.FunctionConfig.KeyValueStoreAssociations
     - CreateFunctionOutput.FunctionSummary.FunctionConfig.KeyValueStoreAssociations
     - OriginGroup.SelectionCriteria
+    - CreateVpcOriginInput.Tags
 
 operations:
   # CloudFront has both List and Get operations. Prefer the Get operations...
@@ -345,6 +346,8 @@ resources:
         template_path: hooks/vpc_origin/sdk_create_post_build_request.go.tpl
       sdk_create_post_set_output:
         template_path: hooks/vpc_origin/sdk_create_post_set_output.go.tpl
+      sdk_update_pre_build_request:
+        template_path: hooks/vpc_origin/sdk_update_pre_build_request.go.tpl
       sdk_update_post_build_request:
         template_path: hooks/vpc_origin/sdk_update_post_build_request.go.tpl
       sdk_update_post_set_output:

@@ -14,7 +14,12 @@
 package vpc_origin
 
 import (
+	"context"
+
+	svcapitypes "github.com/aws-controllers-k8s/cloudfront-controller/apis/v1alpha1"
+	util "github.com/aws-controllers-k8s/cloudfront-controller/pkg/resource/tags"
 	"github.com/aws/aws-sdk-go-v2/aws"
+	svcsdk "github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 )
 
@@ -27,4 +32,40 @@ func setQuantityFields(ve *svcsdktypes.VpcOriginEndpointConfig) {
 	if ve != nil && ve.OriginSslProtocols != nil && ve.OriginSslProtocols.Items != nil {
 		ve.OriginSslProtocols.Quantity = aws.Int32(int32(len(ve.OriginSslProtocols.Items)))
 	}
+}
+
+func updateTagsInCreateRequest(resource *resource, input *svcsdk.CreateVpcOriginInput) {
+	input.Tags = nil
+	desiredTags := svcsdktypes.Tags{}
+	if resource.ko.Spec.Tags != nil {
+		requestedTags := []svcsdktypes.Tag{}
+		for _, tag := range resource.ko.Spec.Tags {
+
+			tag := svcsdktypes.Tag{
+				Key:   tag.Key,
+				Value: tag.Value,
+			}
+			requestedTags = append(requestedTags, tag)
+		}
+
+		desiredTags.Items = requestedTags
+		input.Tags = &desiredTags
+	}
+}
+
+// getTags retrieves the resource's associated tags.
+func (rm *resourceManager) getTags(
+	ctx context.Context,
+	resourceARN string,
+) ([]*svcapitypes.Tag, error) {
+	return util.GetResourceTags(ctx, rm.sdkapi, rm.metrics, resourceARN)
+}
+
+// syncTags keeps the resource's tags in sync.
+func (rm *resourceManager) syncTags(
+	ctx context.Context,
+	desired *resource,
+	latest *resource,
+) (err error) {
+	return util.SyncResourceTags(ctx, rm.sdkapi, rm.metrics, string(*latest.ko.Status.ACKResourceMetadata.ARN), desired.ko.Spec.Tags, latest.ko.Spec.Tags)
 }

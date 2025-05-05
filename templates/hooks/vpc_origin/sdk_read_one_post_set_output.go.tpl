@@ -5,3 +5,6 @@
 if resp.ETag != nil {
 	ko.Status.ETag = resp.ETag
 }
+
+// We need to get the tags that are in the AWS resource
+ko.Spec.Tags, err = rm.getTags(ctx, string(*ko.Status.ACKResourceMetadata.ARN))

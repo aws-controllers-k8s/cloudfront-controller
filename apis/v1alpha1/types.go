@@ -679,8 +679,6 @@ type DistributionConfig struct {
 type DistributionConfigWithTags struct {
 	// A distribution configuration.
 	DistributionConfig *DistributionConfig `json:"distributionConfig,omitempty"`
-	// A complex type that contains zero or more Tag elements.
-	Tags *Tags `json:"tags,omitempty"`
 }
 
 // A list of distribution IDs.
@@ -2024,13 +2022,6 @@ type StreamingDistributionConfig struct {
 	// A list of Amazon Web Services accounts whose public keys CloudFront can use
 	// to verify the signatures of signed URLs and signed cookies.
 	TrustedSigners *TrustedSigners `json:"trustedSigners,omitempty"`
-}
-
-// A streaming distribution Configuration and a list of tags to be associated
-// with the streaming distribution.
-type StreamingDistributionConfigWithTags struct {
-	// A complex type that contains zero or more Tag elements.
-	Tags *Tags `json:"tags,omitempty"`
 }
 
 // A streaming distribution list.
