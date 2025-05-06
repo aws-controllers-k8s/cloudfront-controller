@@ -662,8 +662,8 @@ func (rm *resourceManager) sdkFind(
 							f4f12f0elemf3.HTTPPort = &httpPortCopy
 						}
 						if f4f12f0iter.CustomOriginConfig.HTTPSPort != nil {
-							httpSPortCopy := int64(*f4f12f0iter.CustomOriginConfig.HTTPSPort)
-							f4f12f0elemf3.HTTPSPort = &httpSPortCopy
+							httpsPortCopy := int64(*f4f12f0iter.CustomOriginConfig.HTTPSPort)
+							f4f12f0elemf3.HTTPSPort = &httpsPortCopy
 						}
 						if f4f12f0iter.CustomOriginConfig.OriginKeepaliveTimeout != nil {
 							originKeepaliveTimeoutCopy := int64(*f4f12f0iter.CustomOriginConfig.OriginKeepaliveTimeout)
@@ -1459,8 +1459,8 @@ func (rm *resourceManager) sdkCreate(
 							f4f12f0elemf3.HTTPPort = &httpPortCopy
 						}
 						if f4f12f0iter.CustomOriginConfig.HTTPSPort != nil {
-							httpSPortCopy := int64(*f4f12f0iter.CustomOriginConfig.HTTPSPort)
-							f4f12f0elemf3.HTTPSPort = &httpSPortCopy
+							httpsPortCopy := int64(*f4f12f0iter.CustomOriginConfig.HTTPSPort)
+							f4f12f0elemf3.HTTPSPort = &httpsPortCopy
 						}
 						if f4f12f0iter.CustomOriginConfig.OriginKeepaliveTimeout != nil {
 							originKeepaliveTimeoutCopy := int64(*f4f12f0iter.CustomOriginConfig.OriginKeepaliveTimeout)
@@ -2131,12 +2131,12 @@ func (rm *resourceManager) newCreateRequestPayload(
 							f0f12f0elemf3.HTTPPort = &httpPortCopy
 						}
 						if f0f12f0iter.CustomOriginConfig.HTTPSPort != nil {
-							httpSPortCopy0 := *f0f12f0iter.CustomOriginConfig.HTTPSPort
-							if httpSPortCopy0 > math.MaxInt32 || httpSPortCopy0 < math.MinInt32 {
+							httpsPortCopy0 := *f0f12f0iter.CustomOriginConfig.HTTPSPort
+							if httpsPortCopy0 > math.MaxInt32 || httpsPortCopy0 < math.MinInt32 {
 								return nil, fmt.Errorf("error: field HTTPSPort is of type int32")
 							}
-							httpSPortCopy := int32(httpSPortCopy0)
-							f0f12f0elemf3.HTTPSPort = &httpSPortCopy
+							httpsPortCopy := int32(httpsPortCopy0)
+							f0f12f0elemf3.HTTPSPort = &httpsPortCopy
 						}
 						if f0f12f0iter.CustomOriginConfig.OriginKeepaliveTimeout != nil {
 							originKeepaliveTimeoutCopy0 := *f0f12f0iter.CustomOriginConfig.OriginKeepaliveTimeout
@@ -2855,12 +2855,12 @@ func (rm *resourceManager) newUpdateRequestPayload(
 							f0f12f0elemf3.HTTPPort = &httpPortCopy
 						}
 						if f0f12f0iter.CustomOriginConfig.HTTPSPort != nil {
-							httpSPortCopy0 := *f0f12f0iter.CustomOriginConfig.HTTPSPort
-							if httpSPortCopy0 > math.MaxInt32 || httpSPortCopy0 < math.MinInt32 {
+							httpsPortCopy0 := *f0f12f0iter.CustomOriginConfig.HTTPSPort
+							if httpsPortCopy0 > math.MaxInt32 || httpsPortCopy0 < math.MinInt32 {
 								return nil, fmt.Errorf("error: field HTTPSPort is of type int32")
 							}
-							httpSPortCopy := int32(httpSPortCopy0)
-							f0f12f0elemf3.HTTPSPort = &httpSPortCopy
+							httpsPortCopy := int32(httpsPortCopy0)
+							f0f12f0elemf3.HTTPSPort = &httpsPortCopy
 						}
 						if f0f12f0iter.CustomOriginConfig.OriginKeepaliveTimeout != nil {
 							originKeepaliveTimeoutCopy0 := *f0f12f0iter.CustomOriginConfig.OriginKeepaliveTimeout

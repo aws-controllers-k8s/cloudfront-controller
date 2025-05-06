@@ -128,8 +128,8 @@ func (rm *resourceManager) sdkFind(
 			f5.HTTPPort = &httpPortCopy
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.HTTPSPort != nil {
-			httpSPortCopy := int64(*resp.VpcOrigin.VpcOriginEndpointConfig.HTTPSPort)
-			f5.HTTPSPort = &httpSPortCopy
+			httpsPortCopy := int64(*resp.VpcOrigin.VpcOriginEndpointConfig.HTTPSPort)
+			f5.HTTPSPort = &httpsPortCopy
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.Name != nil {
 			f5.Name = resp.VpcOrigin.VpcOriginEndpointConfig.Name
@@ -267,8 +267,8 @@ func (rm *resourceManager) sdkCreate(
 			f5.HTTPPort = &httpPortCopy
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.HTTPSPort != nil {
-			httpSPortCopy := int64(*resp.VpcOrigin.VpcOriginEndpointConfig.HTTPSPort)
-			f5.HTTPSPort = &httpSPortCopy
+			httpsPortCopy := int64(*resp.VpcOrigin.VpcOriginEndpointConfig.HTTPSPort)
+			f5.HTTPSPort = &httpsPortCopy
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.Name != nil {
 			f5.Name = resp.VpcOrigin.VpcOriginEndpointConfig.Name
@@ -328,12 +328,12 @@ func (rm *resourceManager) newCreateRequestPayload(
 			f0.HTTPPort = &httpPortCopy
 		}
 		if r.ko.Spec.VPCOriginEndpointConfig.HTTPSPort != nil {
-			httpSPortCopy0 := *r.ko.Spec.VPCOriginEndpointConfig.HTTPSPort
-			if httpSPortCopy0 > math.MaxInt32 || httpSPortCopy0 < math.MinInt32 {
+			httpsPortCopy0 := *r.ko.Spec.VPCOriginEndpointConfig.HTTPSPort
+			if httpsPortCopy0 > math.MaxInt32 || httpsPortCopy0 < math.MinInt32 {
 				return nil, fmt.Errorf("error: field HTTPSPort is of type int32")
 			}
-			httpSPortCopy := int32(httpSPortCopy0)
-			f0.HTTPSPort = &httpSPortCopy
+			httpsPortCopy := int32(httpsPortCopy0)
+			f0.HTTPSPort = &httpsPortCopy
 		}
 		if r.ko.Spec.VPCOriginEndpointConfig.Name != nil {
 			f0.Name = r.ko.Spec.VPCOriginEndpointConfig.Name
@@ -450,8 +450,8 @@ func (rm *resourceManager) sdkUpdate(
 			f5.HTTPPort = &httpPortCopy
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.HTTPSPort != nil {
-			httpSPortCopy := int64(*resp.VpcOrigin.VpcOriginEndpointConfig.HTTPSPort)
-			f5.HTTPSPort = &httpSPortCopy
+			httpsPortCopy := int64(*resp.VpcOrigin.VpcOriginEndpointConfig.HTTPSPort)
+			f5.HTTPSPort = &httpsPortCopy
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.Name != nil {
 			f5.Name = resp.VpcOrigin.VpcOriginEndpointConfig.Name
@@ -515,12 +515,12 @@ func (rm *resourceManager) newUpdateRequestPayload(
 			f2.HTTPPort = &httpPortCopy
 		}
 		if r.ko.Spec.VPCOriginEndpointConfig.HTTPSPort != nil {
-			httpSPortCopy0 := *r.ko.Spec.VPCOriginEndpointConfig.HTTPSPort
-			if httpSPortCopy0 > math.MaxInt32 || httpSPortCopy0 < math.MinInt32 {
+			httpsPortCopy0 := *r.ko.Spec.VPCOriginEndpointConfig.HTTPSPort
+			if httpsPortCopy0 > math.MaxInt32 || httpsPortCopy0 < math.MinInt32 {
 				return nil, fmt.Errorf("error: field HTTPSPort is of type int32")
 			}
-			httpSPortCopy := int32(httpSPortCopy0)
-			f2.HTTPSPort = &httpSPortCopy
+			httpsPortCopy := int32(httpsPortCopy0)
+			f2.HTTPSPort = &httpsPortCopy
 		}
 		if r.ko.Spec.VPCOriginEndpointConfig.Name != nil {
 			f2.Name = r.ko.Spec.VPCOriginEndpointConfig.Name

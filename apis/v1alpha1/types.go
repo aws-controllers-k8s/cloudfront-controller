@@ -501,7 +501,7 @@ type CustomHeaders struct {
 // is a custom origin.
 type CustomOriginConfig struct {
 	HTTPPort               *int64  `json:"httpPort,omitempty"`
-	HTTPSPort              *int64  `json:"httpSPort,omitempty"`
+	HTTPSPort              *int64  `json:"httpsPort,omitempty"`
 	OriginKeepaliveTimeout *int64  `json:"originKeepaliveTimeout,omitempty"`
 	OriginProtocolPolicy   *string `json:"originProtocolPolicy,omitempty"`
 	OriginReadTimeout      *int64  `json:"originReadTimeout,omitempty"`
@@ -2106,7 +2106,7 @@ type VPCOriginConfig struct {
 type VPCOriginEndpointConfig struct {
 	ARN                  *string `json:"arn,omitempty"`
 	HTTPPort             *int64  `json:"httpPort,omitempty"`
-	HTTPSPort            *int64  `json:"httpSPort,omitempty"`
+	HTTPSPort            *int64  `json:"httpsPort,omitempty"`
 	Name                 *string `json:"name,omitempty"`
 	OriginProtocolPolicy *string `json:"originProtocolPolicy,omitempty"`
 	// A complex type that contains information about the SSL/TLS protocols that

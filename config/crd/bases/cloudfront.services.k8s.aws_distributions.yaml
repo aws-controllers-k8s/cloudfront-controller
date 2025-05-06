@@ -718,7 +718,7 @@ spec:
                                 httpPort:
                                   format: int64
                                   type: integer
-                                httpSPort:
+                                httpsPort:
                                   format: int64
                                   type: integer
                                 originKeepaliveTimeout:
