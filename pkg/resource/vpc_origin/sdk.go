@@ -696,13 +696,9 @@ func (rm *resourceManager) terminalAWSError(err error) bool {
 		return false
 	}
 	switch terminalErr.ErrorCode() {
-	case "EntityAlreadyExists",
-		"InconsistentQuantities",
+	case "InconsistentQuantities",
 		"InvalidArgument",
 		"InvalidTagging",
-		"UnsupportedOperation",
-		"AccessDenied",
-		"EntityLimitExceeded",
 		"IllegalUpdate",
 		"InvalidIfMatchVersion",
 		"PreconditionFailed":

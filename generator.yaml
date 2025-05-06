@@ -329,13 +329,9 @@ resources:
             - Deployed
     exceptions:
       terminal_codes:
-        - EntityAlreadyExists
         - InconsistentQuantities
         - InvalidArgument
         - InvalidTagging
-        - UnsupportedOperation
-        - AccessDenied
-        - EntityLimitExceeded
         - IllegalUpdate
         - InvalidIfMatchVersion
         - PreconditionFailed
