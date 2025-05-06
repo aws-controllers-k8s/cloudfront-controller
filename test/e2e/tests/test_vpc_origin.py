@@ -29,7 +29,8 @@ VPC_ORIGIN_RESOURCE_PLURAL = "vpcorigins"
 DELETE_WAIT_AFTER_SECONDS = 10
 DELETE_WAIT_PERIODS = 3
 # VPC Origins can take up to 15 minutes to create :(
-CHECK_STATUS_WAIT_SECONDS = 1200
+CHECK_STATUS_WAIT_PERIODS = 20
+CHECK_STATUS_WAIT_SECONDS = 60
 MODIFY_WAIT_AFTER_SECONDS = 30
 
 logger = getLogger(__name__)
@@ -100,16 +101,19 @@ class TestVpcOrigin:
     def test_crud(self, simple_vpc_origin):
         ref, res, vpc_origin_id = simple_vpc_origin
 
-        time.sleep(CHECK_STATUS_WAIT_SECONDS)
+        assert k8s.wait_on_condition(
+            ref,
+            "ACK.ResourceSynced",
+            "True",
+            wait_periods=CHECK_STATUS_WAIT_PERIODS,
+            period_length=CHECK_STATUS_WAIT_SECONDS
+        )
 
-        cr = k8s.get_resource(ref)
         assert cr is not None
         assert "spec" in cr
         assert "vpcOriginEndpointConfig" in cr["spec"]
         assert "originProtocolPolicy" in cr["spec"]["vpcOriginEndpointConfig"]
         assert cr["spec"]["vpcOriginEndpointConfig"]["originProtocolPolicy"] == "http-only"
-
-        condition.assert_synced(ref)
 
         latest = vpc_origin.get(vpc_origin_id)
         assert latest is not None
