@@ -109,6 +109,7 @@ class TestVpcOrigin:
             period_length=CHECK_STATUS_WAIT_SECONDS
         )
 
+        cr = k8s.get_resource(ref)
         assert cr is not None
         assert "spec" in cr
         assert "vpcOriginEndpointConfig" in cr["spec"]
