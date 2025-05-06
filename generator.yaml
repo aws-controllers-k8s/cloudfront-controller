@@ -33,6 +33,7 @@ ignore:
     - CreateDistributionInput.DistributionConfig.Origins.Items.Origin.CustomHeaders.Quantity
     - CreateDistributionInput.DistributionConfig.Origins.Items.Origin.VpcOriginConfig
     - CreateDistributionInput.DistributionConfig.Origins.Items.Origin.CustomOriginConfig.OriginSslProtocols.Quantity
+    #- CreateDistributionInput.DistributionConfig.Origins.Items.Origin.CustomOriginConfig.HTTPSPort
     - CreateDistributionInput.DistributionConfig.OriginGroups.Quantity
     - CreateDistributionInput.DistributionConfig.OriginGroups.Items.OriginGroup.FailoverCriteria.StatusCodes.Quantity
     - CreateDistributionInput.DistributionConfig.OriginGroups.Items.OriginGroup.Members.Quantity
@@ -236,6 +237,8 @@ resources:
           service_name: acm
           resource: Certificate
           path: Status.ACKResourceMetadata.ARN
+      DistributionConfig.Origins.Items.CustomOriginConfig.HTTPSPort:
+        go_tag: json:"httpSPort,omitempty"
   Function:
     tags:
       ignore: true
