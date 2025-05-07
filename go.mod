@@ -8,7 +8,7 @@ require (
 	github.com/aws-controllers-k8s/acm-controller v0.0.13
 	github.com/aws-controllers-k8s/runtime v0.45.0
 	github.com/aws/aws-sdk-go v1.49.0
-	github.com/aws/aws-sdk-go-v2 v1.36.0
+	github.com/aws/aws-sdk-go-v2 v1.36.3
 	github.com/aws/aws-sdk-go-v2/service/cloudfront v1.44.8
 	github.com/aws/smithy-go v1.22.2
 	github.com/go-logr/logr v1.4.2
