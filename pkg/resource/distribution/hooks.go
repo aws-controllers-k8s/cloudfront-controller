@@ -23,7 +23,7 @@ import (
 	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 
 	svcapitypes "github.com/aws-controllers-k8s/cloudfront-controller/apis/v1alpha1"
-	util "github.com/aws-controllers-k8s/cloudfront-controller/pkg/resource/tags"
+	"github.com/aws-controllers-k8s/cloudfront-controller/pkg/resource/tags"
 )
 
 // getIdempotencyToken returns a unique string to be used in certain API calls
@@ -190,7 +190,7 @@ func (rm *resourceManager) getTags(
 	ctx context.Context,
 	resourceARN string,
 ) ([]*svcapitypes.Tag, error) {
-	return util.GetResourceTags(ctx, rm.sdkapi, rm.metrics, resourceARN)
+	return tags.GetResourceTags(ctx, rm.sdkapi, rm.metrics, resourceARN)
 }
 
 // syncTags keeps the resource's tags in sync.
@@ -199,7 +199,7 @@ func (rm *resourceManager) syncTags(
 	desired *resource,
 	latest *resource,
 ) (err error) {
-	return util.SyncResourceTags(ctx, rm.sdkapi, rm.metrics, string(*latest.ko.Status.ACKResourceMetadata.ARN), desired.ko.Spec.Tags, latest.ko.Spec.Tags)
+	return tags.SyncResourceTags(ctx, rm.sdkapi, rm.metrics, string(*latest.ko.Status.ACKResourceMetadata.ARN), desired.ko.Spec.Tags, latest.ko.Spec.Tags)
 }
 
 // distributionDeployed returns true if the supplied distribution is in an active status
