@@ -16,6 +16,7 @@ import logging
 
 from acktest.bootstrapping import Resources, BootstrapFailureException
 from acktest.bootstrapping.s3 import Bucket
+from acktest.bootstrapping.elbv2 import NetworkLoadBalancer
 
 from e2e import bootstrap_directory
 from e2e.bootstrap_resources import BootstrapResources
@@ -40,6 +41,13 @@ def service_bootstrap() -> Resources:
             "ack-cloudfront-controller-tests",
             policy=public_bucket_policy,
         ),
+        NetworkLoadBalancer=NetworkLoadBalancer(
+            name_prefix="ack-cloudfront-tests",
+            scheme="internal",
+            num_public_subnet=1,
+            num_private_subnet=1,
+            apply_security_group=True
+        )
     )
 
     try:

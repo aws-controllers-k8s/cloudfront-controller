@@ -2,6 +2,7 @@
 *.swp
 *~
 .idea
+.vscode
 bin
 build
 .env

@@ -18,7 +18,7 @@ ignore:
     - RealtimeLogConfig
     #- ResponseHeadersPolicy
     - StreamingDistribution
-    - VpcOrigin
+    # - VpcOrigin
   field_paths:
     # NOTE(jaypipes): This is an idempotency token and handled automatically by
     # the controller; we don't want it as a field on the resource.
@@ -76,6 +76,7 @@ ignore:
     - CreateFunctionInput.FunctionConfig.KeyValueStoreAssociations
     - CreateFunctionOutput.FunctionSummary.FunctionConfig.KeyValueStoreAssociations
     - OriginGroup.SelectionCriteria
+    - CreateVpcOriginInput.Tags
 
 operations:
   # CloudFront has both List and Get operations. Prefer the Get operations...
@@ -112,6 +113,18 @@ operations:
     resource_name: ResponseHeadersPolicy
     operation_type: READ_ONE
     output_wrapper_field_path: ResponseHeadersPolicy
+  CreateVpcOrigin:
+    output_wrapper_field_path: VpcOrigin
+    resource_name: VpcOrigin
+    operation_type: CREATE
+  GetVpcOrigin:
+    output_wrapper_field_path: VpcOrigin
+    resource_name: VpcOrigin
+    operation_type: READ_ONE
+  UpdateVpcOrigin:
+    output_wrapper_field_path: VpcOrigin
+    resource_name: VpcOrigin
+    operation_type: UPDATE
 resources:
   CachePolicy:
     exceptions:
@@ -223,6 +236,8 @@ resources:
           service_name: acm
           resource: Certificate
           path: Status.ACKResourceMetadata.ARN
+      DistributionConfig.Origins.Items.CustomOriginConfig.HTTPSPort:
+        go_tag: json:"httpSPort,omitempty"
   Function:
     tags:
       ignore: true
@@ -300,3 +315,41 @@ resources:
         template_path: hooks/response_headers_policy/sdk_update_post_set_output.go.tpl
       sdk_delete_post_build_request:
         template_path: hooks/response_headers_policy/sdk_delete_post_build_request.go.tpl
+  VpcOrigin:
+    fields:
+      Tags:
+        from:
+          operation: TagResource
+          path: Tags.Items
+      ETag:
+        is_read_only: true
+        type: string
+    synced:
+      when:
+        - path: Status.Status
+          in:
+            - Deployed
+    exceptions:
+      terminal_codes:
+        - InconsistentQuantities
+        - InvalidArgument
+        - InvalidTagging
+        - IllegalUpdate
+        - InvalidIfMatchVersion
+        - PreconditionFailed
+    hooks:
+      sdk_read_one_post_set_output:
+        template_path: hooks/vpc_origin/sdk_read_one_post_set_output.go.tpl
+      sdk_create_post_build_request:
+        template_path: hooks/vpc_origin/sdk_create_post_build_request.go.tpl
+      sdk_create_post_set_output:
+        template_path: hooks/vpc_origin/sdk_create_post_set_output.go.tpl
+      sdk_update_pre_build_request:
+        template_path: hooks/vpc_origin/sdk_update_pre_build_request.go.tpl
+      sdk_update_post_build_request:
+        template_path: hooks/vpc_origin/sdk_update_post_build_request.go.tpl
+      sdk_update_post_set_output:
+        template_path: hooks/vpc_origin/sdk_update_post_set_output.go.tpl
+      sdk_delete_post_build_request:
+        template_path: hooks/vpc_origin/sdk_delete_post_build_request.go.tpl
+

@@ -8,3 +8,4 @@ resources:
   - bases/cloudfront.services.k8s.aws_originaccesscontrols.yaml
   - bases/cloudfront.services.k8s.aws_originrequestpolicies.yaml
   - bases/cloudfront.services.k8s.aws_responseheaderspolicies.yaml
+  - bases/cloudfront.services.k8s.aws_vpcorigins.yaml

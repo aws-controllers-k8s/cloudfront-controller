@@ -1,0 +1,17 @@
+apiVersion: cloudfront.services.k8s.aws/v1alpha1
+kind: VPCOrigin
+metadata:
+  name: $VPC_ORIGIN_NAME
+spec:
+  vpcOriginEndpointConfig:
+    name: $VPC_ORIGIN_NAME
+    arn: $VPC_ORIGIN_ENDPOINT_ARN
+    httpPort: $VPC_ORIGIN_HTTP_PORT
+    httpsPort: $VPC_ORIGIN_HTTPS_PORT
+    originProtocolPolicy: $VPC_ORIGIN_PROTOCOL_POLICY
+    originSSLProtocols:
+      items:
+        - "$SSL_PROTOCOL_1"
+  tags:
+    - key: "$TAG_KEY"
+      value: "$TAG_VALUE"
