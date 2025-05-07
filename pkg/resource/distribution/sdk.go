@@ -720,6 +720,21 @@ func (rm *resourceManager) sdkFind(
 						}
 						f4f12f0elem.S3OriginConfig = f4f12f0elemf9
 					}
+					if f4f12f0iter.VpcOriginConfig != nil {
+						f4f12f0elemf10 := &svcapitypes.VPCOriginConfig{}
+						if f4f12f0iter.VpcOriginConfig.OriginKeepaliveTimeout != nil {
+							originKeepaliveTimeoutCopy := int64(*f4f12f0iter.VpcOriginConfig.OriginKeepaliveTimeout)
+							f4f12f0elemf10.OriginKeepaliveTimeout = &originKeepaliveTimeoutCopy
+						}
+						if f4f12f0iter.VpcOriginConfig.OriginReadTimeout != nil {
+							originReadTimeoutCopy := int64(*f4f12f0iter.VpcOriginConfig.OriginReadTimeout)
+							f4f12f0elemf10.OriginReadTimeout = &originReadTimeoutCopy
+						}
+						if f4f12f0iter.VpcOriginConfig.VpcOriginId != nil {
+							f4f12f0elemf10.VPCOriginID = f4f12f0iter.VpcOriginConfig.VpcOriginId
+						}
+						f4f12f0elem.VPCOriginConfig = f4f12f0elemf10
+					}
 					f4f12f0 = append(f4f12f0, f4f12f0elem)
 				}
 				f4f12.Items = f4f12f0
@@ -1517,6 +1532,21 @@ func (rm *resourceManager) sdkCreate(
 						}
 						f4f12f0elem.S3OriginConfig = f4f12f0elemf9
 					}
+					if f4f12f0iter.VpcOriginConfig != nil {
+						f4f12f0elemf10 := &svcapitypes.VPCOriginConfig{}
+						if f4f12f0iter.VpcOriginConfig.OriginKeepaliveTimeout != nil {
+							originKeepaliveTimeoutCopy := int64(*f4f12f0iter.VpcOriginConfig.OriginKeepaliveTimeout)
+							f4f12f0elemf10.OriginKeepaliveTimeout = &originKeepaliveTimeoutCopy
+						}
+						if f4f12f0iter.VpcOriginConfig.OriginReadTimeout != nil {
+							originReadTimeoutCopy := int64(*f4f12f0iter.VpcOriginConfig.OriginReadTimeout)
+							f4f12f0elemf10.OriginReadTimeout = &originReadTimeoutCopy
+						}
+						if f4f12f0iter.VpcOriginConfig.VpcOriginId != nil {
+							f4f12f0elemf10.VPCOriginID = f4f12f0iter.VpcOriginConfig.VpcOriginId
+						}
+						f4f12f0elem.VPCOriginConfig = f4f12f0elemf10
+					}
 					f4f12f0 = append(f4f12f0, f4f12f0elem)
 				}
 				f4f12.Items = f4f12f0
@@ -2200,6 +2230,29 @@ func (rm *resourceManager) newCreateRequestPayload(
 							f0f12f0elemf9.OriginAccessIdentity = f0f12f0iter.S3OriginConfig.OriginAccessIdentity
 						}
 						f0f12f0elem.S3OriginConfig = f0f12f0elemf9
+					}
+					if f0f12f0iter.VPCOriginConfig != nil {
+						f0f12f0elemf10 := &svcsdktypes.VpcOriginConfig{}
+						if f0f12f0iter.VPCOriginConfig.OriginKeepaliveTimeout != nil {
+							originKeepaliveTimeoutCopy0 := *f0f12f0iter.VPCOriginConfig.OriginKeepaliveTimeout
+							if originKeepaliveTimeoutCopy0 > math.MaxInt32 || originKeepaliveTimeoutCopy0 < math.MinInt32 {
+								return nil, fmt.Errorf("error: field OriginKeepaliveTimeout is of type int32")
+							}
+							originKeepaliveTimeoutCopy := int32(originKeepaliveTimeoutCopy0)
+							f0f12f0elemf10.OriginKeepaliveTimeout = &originKeepaliveTimeoutCopy
+						}
+						if f0f12f0iter.VPCOriginConfig.OriginReadTimeout != nil {
+							originReadTimeoutCopy0 := *f0f12f0iter.VPCOriginConfig.OriginReadTimeout
+							if originReadTimeoutCopy0 > math.MaxInt32 || originReadTimeoutCopy0 < math.MinInt32 {
+								return nil, fmt.Errorf("error: field OriginReadTimeout is of type int32")
+							}
+							originReadTimeoutCopy := int32(originReadTimeoutCopy0)
+							f0f12f0elemf10.OriginReadTimeout = &originReadTimeoutCopy
+						}
+						if f0f12f0iter.VPCOriginConfig.VPCOriginID != nil {
+							f0f12f0elemf10.VpcOriginId = f0f12f0iter.VPCOriginConfig.VPCOriginID
+						}
+						f0f12f0elem.VpcOriginConfig = f0f12f0elemf10
 					}
 					f0f12f0 = append(f0f12f0, *f0f12f0elem)
 				}
@@ -2924,6 +2977,29 @@ func (rm *resourceManager) newUpdateRequestPayload(
 							f0f12f0elemf9.OriginAccessIdentity = f0f12f0iter.S3OriginConfig.OriginAccessIdentity
 						}
 						f0f12f0elem.S3OriginConfig = f0f12f0elemf9
+					}
+					if f0f12f0iter.VPCOriginConfig != nil {
+						f0f12f0elemf10 := &svcsdktypes.VpcOriginConfig{}
+						if f0f12f0iter.VPCOriginConfig.OriginKeepaliveTimeout != nil {
+							originKeepaliveTimeoutCopy0 := *f0f12f0iter.VPCOriginConfig.OriginKeepaliveTimeout
+							if originKeepaliveTimeoutCopy0 > math.MaxInt32 || originKeepaliveTimeoutCopy0 < math.MinInt32 {
+								return nil, fmt.Errorf("error: field OriginKeepaliveTimeout is of type int32")
+							}
+							originKeepaliveTimeoutCopy := int32(originKeepaliveTimeoutCopy0)
+							f0f12f0elemf10.OriginKeepaliveTimeout = &originKeepaliveTimeoutCopy
+						}
+						if f0f12f0iter.VPCOriginConfig.OriginReadTimeout != nil {
+							originReadTimeoutCopy0 := *f0f12f0iter.VPCOriginConfig.OriginReadTimeout
+							if originReadTimeoutCopy0 > math.MaxInt32 || originReadTimeoutCopy0 < math.MinInt32 {
+								return nil, fmt.Errorf("error: field OriginReadTimeout is of type int32")
+							}
+							originReadTimeoutCopy := int32(originReadTimeoutCopy0)
+							f0f12f0elemf10.OriginReadTimeout = &originReadTimeoutCopy
+						}
+						if f0f12f0iter.VPCOriginConfig.VPCOriginID != nil {
+							f0f12f0elemf10.VpcOriginId = f0f12f0iter.VPCOriginConfig.VPCOriginID
+						}
+						f0f12f0elem.VpcOriginConfig = f0f12f0elemf10
 					}
 					f0f12f0 = append(f0f12f0, *f0f12f0elem)
 				}

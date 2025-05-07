@@ -31,7 +31,6 @@ ignore:
     # always calculate it by doing a len(items)...
     - CreateDistributionInput.DistributionConfig.Origins.Quantity
     - CreateDistributionInput.DistributionConfig.Origins.Items.Origin.CustomHeaders.Quantity
-    - CreateDistributionInput.DistributionConfig.Origins.Items.Origin.VpcOriginConfig
     - CreateDistributionInput.DistributionConfig.Origins.Items.Origin.CustomOriginConfig.OriginSslProtocols.Quantity
     - CreateDistributionInput.DistributionConfig.OriginGroups.Quantity
     - CreateDistributionInput.DistributionConfig.OriginGroups.Items.OriginGroup.FailoverCriteria.StatusCodes.Quantity
