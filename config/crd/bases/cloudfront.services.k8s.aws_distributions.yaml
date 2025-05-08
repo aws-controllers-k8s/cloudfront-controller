@@ -674,6 +674,8 @@ spec:
                                * Use S3OriginConfig to specify an Amazon S3 bucket that is not configured
                                with static website hosting.
 
+                               * Use VpcOriginConfig to specify a VPC origin.
+
                                * Use CustomOriginConfig to specify all other kinds of origins, including:
                                An Amazon S3 bucket that is configured with static website hosting An
                                Elastic Load Balancing load balancer An Elemental MediaPackage endpoint
@@ -768,6 +770,18 @@ spec:
                                 endpoint, use the CustomOriginConfig element instead.
                               properties:
                                 originAccessIdentity:
+                                  type: string
+                              type: object
+                            vpcOriginConfig:
+                              description: An Amazon CloudFront VPC origin configuration.
+                              properties:
+                                originKeepaliveTimeout:
+                                  format: int64
+                                  type: integer
+                                originReadTimeout:
+                                  format: int64
+                                  type: integer
+                                vpcOriginID:
                                   type: string
                               type: object
                           type: object

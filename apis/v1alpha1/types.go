@@ -94,7 +94,9 @@ type AllowedMethods struct {
 	Items         []*string      `json:"items,omitempty"`
 }
 
-// An Anycast static IP list.
+// An Anycast static IP list. For more information, see Request Anycast static
+// IPs to use for allowlisting (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/request-static-ips.html)
+// in the Amazon CloudFront Developer Guide.
 type AnycastIPList struct {
 	ARN              *string      `json:"arn,omitempty"`
 	ID               *string      `json:"id,omitempty"`
@@ -1159,6 +1161,8 @@ type LoggingConfig struct {
 //   - Use S3OriginConfig to specify an Amazon S3 bucket that is not configured
 //     with static website hosting.
 //
+//   - Use VpcOriginConfig to specify a VPC origin.
+//
 //   - Use CustomOriginConfig to specify all other kinds of origins, including:
 //     An Amazon S3 bucket that is configured with static website hosting An
 //     Elastic Load Balancing load balancer An Elemental MediaPackage endpoint
@@ -1193,6 +1197,8 @@ type Origin struct {
 	// origin is a custom origin or an S3 bucket that is configured as a website
 	// endpoint, use the CustomOriginConfig element instead.
 	S3OriginConfig *S3OriginConfig `json:"s3OriginConfig,omitempty"`
+	// An Amazon CloudFront VPC origin configuration.
+	VPCOriginConfig *VPCOriginConfig `json:"vpcOriginConfig,omitempty"`
 }
 
 // A CloudFront origin access control configuration.
@@ -2099,7 +2105,9 @@ type TrustedSigners struct {
 
 // An Amazon CloudFront VPC origin configuration.
 type VPCOriginConfig struct {
-	VPCOriginID *string `json:"vpcOriginID,omitempty"`
+	OriginKeepaliveTimeout *int64  `json:"originKeepaliveTimeout,omitempty"`
+	OriginReadTimeout      *int64  `json:"originReadTimeout,omitempty"`
+	VPCOriginID            *string `json:"vpcOriginID,omitempty"`
 }
 
 // An Amazon CloudFront VPC origin endpoint configuration.
