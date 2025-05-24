@@ -57,7 +57,10 @@ spec:
                     type: string
                 type: object
               name:
-                description: A name to identify the function.
+                description: |-
+                  A name to identify the function.
+
+                  Regex Pattern: `^[a-zA-Z0-9-_]{1,64}$`
                 type: string
             required:
             - functionCode
