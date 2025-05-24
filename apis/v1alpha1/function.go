@@ -33,6 +33,8 @@ type FunctionSpec struct {
 	// +kubebuilder:validation:Required
 	FunctionConfig *FunctionConfig `json:"functionConfig"`
 	// A name to identify the function.
+	//
+	// Regex Pattern: `^[a-zA-Z0-9-_]{1,64}$`
 	// +kubebuilder:validation:Required
 	Name *string `json:"name"`
 }
