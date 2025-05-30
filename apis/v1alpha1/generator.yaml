@@ -236,7 +236,7 @@ resources:
           resource: Certificate
           path: Status.ACKResourceMetadata.ARN
       DistributionConfig.Origins.Items.CustomOriginConfig.HTTPSPort:
-        go_tag: json:"httpSPort,omitempty"
+        go_tag: json:"httpsPort,omitempty"
   Function:
     tags:
       ignore: true
