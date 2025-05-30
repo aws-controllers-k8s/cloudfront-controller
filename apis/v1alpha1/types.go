@@ -503,7 +503,7 @@ type CustomHeaders struct {
 // is a custom origin.
 type CustomOriginConfig struct {
 	HTTPPort               *int64  `json:"httpPort,omitempty"`
-	HTTPSPort              *int64  `json:"httpSPort,omitempty"`
+	HTTPSPort              *int64  `json:"httpsPort,omitempty"`
 	OriginKeepaliveTimeout *int64  `json:"originKeepaliveTimeout,omitempty"`
 	OriginProtocolPolicy   *string `json:"originProtocolPolicy,omitempty"`
 	OriginReadTimeout      *int64  `json:"originReadTimeout,omitempty"`
