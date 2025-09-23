@@ -90,7 +90,7 @@ class TestCachePolicy:
         assert 'minTTL' in cr['spec']['cachePolicyConfig']
         assert cr['spec']['cachePolicyConfig']['minTTL'] == MIN_TTL
 
-        condition.assert_synced(ref)
+        condition.assert_ready(ref)
 
         latest = cache_policy.get(cache_policy_id)
         assert latest is not None
