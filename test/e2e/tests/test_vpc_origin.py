@@ -103,7 +103,7 @@ class TestVpcOrigin:
 
         assert k8s.wait_on_condition(
             ref,
-            "ACK.ResourceSynced",
+            "Ready",
             "True",
             wait_periods=CHECK_STATUS_WAIT_PERIODS,
             period_length=CHECK_STATUS_WAIT_SECONDS

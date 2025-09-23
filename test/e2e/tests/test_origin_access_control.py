@@ -93,7 +93,7 @@ class TestOriginAccessControl:
             == "a simple origin_access_control"
         )
 
-        condition.assert_synced(ref)
+        condition.assert_ready(ref)
 
         latest = origin_access_control.get(origin_access_control_id)
         assert latest is not None

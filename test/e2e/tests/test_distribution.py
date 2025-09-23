@@ -100,7 +100,7 @@ class TestDistribution:
 
         assert k8s.wait_on_condition(
             ref,
-            "ACK.ResourceSynced",
+            "Ready",
             "True",
             wait_periods=CHECK_STATUS_WAIT_SECONDS // 10,
         )
@@ -185,7 +185,7 @@ class TestDistribution:
         ref, res, distribution_id = simple_distribution
         assert k8s.wait_on_condition(
             ref,
-            "ACK.ResourceSynced",
+            "Ready",
             "True",
             wait_periods=CHECK_STATUS_WAIT_SECONDS,
         )

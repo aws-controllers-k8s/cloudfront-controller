@@ -86,7 +86,7 @@ class TestOriginRequestPolicy:
         assert 'comment' in cr['spec']['originRequestPolicyConfig']
         assert cr['spec']['originRequestPolicyConfig']['comment'] == 'a simple origin_request_policy'
 
-        condition.assert_synced(ref)
+        condition.assert_ready(ref)
 
         latest = origin_request_policy.get(origin_request_policy_id)
         assert latest is not None
