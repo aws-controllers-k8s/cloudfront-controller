@@ -88,7 +88,7 @@ class TestFunction:
         cr = k8s.get_resource(ref)
         assert cr is not None
 
-        condition.assert_synced(ref)
+        condition.assert_ready(ref)
 
         latest = function.get(function_name)
         assert latest is not None

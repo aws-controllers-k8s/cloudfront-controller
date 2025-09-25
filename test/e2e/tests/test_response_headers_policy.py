@@ -86,7 +86,7 @@ class TestResponseHeadersPolicy:
         assert 'comment' in cr['spec']['responseHeadersPolicyConfig']
         assert cr['spec']['responseHeadersPolicyConfig']['comment'] == 'a simple response_headers_policy'
 
-        condition.assert_synced(ref)
+        condition.assert_ready(ref)
 
         latest = response_headers_policy.get(response_headers_policy_id)
         assert latest is not None
