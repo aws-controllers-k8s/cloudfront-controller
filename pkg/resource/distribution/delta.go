@@ -17,16 +17,15 @@ package distribution
 
 import (
 	"bytes"
-	"reflect"
 
 	ackcompare "github.com/aws-controllers-k8s/runtime/pkg/compare"
 	acktags "github.com/aws-controllers-k8s/runtime/pkg/tags"
+	"k8s.io/apimachinery/pkg/api/equality"
 )
 
 // Hack to avoid import errors during build...
 var (
 	_ = &bytes.Buffer{}
-	_ = &reflect.Method{}
 	_ = &acktags.Tags{}
 )
 
@@ -63,7 +62,7 @@ func newResourceDelta(
 			if len(a.ko.Spec.DistributionConfig.CacheBehaviors.Items) != len(b.ko.Spec.DistributionConfig.CacheBehaviors.Items) {
 				delta.Add("Spec.DistributionConfig.CacheBehaviors.Items", a.ko.Spec.DistributionConfig.CacheBehaviors.Items, b.ko.Spec.DistributionConfig.CacheBehaviors.Items)
 			} else if len(a.ko.Spec.DistributionConfig.CacheBehaviors.Items) > 0 {
-				if !reflect.DeepEqual(a.ko.Spec.DistributionConfig.CacheBehaviors.Items, b.ko.Spec.DistributionConfig.CacheBehaviors.Items) {
+				if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.DistributionConfig.CacheBehaviors.Items, b.ko.Spec.DistributionConfig.CacheBehaviors.Items) {
 					delta.Add("Spec.DistributionConfig.CacheBehaviors.Items", a.ko.Spec.DistributionConfig.CacheBehaviors.Items, b.ko.Spec.DistributionConfig.CacheBehaviors.Items)
 				}
 			}
@@ -88,7 +87,7 @@ func newResourceDelta(
 			if len(a.ko.Spec.DistributionConfig.CustomErrorResponses.Items) != len(b.ko.Spec.DistributionConfig.CustomErrorResponses.Items) {
 				delta.Add("Spec.DistributionConfig.CustomErrorResponses.Items", a.ko.Spec.DistributionConfig.CustomErrorResponses.Items, b.ko.Spec.DistributionConfig.CustomErrorResponses.Items)
 			} else if len(a.ko.Spec.DistributionConfig.CustomErrorResponses.Items) > 0 {
-				if !reflect.DeepEqual(a.ko.Spec.DistributionConfig.CustomErrorResponses.Items, b.ko.Spec.DistributionConfig.CustomErrorResponses.Items) {
+				if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.DistributionConfig.CustomErrorResponses.Items, b.ko.Spec.DistributionConfig.CustomErrorResponses.Items) {
 					delta.Add("Spec.DistributionConfig.CustomErrorResponses.Items", a.ko.Spec.DistributionConfig.CustomErrorResponses.Items, b.ko.Spec.DistributionConfig.CustomErrorResponses.Items)
 				}
 			}
@@ -207,7 +206,7 @@ func newResourceDelta(
 				if len(a.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items) != len(b.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items) {
 					delta.Add("Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items", a.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items, b.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items)
 				} else if len(a.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items) > 0 {
-					if !reflect.DeepEqual(a.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items, b.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items) {
+					if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items, b.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items) {
 						delta.Add("Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items", a.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items, b.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items)
 					}
 				}
@@ -218,7 +217,7 @@ func newResourceDelta(
 				if len(a.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items) != len(b.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items) {
 					delta.Add("Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items", a.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items, b.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items)
 				} else if len(a.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items) > 0 {
-					if !reflect.DeepEqual(a.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items, b.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items) {
+					if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items, b.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items) {
 						delta.Add("Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items", a.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items, b.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items)
 					}
 				}
@@ -382,7 +381,7 @@ func newResourceDelta(
 			if len(a.ko.Spec.DistributionConfig.OriginGroups.Items) != len(b.ko.Spec.DistributionConfig.OriginGroups.Items) {
 				delta.Add("Spec.DistributionConfig.OriginGroups.Items", a.ko.Spec.DistributionConfig.OriginGroups.Items, b.ko.Spec.DistributionConfig.OriginGroups.Items)
 			} else if len(a.ko.Spec.DistributionConfig.OriginGroups.Items) > 0 {
-				if !reflect.DeepEqual(a.ko.Spec.DistributionConfig.OriginGroups.Items, b.ko.Spec.DistributionConfig.OriginGroups.Items) {
+				if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.DistributionConfig.OriginGroups.Items, b.ko.Spec.DistributionConfig.OriginGroups.Items) {
 					delta.Add("Spec.DistributionConfig.OriginGroups.Items", a.ko.Spec.DistributionConfig.OriginGroups.Items, b.ko.Spec.DistributionConfig.OriginGroups.Items)
 				}
 			}
@@ -393,7 +392,7 @@ func newResourceDelta(
 			if len(a.ko.Spec.DistributionConfig.Origins.Items) != len(b.ko.Spec.DistributionConfig.Origins.Items) {
 				delta.Add("Spec.DistributionConfig.Origins.Items", a.ko.Spec.DistributionConfig.Origins.Items, b.ko.Spec.DistributionConfig.Origins.Items)
 			} else if len(a.ko.Spec.DistributionConfig.Origins.Items) > 0 {
-				if !reflect.DeepEqual(a.ko.Spec.DistributionConfig.Origins.Items, b.ko.Spec.DistributionConfig.Origins.Items) {
+				if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.DistributionConfig.Origins.Items, b.ko.Spec.DistributionConfig.Origins.Items) {
 					delta.Add("Spec.DistributionConfig.Origins.Items", a.ko.Spec.DistributionConfig.Origins.Items, b.ko.Spec.DistributionConfig.Origins.Items)
 				}
 			}

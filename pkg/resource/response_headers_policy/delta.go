@@ -17,16 +17,15 @@ package response_headers_policy
 
 import (
 	"bytes"
-	"reflect"
 
 	ackcompare "github.com/aws-controllers-k8s/runtime/pkg/compare"
 	acktags "github.com/aws-controllers-k8s/runtime/pkg/tags"
+	"k8s.io/apimachinery/pkg/api/equality"
 )
 
 // Hack to avoid import errors during build...
 var (
 	_ = &bytes.Buffer{}
-	_ = &reflect.Method{}
 	_ = &acktags.Tags{}
 )
 
@@ -128,7 +127,7 @@ func newResourceDelta(
 			if len(a.ko.Spec.ResponseHeadersPolicyConfig.CustomHeadersConfig.Items) != len(b.ko.Spec.ResponseHeadersPolicyConfig.CustomHeadersConfig.Items) {
 				delta.Add("Spec.ResponseHeadersPolicyConfig.CustomHeadersConfig.Items", a.ko.Spec.ResponseHeadersPolicyConfig.CustomHeadersConfig.Items, b.ko.Spec.ResponseHeadersPolicyConfig.CustomHeadersConfig.Items)
 			} else if len(a.ko.Spec.ResponseHeadersPolicyConfig.CustomHeadersConfig.Items) > 0 {
-				if !reflect.DeepEqual(a.ko.Spec.ResponseHeadersPolicyConfig.CustomHeadersConfig.Items, b.ko.Spec.ResponseHeadersPolicyConfig.CustomHeadersConfig.Items) {
+				if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.ResponseHeadersPolicyConfig.CustomHeadersConfig.Items, b.ko.Spec.ResponseHeadersPolicyConfig.CustomHeadersConfig.Items) {
 					delta.Add("Spec.ResponseHeadersPolicyConfig.CustomHeadersConfig.Items", a.ko.Spec.ResponseHeadersPolicyConfig.CustomHeadersConfig.Items, b.ko.Spec.ResponseHeadersPolicyConfig.CustomHeadersConfig.Items)
 				}
 			}
@@ -146,7 +145,7 @@ func newResourceDelta(
 			if len(a.ko.Spec.ResponseHeadersPolicyConfig.RemoveHeadersConfig.Items) != len(b.ko.Spec.ResponseHeadersPolicyConfig.RemoveHeadersConfig.Items) {
 				delta.Add("Spec.ResponseHeadersPolicyConfig.RemoveHeadersConfig.Items", a.ko.Spec.ResponseHeadersPolicyConfig.RemoveHeadersConfig.Items, b.ko.Spec.ResponseHeadersPolicyConfig.RemoveHeadersConfig.Items)
 			} else if len(a.ko.Spec.ResponseHeadersPolicyConfig.RemoveHeadersConfig.Items) > 0 {
-				if !reflect.DeepEqual(a.ko.Spec.ResponseHeadersPolicyConfig.RemoveHeadersConfig.Items, b.ko.Spec.ResponseHeadersPolicyConfig.RemoveHeadersConfig.Items) {
+				if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.ResponseHeadersPolicyConfig.RemoveHeadersConfig.Items, b.ko.Spec.ResponseHeadersPolicyConfig.RemoveHeadersConfig.Items) {
 					delta.Add("Spec.ResponseHeadersPolicyConfig.RemoveHeadersConfig.Items", a.ko.Spec.ResponseHeadersPolicyConfig.RemoveHeadersConfig.Items, b.ko.Spec.ResponseHeadersPolicyConfig.RemoveHeadersConfig.Items)
 				}
 			}
