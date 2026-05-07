@@ -74,6 +74,13 @@ func newResourceDelta(
 				delta.Add("Spec.DistributionConfig.Comment", a.ko.Spec.DistributionConfig.Comment, b.ko.Spec.DistributionConfig.Comment)
 			}
 		}
+		if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.ConnectionMode, b.ko.Spec.DistributionConfig.ConnectionMode) {
+			delta.Add("Spec.DistributionConfig.ConnectionMode", a.ko.Spec.DistributionConfig.ConnectionMode, b.ko.Spec.DistributionConfig.ConnectionMode)
+		} else if a.ko.Spec.DistributionConfig.ConnectionMode != nil && b.ko.Spec.DistributionConfig.ConnectionMode != nil {
+			if *a.ko.Spec.DistributionConfig.ConnectionMode != *b.ko.Spec.DistributionConfig.ConnectionMode {
+				delta.Add("Spec.DistributionConfig.ConnectionMode", a.ko.Spec.DistributionConfig.ConnectionMode, b.ko.Spec.DistributionConfig.ConnectionMode)
+			}
+		}
 		if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.ContinuousDeploymentPolicyID, b.ko.Spec.DistributionConfig.ContinuousDeploymentPolicyID) {
 			delta.Add("Spec.DistributionConfig.ContinuousDeploymentPolicyID", a.ko.Spec.DistributionConfig.ContinuousDeploymentPolicyID, b.ko.Spec.DistributionConfig.ContinuousDeploymentPolicyID)
 		} else if a.ko.Spec.DistributionConfig.ContinuousDeploymentPolicyID != nil && b.ko.Spec.DistributionConfig.ContinuousDeploymentPolicyID != nil {
@@ -431,6 +438,17 @@ func newResourceDelta(
 		} else if a.ko.Spec.DistributionConfig.Staging != nil && b.ko.Spec.DistributionConfig.Staging != nil {
 			if *a.ko.Spec.DistributionConfig.Staging != *b.ko.Spec.DistributionConfig.Staging {
 				delta.Add("Spec.DistributionConfig.Staging", a.ko.Spec.DistributionConfig.Staging, b.ko.Spec.DistributionConfig.Staging)
+			}
+		}
+		if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.TenantConfig, b.ko.Spec.DistributionConfig.TenantConfig) {
+			delta.Add("Spec.DistributionConfig.TenantConfig", a.ko.Spec.DistributionConfig.TenantConfig, b.ko.Spec.DistributionConfig.TenantConfig)
+		} else if a.ko.Spec.DistributionConfig.TenantConfig != nil && b.ko.Spec.DistributionConfig.TenantConfig != nil {
+			if len(a.ko.Spec.DistributionConfig.TenantConfig.ParameterDefinitions) != len(b.ko.Spec.DistributionConfig.TenantConfig.ParameterDefinitions) {
+				delta.Add("Spec.DistributionConfig.TenantConfig.ParameterDefinitions", a.ko.Spec.DistributionConfig.TenantConfig.ParameterDefinitions, b.ko.Spec.DistributionConfig.TenantConfig.ParameterDefinitions)
+			} else if len(a.ko.Spec.DistributionConfig.TenantConfig.ParameterDefinitions) > 0 {
+				if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.DistributionConfig.TenantConfig.ParameterDefinitions, b.ko.Spec.DistributionConfig.TenantConfig.ParameterDefinitions) {
+					delta.Add("Spec.DistributionConfig.TenantConfig.ParameterDefinitions", a.ko.Spec.DistributionConfig.TenantConfig.ParameterDefinitions, b.ko.Spec.DistributionConfig.TenantConfig.ParameterDefinitions)
+				}
 			}
 		}
 		if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.ViewerCertificate, b.ko.Spec.DistributionConfig.ViewerCertificate) {

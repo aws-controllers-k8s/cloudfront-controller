@@ -45,6 +45,9 @@ type VPCOriginStatus struct {
 	// resource
 	// +kubebuilder:validation:Optional
 	Conditions []*ackv1alpha1.Condition `json:"conditions"`
+	// The account ID of the Amazon Web Services account that owns the VPC origin.
+	// +kubebuilder:validation:Optional
+	AccountID *string `json:"accountID,omitempty"`
 	// The VPC origin created time.
 	// +kubebuilder:validation:Optional
 	CreatedTime *metav1.Time `json:"createdTime,omitempty"`

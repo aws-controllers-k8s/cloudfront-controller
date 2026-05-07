@@ -55,11 +55,54 @@ const (
 	CertificateSource_iam        CertificateSource = "iam"
 )
 
+type CertificateTransparencyLoggingPreference string
+
+const (
+	CertificateTransparencyLoggingPreference_disabled CertificateTransparencyLoggingPreference = "disabled"
+	CertificateTransparencyLoggingPreference_enabled  CertificateTransparencyLoggingPreference = "enabled"
+)
+
+type ConnectionMode string
+
+const (
+	ConnectionMode_direct      ConnectionMode = "direct"
+	ConnectionMode_tenant_only ConnectionMode = "tenant-only"
+)
+
 type ContinuousDeploymentPolicyType string
 
 const (
 	ContinuousDeploymentPolicyType_SingleHeader ContinuousDeploymentPolicyType = "SingleHeader"
 	ContinuousDeploymentPolicyType_SingleWeight ContinuousDeploymentPolicyType = "SingleWeight"
+)
+
+type CustomizationActionType string
+
+const (
+	CustomizationActionType_disable  CustomizationActionType = "disable"
+	CustomizationActionType_override CustomizationActionType = "override"
+)
+
+type DNSConfigurationStatus string
+
+const (
+	DNSConfigurationStatus_invalid_configuration DNSConfigurationStatus = "invalid-configuration"
+	DNSConfigurationStatus_unknown_configuration DNSConfigurationStatus = "unknown-configuration"
+	DNSConfigurationStatus_valid_configuration   DNSConfigurationStatus = "valid-configuration"
+)
+
+type DistributionResourceType string
+
+const (
+	DistributionResourceType_distribution        DistributionResourceType = "distribution"
+	DistributionResourceType_distribution_tenant DistributionResourceType = "distribution-tenant"
+)
+
+type DomainStatus string
+
+const (
+	DomainStatus_active   DomainStatus = "active"
+	DomainStatus_inactive DomainStatus = "inactive"
 )
 
 type EventType string
@@ -123,6 +166,14 @@ const (
 	ICPRecordalStatus_SUSPENDED ICPRecordalStatus = "SUSPENDED"
 )
 
+type IPAddressType string
+
+const (
+	IPAddressType_dualstack IPAddressType = "dualstack"
+	IPAddressType_ipv4      IPAddressType = "ipv4"
+	IPAddressType_ipv6      IPAddressType = "ipv6"
+)
+
 type ImportSourceType string
 
 const (
@@ -135,6 +186,18 @@ const (
 	ItemSelection_all       ItemSelection = "all"
 	ItemSelection_none      ItemSelection = "none"
 	ItemSelection_whitelist ItemSelection = "whitelist"
+)
+
+type ManagedCertificateStatus string
+
+const (
+	ManagedCertificateStatus_expired              ManagedCertificateStatus = "expired"
+	ManagedCertificateStatus_failed               ManagedCertificateStatus = "failed"
+	ManagedCertificateStatus_inactive             ManagedCertificateStatus = "inactive"
+	ManagedCertificateStatus_issued               ManagedCertificateStatus = "issued"
+	ManagedCertificateStatus_pending_validation   ManagedCertificateStatus = "pending-validation"
+	ManagedCertificateStatus_revoked              ManagedCertificateStatus = "revoked"
+	ManagedCertificateStatus_validation_timed_out ManagedCertificateStatus = "validation-timed-out"
 )
 
 type Method string
@@ -158,6 +221,8 @@ const (
 	MinimumProtocolVersion_TLSv1_2_2018 MinimumProtocolVersion = "TLSv1.2_2018"
 	MinimumProtocolVersion_TLSv1_2_2019 MinimumProtocolVersion = "TLSv1.2_2019"
 	MinimumProtocolVersion_TLSv1_2_2021 MinimumProtocolVersion = "TLSv1.2_2021"
+	MinimumProtocolVersion_TLSv1_2_2025 MinimumProtocolVersion = "TLSv1.2_2025"
+	MinimumProtocolVersion_TLSv1_3_2025 MinimumProtocolVersion = "TLSv1.3_2025"
 	MinimumProtocolVersion_TLSv1_2016   MinimumProtocolVersion = "TLSv1_2016"
 )
 
@@ -237,6 +302,7 @@ const (
 type PriceClass string
 
 const (
+	PriceClass_None           PriceClass = "None"
 	PriceClass_PriceClass_100 PriceClass = "PriceClass_100"
 	PriceClass_PriceClass_200 PriceClass = "PriceClass_200"
 	PriceClass_PriceClass_All PriceClass = "PriceClass_All"
@@ -297,6 +363,13 @@ const (
 	SSLSupportMethod_sni_only  SSLSupportMethod = "sni-only"
 	SSLSupportMethod_static_ip SSLSupportMethod = "static-ip"
 	SSLSupportMethod_vip       SSLSupportMethod = "vip"
+)
+
+type ValidationTokenHost string
+
+const (
+	ValidationTokenHost_cloudfront  ValidationTokenHost = "cloudfront"
+	ValidationTokenHost_self_hosted ValidationTokenHost = "self-hosted"
 )
 
 type ViewerProtocolPolicy string

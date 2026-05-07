@@ -1,14 +1,18 @@
 ignore:
   resource_names:
     - AnycastIpList
+    - ConnectionFunction
+    - ConnectionGroup
     #- CachePolicy
     - CloudFrontOriginAccessIdentity
     - ContinuousDeploymentPolicy
+    - DistributionTenant
     #- Distribution
     - FieldLevelEncryptionConfig
     - FieldLevelEncryptionProfile
     # Function
     - Invalidation
+    - InvalidationForDistributionTenant
     - KeyGroup
     - KeyValueStore
     - MonitoringSubscription
@@ -18,6 +22,7 @@ ignore:
     - RealtimeLogConfig
     #- ResponseHeadersPolicy
     - StreamingDistribution
+    - TrustStore
     # - VpcOrigin
   field_paths:
     # NOTE(jaypipes): This is an idempotency token and handled automatically by

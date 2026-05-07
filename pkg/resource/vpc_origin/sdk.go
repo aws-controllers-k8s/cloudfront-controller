@@ -91,6 +91,11 @@ func (rm *resourceManager) sdkFind(
 	// the original Kubernetes object we passed to the function
 	ko := r.ko.DeepCopy()
 
+	if resp.VpcOrigin.AccountId != nil {
+		ko.Status.AccountID = resp.VpcOrigin.AccountId
+	} else {
+		ko.Status.AccountID = nil
+	}
 	if ko.Status.ACKResourceMetadata == nil {
 		ko.Status.ACKResourceMetadata = &ackv1alpha1.ResourceMetadata{}
 	}
@@ -119,38 +124,38 @@ func (rm *resourceManager) sdkFind(
 		ko.Status.Status = nil
 	}
 	if resp.VpcOrigin.VpcOriginEndpointConfig != nil {
-		f5 := &svcapitypes.VPCOriginEndpointConfig{}
+		f6 := &svcapitypes.VPCOriginEndpointConfig{}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.Arn != nil {
-			f5.ARN = resp.VpcOrigin.VpcOriginEndpointConfig.Arn
+			f6.ARN = resp.VpcOrigin.VpcOriginEndpointConfig.Arn
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.HTTPPort != nil {
 			httpPortCopy := int64(*resp.VpcOrigin.VpcOriginEndpointConfig.HTTPPort)
-			f5.HTTPPort = &httpPortCopy
+			f6.HTTPPort = &httpPortCopy
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.HTTPSPort != nil {
 			httpsPortCopy := int64(*resp.VpcOrigin.VpcOriginEndpointConfig.HTTPSPort)
-			f5.HTTPSPort = &httpsPortCopy
+			f6.HTTPSPort = &httpsPortCopy
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.Name != nil {
-			f5.Name = resp.VpcOrigin.VpcOriginEndpointConfig.Name
+			f6.Name = resp.VpcOrigin.VpcOriginEndpointConfig.Name
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.OriginProtocolPolicy != "" {
-			f5.OriginProtocolPolicy = aws.String(string(resp.VpcOrigin.VpcOriginEndpointConfig.OriginProtocolPolicy))
+			f6.OriginProtocolPolicy = aws.String(string(resp.VpcOrigin.VpcOriginEndpointConfig.OriginProtocolPolicy))
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.OriginSslProtocols != nil {
-			f5f5 := &svcapitypes.OriginSSLProtocols{}
+			f6f5 := &svcapitypes.OriginSSLProtocols{}
 			if resp.VpcOrigin.VpcOriginEndpointConfig.OriginSslProtocols.Items != nil {
-				f5f5f0 := []*string{}
-				for _, f5f5f0iter := range resp.VpcOrigin.VpcOriginEndpointConfig.OriginSslProtocols.Items {
-					var f5f5f0elem *string
-					f5f5f0elem = aws.String(string(f5f5f0iter))
-					f5f5f0 = append(f5f5f0, f5f5f0elem)
+				f6f5f0 := []*string{}
+				for _, f6f5f0iter := range resp.VpcOrigin.VpcOriginEndpointConfig.OriginSslProtocols.Items {
+					var f6f5f0elem *string
+					f6f5f0elem = aws.String(string(f6f5f0iter))
+					f6f5f0 = append(f6f5f0, f6f5f0elem)
 				}
-				f5f5.Items = f5f5f0
+				f6f5.Items = f6f5f0
 			}
-			f5.OriginSSLProtocols = f5f5
+			f6.OriginSSLProtocols = f6f5
 		}
-		ko.Spec.VPCOriginEndpointConfig = f5
+		ko.Spec.VPCOriginEndpointConfig = f6
 	} else {
 		ko.Spec.VPCOriginEndpointConfig = nil
 	}
@@ -230,6 +235,11 @@ func (rm *resourceManager) sdkCreate(
 	// the original Kubernetes object we passed to the function
 	ko := desired.ko.DeepCopy()
 
+	if resp.VpcOrigin.AccountId != nil {
+		ko.Status.AccountID = resp.VpcOrigin.AccountId
+	} else {
+		ko.Status.AccountID = nil
+	}
 	if ko.Status.ACKResourceMetadata == nil {
 		ko.Status.ACKResourceMetadata = &ackv1alpha1.ResourceMetadata{}
 	}
@@ -258,38 +268,38 @@ func (rm *resourceManager) sdkCreate(
 		ko.Status.Status = nil
 	}
 	if resp.VpcOrigin.VpcOriginEndpointConfig != nil {
-		f5 := &svcapitypes.VPCOriginEndpointConfig{}
+		f6 := &svcapitypes.VPCOriginEndpointConfig{}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.Arn != nil {
-			f5.ARN = resp.VpcOrigin.VpcOriginEndpointConfig.Arn
+			f6.ARN = resp.VpcOrigin.VpcOriginEndpointConfig.Arn
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.HTTPPort != nil {
 			httpPortCopy := int64(*resp.VpcOrigin.VpcOriginEndpointConfig.HTTPPort)
-			f5.HTTPPort = &httpPortCopy
+			f6.HTTPPort = &httpPortCopy
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.HTTPSPort != nil {
 			httpsPortCopy := int64(*resp.VpcOrigin.VpcOriginEndpointConfig.HTTPSPort)
-			f5.HTTPSPort = &httpsPortCopy
+			f6.HTTPSPort = &httpsPortCopy
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.Name != nil {
-			f5.Name = resp.VpcOrigin.VpcOriginEndpointConfig.Name
+			f6.Name = resp.VpcOrigin.VpcOriginEndpointConfig.Name
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.OriginProtocolPolicy != "" {
-			f5.OriginProtocolPolicy = aws.String(string(resp.VpcOrigin.VpcOriginEndpointConfig.OriginProtocolPolicy))
+			f6.OriginProtocolPolicy = aws.String(string(resp.VpcOrigin.VpcOriginEndpointConfig.OriginProtocolPolicy))
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.OriginSslProtocols != nil {
-			f5f5 := &svcapitypes.OriginSSLProtocols{}
+			f6f5 := &svcapitypes.OriginSSLProtocols{}
 			if resp.VpcOrigin.VpcOriginEndpointConfig.OriginSslProtocols.Items != nil {
-				f5f5f0 := []*string{}
-				for _, f5f5f0iter := range resp.VpcOrigin.VpcOriginEndpointConfig.OriginSslProtocols.Items {
-					var f5f5f0elem *string
-					f5f5f0elem = aws.String(string(f5f5f0iter))
-					f5f5f0 = append(f5f5f0, f5f5f0elem)
+				f6f5f0 := []*string{}
+				for _, f6f5f0iter := range resp.VpcOrigin.VpcOriginEndpointConfig.OriginSslProtocols.Items {
+					var f6f5f0elem *string
+					f6f5f0elem = aws.String(string(f6f5f0iter))
+					f6f5f0 = append(f6f5f0, f6f5f0elem)
 				}
-				f5f5.Items = f5f5f0
+				f6f5.Items = f6f5f0
 			}
-			f5.OriginSSLProtocols = f5f5
+			f6.OriginSSLProtocols = f6f5
 		}
-		ko.Spec.VPCOriginEndpointConfig = f5
+		ko.Spec.VPCOriginEndpointConfig = f6
 	} else {
 		ko.Spec.VPCOriginEndpointConfig = nil
 	}
@@ -413,6 +423,11 @@ func (rm *resourceManager) sdkUpdate(
 	// the original Kubernetes object we passed to the function
 	ko := desired.ko.DeepCopy()
 
+	if resp.VpcOrigin.AccountId != nil {
+		ko.Status.AccountID = resp.VpcOrigin.AccountId
+	} else {
+		ko.Status.AccountID = nil
+	}
 	if ko.Status.ACKResourceMetadata == nil {
 		ko.Status.ACKResourceMetadata = &ackv1alpha1.ResourceMetadata{}
 	}
@@ -441,38 +456,38 @@ func (rm *resourceManager) sdkUpdate(
 		ko.Status.Status = nil
 	}
 	if resp.VpcOrigin.VpcOriginEndpointConfig != nil {
-		f5 := &svcapitypes.VPCOriginEndpointConfig{}
+		f6 := &svcapitypes.VPCOriginEndpointConfig{}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.Arn != nil {
-			f5.ARN = resp.VpcOrigin.VpcOriginEndpointConfig.Arn
+			f6.ARN = resp.VpcOrigin.VpcOriginEndpointConfig.Arn
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.HTTPPort != nil {
 			httpPortCopy := int64(*resp.VpcOrigin.VpcOriginEndpointConfig.HTTPPort)
-			f5.HTTPPort = &httpPortCopy
+			f6.HTTPPort = &httpPortCopy
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.HTTPSPort != nil {
 			httpsPortCopy := int64(*resp.VpcOrigin.VpcOriginEndpointConfig.HTTPSPort)
-			f5.HTTPSPort = &httpsPortCopy
+			f6.HTTPSPort = &httpsPortCopy
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.Name != nil {
-			f5.Name = resp.VpcOrigin.VpcOriginEndpointConfig.Name
+			f6.Name = resp.VpcOrigin.VpcOriginEndpointConfig.Name
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.OriginProtocolPolicy != "" {
-			f5.OriginProtocolPolicy = aws.String(string(resp.VpcOrigin.VpcOriginEndpointConfig.OriginProtocolPolicy))
+			f6.OriginProtocolPolicy = aws.String(string(resp.VpcOrigin.VpcOriginEndpointConfig.OriginProtocolPolicy))
 		}
 		if resp.VpcOrigin.VpcOriginEndpointConfig.OriginSslProtocols != nil {
-			f5f5 := &svcapitypes.OriginSSLProtocols{}
+			f6f5 := &svcapitypes.OriginSSLProtocols{}
 			if resp.VpcOrigin.VpcOriginEndpointConfig.OriginSslProtocols.Items != nil {
-				f5f5f0 := []*string{}
-				for _, f5f5f0iter := range resp.VpcOrigin.VpcOriginEndpointConfig.OriginSslProtocols.Items {
-					var f5f5f0elem *string
-					f5f5f0elem = aws.String(string(f5f5f0iter))
-					f5f5f0 = append(f5f5f0, f5f5f0elem)
+				f6f5f0 := []*string{}
+				for _, f6f5f0iter := range resp.VpcOrigin.VpcOriginEndpointConfig.OriginSslProtocols.Items {
+					var f6f5f0elem *string
+					f6f5f0elem = aws.String(string(f6f5f0iter))
+					f6f5f0 = append(f6f5f0, f6f5f0elem)
 				}
-				f5f5.Items = f5f5f0
+				f6f5.Items = f6f5f0
 			}
-			f5.OriginSSLProtocols = f5f5
+			f6.OriginSSLProtocols = f6f5
 		}
-		ko.Spec.VPCOriginEndpointConfig = f5
+		ko.Spec.VPCOriginEndpointConfig = f6
 	} else {
 		ko.Spec.VPCOriginEndpointConfig = nil
 	}
