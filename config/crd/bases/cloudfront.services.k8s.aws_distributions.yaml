@@ -342,10 +342,10 @@ spec:
                           description: |-
                             A complex type that controls:
 
-                               * Whether CloudFront replaces HTTP status codes in the 4xx and 5xx range
-                               with custom error messages before returning the response to the viewer.
+                              - Whether CloudFront replaces HTTP status codes in the 4xx and 5xx range
+                                with custom error messages before returning the response to the viewer.
 
-                               * How long CloudFront caches HTTP status codes in the 4xx and 5xx range.
+                              - How long CloudFront caches HTTP status codes in the 4xx and 5xx range.
 
                             For more information about custom error pages, see Customizing Error Responses
                             (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/custom-error-pages.html)
@@ -693,16 +693,16 @@ spec:
                             An origin is the location where content is stored, and from which CloudFront
                             gets content to serve to viewers. To specify an origin:
 
-                               * Use S3OriginConfig to specify an Amazon S3 bucket that is not configured
-                               with static website hosting.
+                              - Use S3OriginConfig to specify an Amazon S3 bucket that is not configured
+                                with static website hosting.
 
-                               * Use VpcOriginConfig to specify a VPC origin.
+                              - Use VpcOriginConfig to specify a VPC origin.
 
-                               * Use CustomOriginConfig to specify all other kinds of origins, including:
-                               An Amazon S3 bucket that is configured with static website hosting An
-                               Elastic Load Balancing load balancer An Elemental MediaPackage endpoint
-                               An Elemental MediaStore container Any other HTTP server, running on an
-                               Amazon EC2 instance or any other kind of host
+                              - Use CustomOriginConfig to specify all other kinds of origins, including:
+                                An Amazon S3 bucket that is configured with static website hosting An
+                                Elastic Load Balancing load balancer An Elemental MediaPackage endpoint
+                                An Elemental MediaStore container Any other HTTP server, running on an
+                                Amazon EC2 instance or any other kind of host
 
                             For the current maximum number of origins that you can specify per distribution,
                             see General Quotas on Web Distributions (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html#limits-web-distributions)
