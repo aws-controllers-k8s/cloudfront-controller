@@ -67,11 +67,33 @@ func newResourceDelta(
 				}
 			}
 		}
+		if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.CacheTagConfig, b.ko.Spec.DistributionConfig.CacheTagConfig) {
+			delta.Add("Spec.DistributionConfig.CacheTagConfig", a.ko.Spec.DistributionConfig.CacheTagConfig, b.ko.Spec.DistributionConfig.CacheTagConfig)
+		} else if a.ko.Spec.DistributionConfig.CacheTagConfig != nil && b.ko.Spec.DistributionConfig.CacheTagConfig != nil {
+			if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.CacheTagConfig.HeaderName, b.ko.Spec.DistributionConfig.CacheTagConfig.HeaderName) {
+				delta.Add("Spec.DistributionConfig.CacheTagConfig.HeaderName", a.ko.Spec.DistributionConfig.CacheTagConfig.HeaderName, b.ko.Spec.DistributionConfig.CacheTagConfig.HeaderName)
+			} else if a.ko.Spec.DistributionConfig.CacheTagConfig.HeaderName != nil && b.ko.Spec.DistributionConfig.CacheTagConfig.HeaderName != nil {
+				if *a.ko.Spec.DistributionConfig.CacheTagConfig.HeaderName != *b.ko.Spec.DistributionConfig.CacheTagConfig.HeaderName {
+					delta.Add("Spec.DistributionConfig.CacheTagConfig.HeaderName", a.ko.Spec.DistributionConfig.CacheTagConfig.HeaderName, b.ko.Spec.DistributionConfig.CacheTagConfig.HeaderName)
+				}
+			}
+		}
 		if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.Comment, b.ko.Spec.DistributionConfig.Comment) {
 			delta.Add("Spec.DistributionConfig.Comment", a.ko.Spec.DistributionConfig.Comment, b.ko.Spec.DistributionConfig.Comment)
 		} else if a.ko.Spec.DistributionConfig.Comment != nil && b.ko.Spec.DistributionConfig.Comment != nil {
 			if *a.ko.Spec.DistributionConfig.Comment != *b.ko.Spec.DistributionConfig.Comment {
 				delta.Add("Spec.DistributionConfig.Comment", a.ko.Spec.DistributionConfig.Comment, b.ko.Spec.DistributionConfig.Comment)
+			}
+		}
+		if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.ConnectionFunctionAssociation, b.ko.Spec.DistributionConfig.ConnectionFunctionAssociation) {
+			delta.Add("Spec.DistributionConfig.ConnectionFunctionAssociation", a.ko.Spec.DistributionConfig.ConnectionFunctionAssociation, b.ko.Spec.DistributionConfig.ConnectionFunctionAssociation)
+		} else if a.ko.Spec.DistributionConfig.ConnectionFunctionAssociation != nil && b.ko.Spec.DistributionConfig.ConnectionFunctionAssociation != nil {
+			if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.ConnectionFunctionAssociation.ID, b.ko.Spec.DistributionConfig.ConnectionFunctionAssociation.ID) {
+				delta.Add("Spec.DistributionConfig.ConnectionFunctionAssociation.ID", a.ko.Spec.DistributionConfig.ConnectionFunctionAssociation.ID, b.ko.Spec.DistributionConfig.ConnectionFunctionAssociation.ID)
+			} else if a.ko.Spec.DistributionConfig.ConnectionFunctionAssociation.ID != nil && b.ko.Spec.DistributionConfig.ConnectionFunctionAssociation.ID != nil {
+				if *a.ko.Spec.DistributionConfig.ConnectionFunctionAssociation.ID != *b.ko.Spec.DistributionConfig.ConnectionFunctionAssociation.ID {
+					delta.Add("Spec.DistributionConfig.ConnectionFunctionAssociation.ID", a.ko.Spec.DistributionConfig.ConnectionFunctionAssociation.ID, b.ko.Spec.DistributionConfig.ConnectionFunctionAssociation.ID)
+				}
 			}
 		}
 		if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.ConnectionMode, b.ko.Spec.DistributionConfig.ConnectionMode) {
@@ -501,6 +523,42 @@ func newResourceDelta(
 			} else if a.ko.Spec.DistributionConfig.ViewerCertificate.SSLSupportMethod != nil && b.ko.Spec.DistributionConfig.ViewerCertificate.SSLSupportMethod != nil {
 				if *a.ko.Spec.DistributionConfig.ViewerCertificate.SSLSupportMethod != *b.ko.Spec.DistributionConfig.ViewerCertificate.SSLSupportMethod {
 					delta.Add("Spec.DistributionConfig.ViewerCertificate.SSLSupportMethod", a.ko.Spec.DistributionConfig.ViewerCertificate.SSLSupportMethod, b.ko.Spec.DistributionConfig.ViewerCertificate.SSLSupportMethod)
+				}
+			}
+		}
+		if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.ViewerMtlsConfig, b.ko.Spec.DistributionConfig.ViewerMtlsConfig) {
+			delta.Add("Spec.DistributionConfig.ViewerMtlsConfig", a.ko.Spec.DistributionConfig.ViewerMtlsConfig, b.ko.Spec.DistributionConfig.ViewerMtlsConfig)
+		} else if a.ko.Spec.DistributionConfig.ViewerMtlsConfig != nil && b.ko.Spec.DistributionConfig.ViewerMtlsConfig != nil {
+			if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.ViewerMtlsConfig.Mode, b.ko.Spec.DistributionConfig.ViewerMtlsConfig.Mode) {
+				delta.Add("Spec.DistributionConfig.ViewerMtlsConfig.Mode", a.ko.Spec.DistributionConfig.ViewerMtlsConfig.Mode, b.ko.Spec.DistributionConfig.ViewerMtlsConfig.Mode)
+			} else if a.ko.Spec.DistributionConfig.ViewerMtlsConfig.Mode != nil && b.ko.Spec.DistributionConfig.ViewerMtlsConfig.Mode != nil {
+				if *a.ko.Spec.DistributionConfig.ViewerMtlsConfig.Mode != *b.ko.Spec.DistributionConfig.ViewerMtlsConfig.Mode {
+					delta.Add("Spec.DistributionConfig.ViewerMtlsConfig.Mode", a.ko.Spec.DistributionConfig.ViewerMtlsConfig.Mode, b.ko.Spec.DistributionConfig.ViewerMtlsConfig.Mode)
+				}
+			}
+			if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig, b.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig) {
+				delta.Add("Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig", a.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig, b.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig)
+			} else if a.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig != nil && b.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig != nil {
+				if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.AdvertiseTrustStoreCaNames, b.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.AdvertiseTrustStoreCaNames) {
+					delta.Add("Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.AdvertiseTrustStoreCaNames", a.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.AdvertiseTrustStoreCaNames, b.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.AdvertiseTrustStoreCaNames)
+				} else if a.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.AdvertiseTrustStoreCaNames != nil && b.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.AdvertiseTrustStoreCaNames != nil {
+					if *a.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.AdvertiseTrustStoreCaNames != *b.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.AdvertiseTrustStoreCaNames {
+						delta.Add("Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.AdvertiseTrustStoreCaNames", a.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.AdvertiseTrustStoreCaNames, b.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.AdvertiseTrustStoreCaNames)
+					}
+				}
+				if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.IgnoreCertificateExpiry, b.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.IgnoreCertificateExpiry) {
+					delta.Add("Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.IgnoreCertificateExpiry", a.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.IgnoreCertificateExpiry, b.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.IgnoreCertificateExpiry)
+				} else if a.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.IgnoreCertificateExpiry != nil && b.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.IgnoreCertificateExpiry != nil {
+					if *a.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.IgnoreCertificateExpiry != *b.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.IgnoreCertificateExpiry {
+						delta.Add("Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.IgnoreCertificateExpiry", a.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.IgnoreCertificateExpiry, b.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.IgnoreCertificateExpiry)
+					}
+				}
+				if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.TrustStoreID, b.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.TrustStoreID) {
+					delta.Add("Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.TrustStoreID", a.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.TrustStoreID, b.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.TrustStoreID)
+				} else if a.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.TrustStoreID != nil && b.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.TrustStoreID != nil {
+					if *a.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.TrustStoreID != *b.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.TrustStoreID {
+						delta.Add("Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.TrustStoreID", a.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.TrustStoreID, b.ko.Spec.DistributionConfig.ViewerMtlsConfig.TrustStoreConfig.TrustStoreID)
+					}
 				}
 			}
 		}

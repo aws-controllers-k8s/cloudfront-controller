@@ -166,6 +166,23 @@ const (
 	ICPRecordalStatus_SUSPENDED ICPRecordalStatus = "SUSPENDED"
 )
 
+type IPAMCIDRStatus string
+
+const (
+	IPAMCIDRStatus_advertised         IPAMCIDRStatus = "advertised"
+	IPAMCIDRStatus_advertising        IPAMCIDRStatus = "advertising"
+	IPAMCIDRStatus_deprovisioned      IPAMCIDRStatus = "deprovisioned"
+	IPAMCIDRStatus_deprovisioning     IPAMCIDRStatus = "deprovisioning"
+	IPAMCIDRStatus_failed_advertise   IPAMCIDRStatus = "failed-advertise"
+	IPAMCIDRStatus_failed_deprovision IPAMCIDRStatus = "failed-deprovision"
+	IPAMCIDRStatus_failed_provision   IPAMCIDRStatus = "failed-provision"
+	IPAMCIDRStatus_failed_withdraw    IPAMCIDRStatus = "failed-withdraw"
+	IPAMCIDRStatus_provisioned        IPAMCIDRStatus = "provisioned"
+	IPAMCIDRStatus_provisioning       IPAMCIDRStatus = "provisioning"
+	IPAMCIDRStatus_withdrawing        IPAMCIDRStatus = "withdrawing"
+	IPAMCIDRStatus_withdrawn          IPAMCIDRStatus = "withdrawn"
+)
+
 type IPAddressType string
 
 const (
@@ -365,11 +382,26 @@ const (
 	SSLSupportMethod_vip       SSLSupportMethod = "vip"
 )
 
+type TrustStoreStatus string
+
+const (
+	TrustStoreStatus_active  TrustStoreStatus = "active"
+	TrustStoreStatus_failed  TrustStoreStatus = "failed"
+	TrustStoreStatus_pending TrustStoreStatus = "pending"
+)
+
 type ValidationTokenHost string
 
 const (
 	ValidationTokenHost_cloudfront  ValidationTokenHost = "cloudfront"
 	ValidationTokenHost_self_hosted ValidationTokenHost = "self-hosted"
+)
+
+type ViewerMtlsMode string
+
+const (
+	ViewerMtlsMode_optional ViewerMtlsMode = "optional"
+	ViewerMtlsMode_required ViewerMtlsMode = "required"
 )
 
 type ViewerProtocolPolicy string

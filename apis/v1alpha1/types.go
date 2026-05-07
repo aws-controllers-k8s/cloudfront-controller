@@ -127,6 +127,14 @@ type AnycastIPListSummary struct {
 	Status           *string      `json:"status,omitempty"`
 }
 
+// The CA certificates bundle location in Amazon S3.
+type CaCertificatesBundleS3Location struct {
+	Bucket  *string `json:"bucket,omitempty"`
+	Key     *string `json:"key,omitempty"`
+	Region  *string `json:"region,omitempty"`
+	Version *string `json:"version,omitempty"`
+}
+
 // A complex type that describes how CloudFront processes requests.
 //
 // You must create at least as many cache behaviors (including the default cache
@@ -378,6 +386,16 @@ type CachePolicy_SDK struct {
 	LastModifiedTime  *metav1.Time       `json:"lastModifiedTime,omitempty"`
 }
 
+// A complex type that specifies the HTTP header name from which CloudFront
+// extracts cache tags from origin responses. When you add CacheTagConfig to
+// a distribution, CloudFront reads the specified header from origin responses,
+// parses the comma-separated tag values, and stores them with the cached object.
+// You can then invalidate cached objects by tag using the CreateInvalidation
+// API.
+type CacheTagConfig struct {
+	HeaderName *string `json:"headerName,omitempty"`
+}
+
 // A complex type that controls whether CloudFront caches the response to requests
 // using the specified HTTP methods. There are two choices:
 //
@@ -417,6 +435,31 @@ type ConflictingAliasesList struct {
 	MaxItems   *int64  `json:"maxItems,omitempty"`
 	NextMarker *string `json:"nextMarker,omitempty"`
 	Quantity   *int64  `json:"quantity,omitempty"`
+}
+
+// A connection function association.
+type ConnectionFunctionAssociation struct {
+	ID *string `json:"id,omitempty"`
+}
+
+// A connection function summary.
+type ConnectionFunctionSummary struct {
+	ConnectionFunctionARN *string `json:"connectionFunctionARN,omitempty"`
+	// Contains configuration information about a CloudFront function.
+	ConnectionFunctionConfig *FunctionConfig `json:"connectionFunctionConfig,omitempty"`
+	CreatedTime              *metav1.Time    `json:"createdTime,omitempty"`
+	ID                       *string         `json:"id,omitempty"`
+	LastModifiedTime         *metav1.Time    `json:"lastModifiedTime,omitempty"`
+	Name                     *string         `json:"name,omitempty"`
+	Stage                    *string         `json:"stage,omitempty"`
+	Status                   *string         `json:"status,omitempty"`
+}
+
+// A connection function test result.
+type ConnectionFunctionTestResult struct {
+	ComputeUtilization             *string `json:"computeUtilization,omitempty"`
+	ConnectionFunctionErrorMessage *string `json:"connectionFunctionErrorMessage,omitempty"`
+	ConnectionFunctionOutput       *string `json:"connectionFunctionOutput,omitempty"`
 }
 
 // The connection group for your distribution tenants. When you first create
@@ -571,8 +614,10 @@ type CustomOriginConfig struct {
 	HTTPSPort              *int64  `json:"httpSPort,omitempty"`
 	IPAddressType          *string `json:"ipAddressType,omitempty"`
 	OriginKeepaliveTimeout *int64  `json:"originKeepaliveTimeout,omitempty"`
-	OriginProtocolPolicy   *string `json:"originProtocolPolicy,omitempty"`
-	OriginReadTimeout      *int64  `json:"originReadTimeout,omitempty"`
+	// Configures mutual TLS authentication between CloudFront and your origin server.
+	OriginMtlsConfig     *OriginMtlsConfig `json:"originMtlsConfig,omitempty"`
+	OriginProtocolPolicy *string           `json:"originProtocolPolicy,omitempty"`
+	OriginReadTimeout    *int64            `json:"originReadTimeout,omitempty"`
 	// A complex type that contains information about the SSL/TLS protocols that
 	// CloudFront can use when establishing an HTTPS connection with your origin.
 	OriginSSLProtocols *OriginSSLProtocols `json:"originSSLProtocols,omitempty"`
@@ -673,10 +718,19 @@ type DistributionConfig struct {
 	// if any, for this distribution.
 	Aliases *Aliases `json:"aliases,omitempty"`
 	// A complex type that contains zero or more CacheBehavior elements.
-	CacheBehaviors               *CacheBehaviors `json:"cacheBehaviors,omitempty"`
-	Comment                      *string         `json:"comment,omitempty"`
-	ConnectionMode               *string         `json:"connectionMode,omitempty"`
-	ContinuousDeploymentPolicyID *string         `json:"continuousDeploymentPolicyID,omitempty"`
+	CacheBehaviors *CacheBehaviors `json:"cacheBehaviors,omitempty"`
+	// A complex type that specifies the HTTP header name from which CloudFront
+	// extracts cache tags from origin responses. When you add CacheTagConfig to
+	// a distribution, CloudFront reads the specified header from origin responses,
+	// parses the comma-separated tag values, and stores them with the cached object.
+	// You can then invalidate cached objects by tag using the CreateInvalidation
+	// API.
+	CacheTagConfig *CacheTagConfig `json:"cacheTagConfig,omitempty"`
+	Comment        *string         `json:"comment,omitempty"`
+	// A connection function association.
+	ConnectionFunctionAssociation *ConnectionFunctionAssociation `json:"connectionFunctionAssociation,omitempty"`
+	ConnectionMode                *string                        `json:"connectionMode,omitempty"`
+	ContinuousDeploymentPolicyID  *string                        `json:"continuousDeploymentPolicyID,omitempty"`
 	// A complex type that controls:
 	//
 	//    * Whether CloudFront replaces HTTP status codes in the 4xx and 5xx range
@@ -770,7 +824,9 @@ type DistributionConfig struct {
 	// and Using Alternate Domain Names and HTTPS (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https-alternate-domain-names.html)
 	// in the Amazon CloudFront Developer Guide.
 	ViewerCertificate *ViewerCertificate `json:"viewerCertificate,omitempty"`
-	WebACLID          *string            `json:"webACLID,omitempty"`
+	// A viewer mTLS configuration.
+	ViewerMtlsConfig *ViewerMtlsConfig `json:"viewerMtlsConfig,omitempty"`
+	WebACLID         *string           `json:"webACLID,omitempty"`
 }
 
 // A distribution Configuration and a list of tags to be associated with the
@@ -833,7 +889,9 @@ type DistributionSummary struct {
 	// A complex type that contains zero or more CacheBehavior elements.
 	CacheBehaviors *CacheBehaviors `json:"cacheBehaviors,omitempty"`
 	Comment        *string         `json:"comment,omitempty"`
-	ConnectionMode *string         `json:"connectionMode,omitempty"`
+	// A connection function association.
+	ConnectionFunctionAssociation *ConnectionFunctionAssociation `json:"connectionFunctionAssociation,omitempty"`
+	ConnectionMode                *string                        `json:"connectionMode,omitempty"`
 	// A complex type that controls:
 	//
 	//    * Whether CloudFront replaces HTTP status codes in the 4xx and 5xx range
@@ -912,7 +970,9 @@ type DistributionSummary struct {
 	// and Using Alternate Domain Names and HTTPS (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https-alternate-domain-names.html)
 	// in the Amazon CloudFront Developer Guide.
 	ViewerCertificate *ViewerCertificate `json:"viewerCertificate,omitempty"`
-	WebACLID          *string            `json:"webACLID,omitempty"`
+	// A viewer mTLS configuration.
+	ViewerMtlsConfig *ViewerMtlsConfig `json:"viewerMtlsConfig,omitempty"`
+	WebACLID         *string           `json:"webACLID,omitempty"`
 }
 
 // The distribution tenant.
@@ -1197,6 +1257,20 @@ type GeoRestrictionCustomization struct {
 // Contains a list of HTTP header names.
 type Headers struct {
 	Items []*string `json:"items,omitempty"`
+}
+
+// Configuration for an IPAM CIDR that defines a specific IP address range,
+// IPAM pool, and associated Anycast IP address.
+type IPAMCIDRConfig struct {
+	AnycastIP   *string `json:"anycastIP,omitempty"`
+	CIDR        *string `json:"cidr,omitempty"`
+	IPAMPoolARN *string `json:"ipamPoolARN,omitempty"`
+}
+
+// The configuration IPAM settings that includes the quantity of CIDR configurations
+// and the list of IPAM CIDR configurations.
+type IPAMConfig struct {
+	Quantity *int64 `json:"quantity,omitempty"`
 }
 
 // The import source for the key value store.
@@ -1524,6 +1598,11 @@ type OriginGroupMembers struct {
 type OriginGroups struct {
 	// List of origin groups for a distribution.
 	Items []*OriginGroup `json:"items,omitempty"`
+}
+
+// Configures mutual TLS authentication between CloudFront and your origin server.
+type OriginMtlsConfig struct {
+	ClientCertificateARN *string `json:"clientCertificateARN,omitempty"`
 }
 
 // An origin request policy configuration.
@@ -2341,6 +2420,34 @@ type TestResult struct {
 	FunctionSummary *FunctionSummary `json:"functionSummary,omitempty"`
 }
 
+// A trust store.
+type TrustStore struct {
+	ARN                    *string      `json:"arn,omitempty"`
+	ID                     *string      `json:"id,omitempty"`
+	LastModifiedTime       *metav1.Time `json:"lastModifiedTime,omitempty"`
+	Name                   *string      `json:"name,omitempty"`
+	NumberOfCaCertificates *int64       `json:"numberOfCaCertificates,omitempty"`
+	Reason                 *string      `json:"reason,omitempty"`
+}
+
+// A trust store configuration.
+type TrustStoreConfig struct {
+	AdvertiseTrustStoreCaNames *bool   `json:"advertiseTrustStoreCaNames,omitempty"`
+	IgnoreCertificateExpiry    *bool   `json:"ignoreCertificateExpiry,omitempty"`
+	TrustStoreID               *string `json:"trustStoreID,omitempty"`
+}
+
+// A trust store summary.
+type TrustStoreSummary struct {
+	ARN                    *string      `json:"arn,omitempty"`
+	ETag                   *string      `json:"eTag,omitempty"`
+	ID                     *string      `json:"id,omitempty"`
+	LastModifiedTime       *metav1.Time `json:"lastModifiedTime,omitempty"`
+	Name                   *string      `json:"name,omitempty"`
+	NumberOfCaCertificates *int64       `json:"numberOfCaCertificates,omitempty"`
+	Reason                 *string      `json:"reason,omitempty"`
+}
+
 // A list of key groups whose public keys CloudFront can use to verify the signatures
 // of signed URLs and signed cookies.
 type TrustedKeyGroups struct {
@@ -2465,6 +2572,13 @@ type ViewerCertificate struct {
 	IAMCertificateID             *string                                  `json:"iamCertificateID,omitempty"`
 	MinimumProtocolVersion       *string                                  `json:"minimumProtocolVersion,omitempty"`
 	SSLSupportMethod             *string                                  `json:"sslSupportMethod,omitempty"`
+}
+
+// A viewer mTLS configuration.
+type ViewerMtlsConfig struct {
+	Mode *string `json:"mode,omitempty"`
+	// A trust store configuration.
+	TrustStoreConfig *TrustStoreConfig `json:"trustStoreConfig,omitempty"`
 }
 
 // The WAF web ACL customization specified for the distribution tenant.
