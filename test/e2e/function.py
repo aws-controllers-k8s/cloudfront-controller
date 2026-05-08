@@ -83,14 +83,22 @@ def wait_until_deleted(
             break
 
 
-def get(function_name):
+def get(function_name, stage="DEVELOPMENT"):
     """Returns a dict containing the Function record from the CloudFront
     API.
     If no such Function exists, returns None.
     """
     c = boto3.client('cloudfront')
     try:
-        resp = c.describe_function(Name=function_name)
+        resp = c.describe_function(Name=function_name, Stage=stage)
         return resp['FunctionSummary']
     except Exception:
         return None
+
+
+def get_live(function_name):
+    """Returns a dict containing the LIVE stage Function record from the
+    CloudFront API.
+    If no such Function exists in the LIVE stage, returns None.
+    """
+    return get(function_name, stage="LIVE")

@@ -40,6 +40,7 @@ func newResourceDelta(
 		delta.Add("", a, b)
 		return delta
 	}
+	customPreCompare(delta, a, b)
 
 	if !bytes.Equal(a.ko.Spec.FunctionCode, b.ko.Spec.FunctionCode) {
 		delta.Add("Spec.FunctionCode", a.ko.Spec.FunctionCode, b.ko.Spec.FunctionCode)

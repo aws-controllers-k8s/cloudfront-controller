@@ -3240,6 +3240,11 @@ func (in *FunctionStatus) DeepCopyInto(out *FunctionStatus) {
 		*out = new(FunctionSummary)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.LiveETag != nil {
+		in, out := &in.LiveETag, &out.LiveETag
+		*out = new(string)
+		**out = **in
+	}
 	if in.Location != nil {
 		in, out := &in.Location, &out.Location
 		*out = new(string)

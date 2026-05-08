@@ -259,6 +259,11 @@ func (rm *resourceManager) sdkCreate(
 	}
 
 	rm.setStatusDefaults(ko)
+	if functionAutoPublishEnabled(ko) {
+		msg := "function created successfully. Requeue to autopublish"
+		ackcondition.SetSynced(&resource{ko}, corev1.ConditionFalse, &msg, nil)
+	}
+
 	return &resource{ko}, nil
 }
 
@@ -364,6 +369,12 @@ func (rm *resourceManager) sdkUpdate(
 	}
 
 	rm.setStatusDefaults(ko)
+	if functionAutoPublishEnabled(ko) {
+		if err := rm.publishFunction(ctx, ko); err != nil {
+			return &resource{ko}, err
+		}
+	}
+
 	return &resource{ko}, nil
 }
 
