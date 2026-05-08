@@ -318,8 +318,26 @@ spec:
                           type: object
                         type: array
                     type: object
+                  cacheTagConfig:
+                    description: |-
+                      A complex type that specifies the HTTP header name from which CloudFront
+                      extracts cache tags from origin responses. When you add CacheTagConfig to
+                      a distribution, CloudFront reads the specified header from origin responses,
+                      parses the comma-separated tag values, and stores them with the cached object.
+                      You can then invalidate cached objects by tag using the CreateInvalidation
+                      API.
+                    properties:
+                      headerName:
+                        type: string
+                    type: object
                   comment:
                     type: string
+                  connectionFunctionAssociation:
+                    description: A connection function association.
+                    properties:
+                      id:
+                        type: string
+                    type: object
                   connectionMode:
                     type: string
                   continuousDeploymentPolicyID:
@@ -750,6 +768,13 @@ spec:
                                 originKeepaliveTimeout:
                                   format: int64
                                   type: integer
+                                originMtlsConfig:
+                                  description: Configures mutual TLS authentication
+                                    between CloudFront and your origin server.
+                                  properties:
+                                    clientCertificateARN:
+                                      type: string
+                                  type: object
                                 originProtocolPolicy:
                                   type: string
                                 originReadTimeout:
@@ -947,6 +972,22 @@ spec:
                         type: string
                       sslSupportMethod:
                         type: string
+                    type: object
+                  viewerMtlsConfig:
+                    description: A viewer mTLS configuration.
+                    properties:
+                      mode:
+                        type: string
+                      trustStoreConfig:
+                        description: A trust store configuration.
+                        properties:
+                          advertiseTrustStoreCaNames:
+                            type: boolean
+                          ignoreCertificateExpiry:
+                            type: boolean
+                          trustStoreID:
+                            type: string
+                        type: object
                     type: object
                   webACLID:
                     type: string
