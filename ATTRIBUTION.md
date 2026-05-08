@@ -1957,6 +1957,10 @@ License Identifier: Apache-2.0
 Subdependencies:
 * `github.com/aws/smithy-go`
 
+#### github.com/aws/smithy-go
+
+License Identifier: Apache-2.0
+
 ### github.com/aws/aws-sdk-go-v2/service/cloudfront
 
 License Identifier: Apache-2.0
@@ -1966,10 +1970,6 @@ Subdependencies:
 * `github.com/aws/aws-sdk-go-v2/internal/configsources`
 * `github.com/aws/aws-sdk-go-v2/internal/endpoints/v2`
 * `github.com/aws/smithy-go`
-
-#### github.com/aws/aws-sdk-go-v2
-
-License Identifier: Apache-2.0
 
 
 
