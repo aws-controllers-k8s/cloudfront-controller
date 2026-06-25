@@ -26,6 +26,7 @@ import (
 	acktypes "github.com/aws-controllers-k8s/runtime/pkg/types"
 	ackrtutil "github.com/aws-controllers-k8s/runtime/pkg/util"
 	ackrtwebhook "github.com/aws-controllers-k8s/runtime/pkg/webhook"
+	wafv2apitypes "github.com/aws-controllers-k8s/wafv2-controller/apis/v1alpha1"
 	flag "github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -64,6 +65,7 @@ func init() {
 	_ = svctypes.AddToScheme(scheme)
 	_ = ackv1alpha1.AddToScheme(scheme)
 	_ = acmapitypes.AddToScheme(scheme)
+	_ = wafv2apitypes.AddToScheme(scheme)
 }
 
 func main() {

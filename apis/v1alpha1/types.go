@@ -827,6 +827,8 @@ type DistributionConfig struct {
 	// A viewer mTLS configuration.
 	ViewerMtlsConfig *ViewerMtlsConfig `json:"viewerMtlsConfig,omitempty"`
 	WebACLID         *string           `json:"webACLID,omitempty"`
+	// Reference field for WebACLID
+	WebACLRef *ackv1alpha1.AWSResourceReferenceWrapper `json:"webACLRef,omitempty"`
 }
 
 // A distribution Configuration and a list of tags to be associated with the
