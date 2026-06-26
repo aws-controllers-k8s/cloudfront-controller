@@ -28,12 +28,16 @@ import (
 	ackerr "github.com/aws-controllers-k8s/runtime/pkg/errors"
 	ackrt "github.com/aws-controllers-k8s/runtime/pkg/runtime"
 	acktypes "github.com/aws-controllers-k8s/runtime/pkg/types"
+	wafv2apitypes "github.com/aws-controllers-k8s/wafv2-controller/apis/v1alpha1"
 
 	svcapitypes "github.com/aws-controllers-k8s/cloudfront-controller/apis/v1alpha1"
 )
 
 // +kubebuilder:rbac:groups=acm.services.k8s.aws,resources=certificates,verbs=get;list
 // +kubebuilder:rbac:groups=acm.services.k8s.aws,resources=certificates/status,verbs=get;list
+
+// +kubebuilder:rbac:groups=wafv2.services.k8s.aws,resources=webacls,verbs=get;list
+// +kubebuilder:rbac:groups=wafv2.services.k8s.aws,resources=webacls/status,verbs=get;list
 
 // ClearResolvedReferences removes any reference values that were made
 // concrete in the spec. It returns a copy of the input AWSResource which
@@ -47,6 +51,12 @@ func (rm *resourceManager) ClearResolvedReferences(res acktypes.AWSResource) ack
 			if ko.Spec.DistributionConfig.ViewerCertificate.ACMCertificateRef != nil {
 				ko.Spec.DistributionConfig.ViewerCertificate.ACMCertificateARN = nil
 			}
+		}
+	}
+
+	if ko.Spec.DistributionConfig != nil {
+		if ko.Spec.DistributionConfig.WebACLRef != nil {
+			ko.Spec.DistributionConfig.WebACLID = nil
 		}
 	}
 
@@ -75,6 +85,12 @@ func (rm *resourceManager) ResolveReferences(
 		resourceHasReferences = resourceHasReferences || fieldHasReferences
 	}
 
+	if fieldHasReferences, err := rm.resolveReferenceForDistributionConfig_WebACLID(ctx, apiReader, ko); err != nil {
+		return &resource{ko}, (resourceHasReferences || fieldHasReferences), err
+	} else {
+		resourceHasReferences = resourceHasReferences || fieldHasReferences
+	}
+
 	return &resource{ko}, resourceHasReferences, err
 }
 
@@ -87,6 +103,12 @@ func validateReferenceFields(ko *svcapitypes.Distribution) error {
 			if ko.Spec.DistributionConfig.ViewerCertificate.ACMCertificateRef != nil && ko.Spec.DistributionConfig.ViewerCertificate.ACMCertificateARN != nil {
 				return ackerr.ResourceReferenceAndIDNotSupportedFor("DistributionConfig.ViewerCertificate.ACMCertificateARN", "DistributionConfig.ViewerCertificate.ACMCertificateRef")
 			}
+		}
+	}
+
+	if ko.Spec.DistributionConfig != nil {
+		if ko.Spec.DistributionConfig.WebACLRef != nil && ko.Spec.DistributionConfig.WebACLID != nil {
+			return ackerr.ResourceReferenceAndIDNotSupportedFor("DistributionConfig.WebACLID", "DistributionConfig.WebACLRef")
 		}
 	}
 	return nil
@@ -181,6 +203,99 @@ func getReferencedResourceState_Certificate(
 	if obj.Status.ACKResourceMetadata == nil || obj.Status.ACKResourceMetadata.ARN == nil {
 		return ackerr.ResourceReferenceMissingTargetFieldFor(
 			"Certificate",
+			namespace, name,
+			"Status.ACKResourceMetadata.ARN")
+	}
+	return nil
+}
+
+// resolveReferenceForDistributionConfig_WebACLID reads the resource referenced
+// from DistributionConfig.WebACLRef field and sets the DistributionConfig.WebACLID
+// from referenced resource. Returns a boolean indicating whether a reference
+// contains references, or an error
+func (rm *resourceManager) resolveReferenceForDistributionConfig_WebACLID(
+	ctx context.Context,
+	apiReader client.Reader,
+	ko *svcapitypes.Distribution,
+) (hasReferences bool, err error) {
+	if ko.Spec.DistributionConfig != nil {
+		if ko.Spec.DistributionConfig.WebACLRef != nil && ko.Spec.DistributionConfig.WebACLRef.From != nil {
+			hasReferences = true
+			arr := ko.Spec.DistributionConfig.WebACLRef.From
+			if arr.Name == nil || *arr.Name == "" {
+				return hasReferences, fmt.Errorf("provided resource reference is nil or empty: DistributionConfig.WebACLRef")
+			}
+			namespace, err := ackrt.ResolveCrossNamespaceReference(
+				ctx,
+				rm.cfg.EnableCrossNamespace,
+				&ko.Status.Conditions,
+				ackrt.CrossNamespaceRefKindResource,
+				ko.ObjectMeta.GetNamespace(),
+				arr.Namespace,
+				*arr.Name,
+			)
+			if err != nil {
+				return hasReferences, err
+			}
+			obj := &wafv2apitypes.WebACL{}
+			if err := getReferencedResourceState_WebACL(ctx, apiReader, obj, *arr.Name, namespace); err != nil {
+				return hasReferences, err
+			}
+			ko.Spec.DistributionConfig.WebACLID = (*string)(obj.Status.ACKResourceMetadata.ARN)
+		}
+	}
+
+	return hasReferences, nil
+}
+
+// getReferencedResourceState_WebACL looks up whether a referenced resource
+// exists and is in a ACK.ResourceSynced=True state. If the referenced resource does exist and is
+// in a Synced state, returns nil, otherwise returns `ackerr.ResourceReferenceTerminalFor` or
+// `ResourceReferenceNotSyncedFor` depending on if the resource is in a Terminal state.
+func getReferencedResourceState_WebACL(
+	ctx context.Context,
+	apiReader client.Reader,
+	obj *wafv2apitypes.WebACL,
+	name string, // the Kubernetes name of the referenced resource
+	namespace string, // the Kubernetes namespace of the referenced resource
+) error {
+	namespacedName := types.NamespacedName{
+		Namespace: namespace,
+		Name:      name,
+	}
+	err := apiReader.Get(ctx, namespacedName, obj)
+	if err != nil {
+		return err
+	}
+	var refResourceTerminal bool
+	for _, cond := range obj.Status.Conditions {
+		if cond.Type == ackv1alpha1.ConditionTypeTerminal &&
+			cond.Status == corev1.ConditionTrue {
+			return ackerr.ResourceReferenceTerminalFor(
+				"WebACL",
+				namespace, name)
+		}
+	}
+	if refResourceTerminal {
+		return ackerr.ResourceReferenceTerminalFor(
+			"WebACL",
+			namespace, name)
+	}
+	var refResourceSynced bool
+	for _, cond := range obj.Status.Conditions {
+		if cond.Type == ackv1alpha1.ConditionTypeResourceSynced &&
+			cond.Status == corev1.ConditionTrue {
+			refResourceSynced = true
+		}
+	}
+	if !refResourceSynced {
+		return ackerr.ResourceReferenceNotSyncedFor(
+			"WebACL",
+			namespace, name)
+	}
+	if obj.Status.ACKResourceMetadata == nil || obj.Status.ACKResourceMetadata.ARN == nil {
+		return ackerr.ResourceReferenceMissingTargetFieldFor(
+			"WebACL",
 			namespace, name,
 			"Status.ACKResourceMetadata.ARN")
 	}

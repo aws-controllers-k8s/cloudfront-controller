@@ -84,3 +84,11 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - wafv2.services.k8s.aws
+  resources:
+  - webacls
+  - webacls/status
+  verbs:
+  - get
+  - list

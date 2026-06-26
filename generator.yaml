@@ -240,6 +240,11 @@ resources:
           service_name: acm
           resource: Certificate
           path: Status.ACKResourceMetadata.ARN
+      DistributionConfig.WebACLID:
+        references:
+          service_name: wafv2
+          resource: WebACL
+          path: Status.ACKResourceMetadata.ARN
       DistributionConfig.Origins.Items.CustomOriginConfig.HTTPSPort:
         go_tag: json:"httpSPort,omitempty"
   Function:
