@@ -1,0 +1,11 @@
+apiVersion: cloudfront.services.k8s.aws/v1alpha1
+kind: ConnectionGroup
+metadata:
+  name: $CONNECTION_GROUP_NAME
+spec:
+  name: $CONNECTION_GROUP_NAME
+  enabled: $CONNECTION_GROUP_ENABLED
+  ipv6Enabled: $CONNECTION_GROUP_IPV6_ENABLED
+  tags:
+    - key: hello
+      value: world
