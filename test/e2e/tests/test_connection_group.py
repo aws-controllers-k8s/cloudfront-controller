@@ -27,7 +27,8 @@ from e2e import connection_group
 
 CONNECTION_GROUP_RESOURCE_PLURAL = "connectiongroups"
 DELETE_WAIT_AFTER_SECONDS = 10
-CHECK_STATUS_WAIT_SECONDS = 10
+CHECK_STATUS_WAIT_SECONDS = 60
+CHECK_STATUS_WAIT_PERIODS = 20
 MODIFY_WAIT_AFTER_SECONDS = 10
 
 
@@ -84,7 +85,13 @@ class TestConnectionGroup:
     def test_crud(self, simple_connection_group):
         ref, _, connection_group_id = simple_connection_group
 
-        time.sleep(CHECK_STATUS_WAIT_SECONDS)
+        assert k8s.wait_on_condition(
+            ref,
+            "ACK.ResourceSynced",
+            "True",
+            wait_periods=CHECK_STATUS_WAIT_PERIODS,
+            period_length=CHECK_STATUS_WAIT_SECONDS
+        )
 
         cr = k8s.get_resource(ref)
         assert cr is not None
@@ -92,8 +99,6 @@ class TestConnectionGroup:
         assert 'name' in cr['spec']
         assert cr['spec']['enabled'] is True
         assert cr['spec']['ipv6Enabled'] is True
-
-        condition.assert_synced(ref)
 
         # Verify the resource state in the CloudFront API matches the spec,
         # including the tags applied at create time.
@@ -141,3 +146,21 @@ class TestConnectionGroup:
 
         response_tags = connection_group.get_tags(arn)
         assert {"Key": "new_key", "Value": "new_value"} in response_tags
+        assert {"Key": "hello", "Value": "world"} not in response_tags
+
+        # Test: Name field cannot be updated
+        updates = {
+            "spec": {
+                "name": "new_cg_name"
+            }
+        }
+        try:
+            k8s.patch_custom_resource(ref, updates)
+            time.sleep(MODIFY_WAIT_AFTER_SECONDS)
+        except k8s.ApiException:
+            k8s.assert_condition_state_message(
+                ref, 
+                k8s.ApiException, 
+                "FieldInvalidValue", 
+                "Invalid value: \"new_cg_name\": Value is immutable once set"
+            )

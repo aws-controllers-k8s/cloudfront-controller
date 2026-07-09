@@ -4,6 +4,8 @@
 	// once the disable has taken effect.
 	if r.ko.Spec.Enabled != nil && *r.ko.Spec.Enabled {
 		r.ko.Spec.Enabled = aws.Bool(false)
+		// An empty path here works because it is a non-Tags change, 
+		// forcing an update which then disables the resource without calling syncTags
 		_, err = rm.sdkUpdate(ctx, r, r, &ackcompare.Delta{
 			Differences: []*ackcompare.Difference{&ackcompare.Difference{Path: ackcompare.Path{}, A: nil, B: nil}},
 		})
