@@ -148,19 +148,7 @@ class TestConnectionGroup:
         assert {"Key": "new_key", "Value": "new_value"} in response_tags
         assert {"Key": "hello", "Value": "world"} not in response_tags
 
-        # Test: Name field cannot be updated
-        updates = {
-            "spec": {
-                "name": "new_cg_name"
-            }
-        }
-        try:
-            k8s.patch_custom_resource(ref, updates)
-            time.sleep(MODIFY_WAIT_AFTER_SECONDS)
-        except k8s.ApiException:
-            k8s.assert_condition_state_message(
-                ref, 
-                k8s.ApiException, 
-                "FieldInvalidValue", 
-                "Invalid value: \"new_cg_name\": Value is immutable once set"
-            )
+        # Test: Name field is immutable and rejected by the API server
+        with pytest.raises(k8s.ApiException) as exc:
+            k8s.patch_custom_resource(ref, {"spec": {"name": "new_cg_name"}})
+        assert "Value is immutable once set" in str(exc.value.body)
