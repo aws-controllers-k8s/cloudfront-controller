@@ -81,6 +81,7 @@ rules:
   - cloudfront.services.k8s.aws
   resources:
   - cachepolicies
+  - connectiongroups
   - distributions
   - functions
   - originaccesscontrols
@@ -99,6 +100,7 @@ rules:
   - cloudfront.services.k8s.aws
   resources:
   - cachepolicies/status
+  - connectiongroups/status
   - distributions/status
   - functions/status
   - originaccesscontrols/status

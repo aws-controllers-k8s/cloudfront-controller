@@ -462,25 +462,6 @@ type ConnectionFunctionTestResult struct {
 	ConnectionFunctionOutput       *string `json:"connectionFunctionOutput,omitempty"`
 }
 
-// The connection group for your distribution tenants. When you first create
-// a distribution tenant and you don't specify a connection group, CloudFront
-// will automatically create a default connection group for you. When you create
-// a new distribution tenant and don't specify a connection group, the default
-// one will be associated with your distribution tenant.
-type ConnectionGroup struct {
-	AnycastIPListID  *string      `json:"anycastIPListID,omitempty"`
-	ARN              *string      `json:"arn,omitempty"`
-	CreatedTime      *metav1.Time `json:"createdTime,omitempty"`
-	Enabled          *bool        `json:"enabled,omitempty"`
-	ID               *string      `json:"id,omitempty"`
-	IPv6Enabled      *bool        `json:"ipv6Enabled,omitempty"`
-	IsDefault        *bool        `json:"isDefault,omitempty"`
-	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
-	Name             *string      `json:"name,omitempty"`
-	RoutingEndpoint  *string      `json:"routingEndpoint,omitempty"`
-	Status           *string      `json:"status,omitempty"`
-}
-
 // Contains information about what CloudFront resources your connection groups
 // are associated with.
 type ConnectionGroupAssociationFilter struct {
@@ -495,6 +476,25 @@ type ConnectionGroupSummary struct {
 	ETag             *string      `json:"eTag,omitempty"`
 	Enabled          *bool        `json:"enabled,omitempty"`
 	ID               *string      `json:"id,omitempty"`
+	IsDefault        *bool        `json:"isDefault,omitempty"`
+	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
+	Name             *string      `json:"name,omitempty"`
+	RoutingEndpoint  *string      `json:"routingEndpoint,omitempty"`
+	Status           *string      `json:"status,omitempty"`
+}
+
+// The connection group for your distribution tenants. When you first create
+// a distribution tenant and you don't specify a connection group, CloudFront
+// will automatically create a default connection group for you. When you create
+// a new distribution tenant and don't specify a connection group, the default
+// one will be associated with your distribution tenant.
+type ConnectionGroup_SDK struct {
+	AnycastIPListID  *string      `json:"anycastIPListID,omitempty"`
+	ARN              *string      `json:"arn,omitempty"`
+	CreatedTime      *metav1.Time `json:"createdTime,omitempty"`
+	Enabled          *bool        `json:"enabled,omitempty"`
+	ID               *string      `json:"id,omitempty"`
+	IPv6Enabled      *bool        `json:"ipv6Enabled,omitempty"`
 	IsDefault        *bool        `json:"isDefault,omitempty"`
 	LastModifiedTime *metav1.Time `json:"lastModifiedTime,omitempty"`
 	Name             *string      `json:"name,omitempty"`
