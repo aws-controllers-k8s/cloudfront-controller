@@ -1,0 +1,11 @@
+apiVersion: cloudfront.services.k8s.aws/v1alpha1
+kind: DistributionTenant
+metadata:
+  name: $DISTRIBUTION_TENANT_NAME
+spec:
+  name: $DISTRIBUTION_TENANT_NAME
+  distributionID: $DISTRIBUTION_ID
+  connectionGroupID: $CONNECTION_GROUP_ID
+  enabled: true
+  domains:
+    - domain: $DISTRIBUTION_TENANT_DOMAIN

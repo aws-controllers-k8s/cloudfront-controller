@@ -83,6 +83,7 @@ rules:
   - cachepolicies
   - connectiongroups
   - distributions
+  - distributiontenants
   - functions
   - originaccesscontrols
   - originrequestpolicies
@@ -102,6 +103,7 @@ rules:
   - cachepolicies/status
   - connectiongroups/status
   - distributions/status
+  - distributiontenants/status
   - functions/status
   - originaccesscontrols/status
   - originrequestpolicies/status

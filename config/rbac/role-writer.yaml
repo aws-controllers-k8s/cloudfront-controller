@@ -12,6 +12,7 @@ rules:
   - cachepolicies
   - connectiongroups
   - distributions
+  - distributiontenants
   - functions
   - originaccesscontrols
   - originrequestpolicies
@@ -31,6 +32,7 @@ rules:
   - cachepolicies
   - connectiongroups
   - distributions
+  - distributiontenants
   - functions
   - originaccesscontrols
   - originrequestpolicies

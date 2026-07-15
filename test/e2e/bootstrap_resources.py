@@ -19,12 +19,15 @@ from dataclasses import dataclass
 from acktest.bootstrapping import Resources
 from acktest.bootstrapping.s3 import Bucket
 from acktest.bootstrapping.elbv2 import NetworkLoadBalancer
+from e2e.cloudfront_bootstrap import ConnectionGroup, MultiTenantDistribution
 from e2e import bootstrap_directory
 
 @dataclass
 class BootstrapResources(Resources):
     PublicBucket: Bucket
     NetworkLoadBalancer: NetworkLoadBalancer
+    TenantConnectionGroup: ConnectionGroup
+    TenantDistribution: MultiTenantDistribution
     
 
 _bootstrap_resources = None
