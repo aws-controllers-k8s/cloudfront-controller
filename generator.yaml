@@ -254,12 +254,9 @@ resources:
     exceptions:
       terminal_codes:
         - EntityAlreadyExists
-        - EntityLimitExceeded
         - InvalidArgument
         - InvalidAssociation
         - InvalidTagging
-        - InvalidIfMatchVersion
-        - PreconditionFailed
         - CNAMEAlreadyExists
     synced:
       when:

@@ -921,12 +921,9 @@ func (rm *resourceManager) terminalAWSError(err error) bool {
 	}
 	switch terminalErr.ErrorCode() {
 	case "EntityAlreadyExists",
-		"EntityLimitExceeded",
 		"InvalidArgument",
 		"InvalidAssociation",
 		"InvalidTagging",
-		"InvalidIfMatchVersion",
-		"PreconditionFailed",
 		"CNAMEAlreadyExists":
 		return true
 	default:
