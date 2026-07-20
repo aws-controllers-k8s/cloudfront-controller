@@ -20,6 +20,7 @@ from acktest.bootstrapping.elbv2 import NetworkLoadBalancer
 
 from e2e import bootstrap_directory
 from e2e.bootstrap_resources import BootstrapResources
+from e2e.cloudfront_bootstrap import ConnectionGroup, MultiTenantDistribution
 
 public_bucket_policy = """{
     "Version":"2008-10-17",
@@ -36,18 +37,26 @@ public_bucket_policy = """{
 def service_bootstrap() -> Resources:
     logging.getLogger().setLevel(logging.INFO)
 
+    bucket = Bucket(
+        "ack-cloudfront-tests",
+        policy=public_bucket_policy, 
+    )
     resources = BootstrapResources(
-        PublicBucket=Bucket(
-            "ack-cloudfront-controller-tests",
-            policy=public_bucket_policy,
-        ),
+        PublicBucket=bucket,
         NetworkLoadBalancer=NetworkLoadBalancer(
             name_prefix="ack-cloudfront-tests",
             scheme="internal",
             num_public_subnet=1,
             num_private_subnet=1,
-            apply_security_group=True
-        )
+            apply_security_group=True,
+        ),
+        TenantConnectionGroup=ConnectionGroup(
+            name_prefix="ack-cf-tenant-cg",
+        ),
+        TenantDistribution=MultiTenantDistribution(
+            name_prefix="ack-cf-tenant-dist",
+            bucket_domain_name=f"{bucket.name}.s3.amazonaws.com",
+        ),
     )
 
     try:

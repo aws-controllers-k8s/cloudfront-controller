@@ -623,6 +623,21 @@ type CustomOriginConfig struct {
 	OriginSSLProtocols *OriginSSLProtocols `json:"originSSLProtocols,omitempty"`
 }
 
+// Customizations for the distribution tenant. For each distribution tenant,
+// you can specify the geographic restrictions, and the Amazon Resource Names
+// (ARNs) for the ACM certificate and WAF web ACL. These are specific values
+// that you can override or disable from the multi-tenant distribution that
+// was used to create the distribution tenant.
+type Customizations struct {
+	// The Certificate Manager (ACM) certificate associated with your distribution.
+	Certificate *Certificate `json:"certificate,omitempty"`
+	// The customizations that you specified for the distribution tenant for geographic
+	// restrictions.
+	GeoRestrictions *GeoRestrictionCustomization `json:"geoRestrictions,omitempty"`
+	// The WAF web ACL customization specified for the distribution tenant.
+	WebACL *WebACLCustomization `json:"webACL,omitempty"`
+}
+
 // The DNS configuration for your domain names.
 type DNSConfiguration struct {
 	Domain *string `json:"domain,omitempty"`
@@ -975,19 +990,6 @@ type DistributionSummary struct {
 	WebACLID         *string           `json:"webACLID,omitempty"`
 }
 
-// The distribution tenant.
-type DistributionTenant struct {
-	ARN               *string      `json:"arn,omitempty"`
-	ConnectionGroupID *string      `json:"connectionGroupID,omitempty"`
-	CreatedTime       *metav1.Time `json:"createdTime,omitempty"`
-	DistributionID    *string      `json:"distributionID,omitempty"`
-	Enabled           *bool        `json:"enabled,omitempty"`
-	ID                *string      `json:"id,omitempty"`
-	LastModifiedTime  *metav1.Time `json:"lastModifiedTime,omitempty"`
-	Name              *string      `json:"name,omitempty"`
-	Status            *string      `json:"status,omitempty"`
-}
-
 // Filter by the associated distribution ID or connection group ID.
 type DistributionTenantAssociationFilter struct {
 	ConnectionGroupID *string `json:"connectionGroupID,omitempty"`
@@ -999,13 +1001,41 @@ type DistributionTenantSummary struct {
 	ARN               *string      `json:"arn,omitempty"`
 	ConnectionGroupID *string      `json:"connectionGroupID,omitempty"`
 	CreatedTime       *metav1.Time `json:"createdTime,omitempty"`
-	DistributionID    *string      `json:"distributionID,omitempty"`
-	ETag              *string      `json:"eTag,omitempty"`
-	Enabled           *bool        `json:"enabled,omitempty"`
-	ID                *string      `json:"id,omitempty"`
-	LastModifiedTime  *metav1.Time `json:"lastModifiedTime,omitempty"`
-	Name              *string      `json:"name,omitempty"`
-	Status            *string      `json:"status,omitempty"`
+	// Customizations for the distribution tenant. For each distribution tenant,
+	// you can specify the geographic restrictions, and the Amazon Resource Names
+	// (ARNs) for the ACM certificate and WAF web ACL. These are specific values
+	// that you can override or disable from the multi-tenant distribution that
+	// was used to create the distribution tenant.
+	Customizations   *Customizations `json:"customizations,omitempty"`
+	DistributionID   *string         `json:"distributionID,omitempty"`
+	Domains          []*DomainResult `json:"domains,omitempty"`
+	ETag             *string         `json:"eTag,omitempty"`
+	Enabled          *bool           `json:"enabled,omitempty"`
+	ID               *string         `json:"id,omitempty"`
+	LastModifiedTime *metav1.Time    `json:"lastModifiedTime,omitempty"`
+	Name             *string         `json:"name,omitempty"`
+	Status           *string         `json:"status,omitempty"`
+}
+
+// The distribution tenant.
+type DistributionTenant_SDK struct {
+	ARN               *string      `json:"arn,omitempty"`
+	ConnectionGroupID *string      `json:"connectionGroupID,omitempty"`
+	CreatedTime       *metav1.Time `json:"createdTime,omitempty"`
+	// Customizations for the distribution tenant. For each distribution tenant,
+	// you can specify the geographic restrictions, and the Amazon Resource Names
+	// (ARNs) for the ACM certificate and WAF web ACL. These are specific values
+	// that you can override or disable from the multi-tenant distribution that
+	// was used to create the distribution tenant.
+	Customizations   *Customizations `json:"customizations,omitempty"`
+	DistributionID   *string         `json:"distributionID,omitempty"`
+	Domains          []*DomainResult `json:"domains,omitempty"`
+	Enabled          *bool           `json:"enabled,omitempty"`
+	ID               *string         `json:"id,omitempty"`
+	LastModifiedTime *metav1.Time    `json:"lastModifiedTime,omitempty"`
+	Name             *string         `json:"name,omitempty"`
+	Parameters       []*Parameter    `json:"parameters,omitempty"`
+	Status           *string         `json:"status,omitempty"`
 }
 
 // A distribution tells CloudFront where you want content to be delivered from,
@@ -1046,6 +1076,7 @@ type DomainItem struct {
 // The details about the domain result.
 type DomainResult struct {
 	Domain *string `json:"domain,omitempty"`
+	Status *string `json:"status,omitempty"`
 }
 
 // Complex data type for field-level encryption profiles that includes all of
@@ -1420,13 +1451,16 @@ type LoggingConfig struct {
 
 // Contains details about the CloudFront managed ACM certificate.
 type ManagedCertificateDetails struct {
-	CertificateARN *string `json:"certificateARN,omitempty"`
+	CertificateARN      *string `json:"certificateARN,omitempty"`
+	ValidationTokenHost *string `json:"validationTokenHost,omitempty"`
 }
 
 // An object that represents the request for the Amazon CloudFront managed ACM
 // certificate.
 type ManagedCertificateRequest struct {
-	PrimaryDomainName *string `json:"primaryDomainName,omitempty"`
+	CertificateTransparencyLoggingPreference *string `json:"certificateTransparencyLoggingPreference,omitempty"`
+	PrimaryDomainName                        *string `json:"primaryDomainName,omitempty"`
+	ValidationTokenHost                      *string `json:"validationTokenHost,omitempty"`
 }
 
 // An origin.
@@ -2583,5 +2617,6 @@ type ViewerMtlsConfig struct {
 
 // The WAF web ACL customization specified for the distribution tenant.
 type WebACLCustomization struct {
-	ARN *string `json:"arn,omitempty"`
+	Action *string `json:"action,omitempty"`
+	ARN    *string `json:"arn,omitempty"`
 }

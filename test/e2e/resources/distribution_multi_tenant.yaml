@@ -1,0 +1,19 @@
+apiVersion: cloudfront.services.k8s.aws/v1alpha1
+kind: Distribution
+metadata:
+  name: $DISTRIBUTION_NAME
+spec:
+  distributionConfig:
+    comment: $DISTRIBUTION_COMMENT
+    enabled: true
+    connectionMode: "tenant-only"
+    defaultCacheBehavior:
+      targetOriginID: $ORIGIN_ID
+      viewerProtocolPolicy: allow-all
+      cachePolicyID: $CACHE_POLICY_ID
+    origins:
+      items:
+      - id: $ORIGIN_ID
+        domainName: $ORIGIN_S3_DOMAIN_NAME
+        s3OriginConfig:
+          originAccessIdentity: ''

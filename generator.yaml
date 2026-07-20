@@ -6,7 +6,7 @@ ignore:
     #- CachePolicy
     - CloudFrontOriginAccessIdentity
     - ContinuousDeploymentPolicy
-    - DistributionTenant
+    #- DistributionTenant
     #- Distribution
     - FieldLevelEncryptionConfig
     - FieldLevelEncryptionProfile
@@ -90,6 +90,10 @@ ignore:
     - CreateConnectionGroupOutput.ConnectionGroup.Tags
     - GetConnectionGroupOutput.ConnectionGroup.Tags
     - UpdateConnectionGroupOutput.ConnectionGroup.Tags
+    - CreateDistributionTenantInput.Tags
+    - CreateDistributionTenantOutput.DistributionTenant.Tags
+    - GetDistributionTenantOutput.DistributionTenant.Tags
+    - UpdateDistributionTenantOutput.DistributionTenant.Tags
 
 operations:
   # CloudFront has both List and Get operations. Prefer the Get operations...
@@ -110,6 +114,18 @@ operations:
   UpdateConnectionGroup:
     output_wrapper_field_path: ConnectionGroup
     resource_name: ConnectionGroup
+    operation_type: UPDATE
+  CreateDistributionTenant:
+    output_wrapper_field_path: DistributionTenant
+    resource_name: DistributionTenant
+    operation_type: CREATE
+  GetDistributionTenant:
+    output_wrapper_field_path: DistributionTenant
+    resource_name: DistributionTenant
+    operation_type: READ_ONE
+  UpdateDistributionTenant:
+    output_wrapper_field_path: DistributionTenant
+    resource_name: DistributionTenant
     operation_type: UPDATE
   CreateDistribution:
     output_wrapper_field_path: Distribution
@@ -229,6 +245,63 @@ resources:
         template_path: hooks/connection_group/sdk_delete_pre_build_request.go.tpl
       sdk_delete_post_build_request:
         template_path: hooks/connection_group/sdk_delete_post_build_request.go.tpl
+  DistributionTenant:
+    renames:
+      operations:
+        GetDistributionTenant:
+          input_fields:
+            Identifier: Id
+    exceptions:
+      terminal_codes:
+        - EntityAlreadyExists
+        - InvalidArgument
+        - InvalidAssociation
+        - InvalidTagging
+        - CNAMEAlreadyExists
+    synced:
+      when:
+        - path: Status.Status
+          in:
+            - Deployed
+    fields:
+      Name:
+        is_immutable: true
+      Tags:
+        from:
+          operation: TagResource
+          path: Tags.Items
+      ETag:
+        is_read_only: true
+        type: string
+      DistributionId:
+        references:
+          resource: Distribution
+          path: Status.ID
+      ConnectionGroupId:
+        references:
+          resource: ConnectionGroup
+          path: Status.ID
+      # NOTE: Cannot add a cross-resource reference for Customizations.Certificate.Arn
+      # because the leaf field name "Arn" is just an identifier suffix, which the
+      # code-generator rejects (it cannot derive a valid Ref field name from it).
+      # Users must supply the ACM certificate ARN directly.
+    hooks:
+      sdk_read_one_post_set_output:
+        template_path: hooks/distribution_tenant/sdk_read_one_post_set_output.go.tpl
+      sdk_create_post_build_request:
+        template_path: hooks/distribution_tenant/sdk_create_post_build_request.go.tpl
+      sdk_create_post_set_output:
+        template_path: hooks/distribution_tenant/sdk_create_post_set_output.go.tpl
+      sdk_update_pre_build_request:
+        template_path: hooks/distribution_tenant/sdk_update_pre_build_request.go.tpl
+      sdk_update_post_build_request:
+        template_path: hooks/distribution_tenant/sdk_update_post_build_request.go.tpl
+      sdk_update_post_set_output:
+        template_path: hooks/distribution_tenant/sdk_update_post_set_output.go.tpl
+      sdk_delete_pre_build_request:
+        template_path: hooks/distribution_tenant/sdk_delete_pre_build_request.go.tpl
+      sdk_delete_post_build_request:
+        template_path: hooks/distribution_tenant/sdk_delete_post_build_request.go.tpl
   Distribution:
     exceptions:
       terminal_codes:

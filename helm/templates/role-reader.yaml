@@ -19,6 +19,7 @@ rules:
   - cachepolicies
   - connectiongroups
   - distributions
+  - distributiontenants
   - functions
   - originaccesscontrols
   - originrequestpolicies

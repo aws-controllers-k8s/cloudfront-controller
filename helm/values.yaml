@@ -153,6 +153,7 @@ reconcile:
     - CachePolicy
     - ConnectionGroup
     - Distribution
+    - DistributionTenant
     - Function
     - OriginAccessControl
     - OriginRequestPolicy
