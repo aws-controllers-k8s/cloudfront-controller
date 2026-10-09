@@ -41,6 +41,7 @@ func newResourceDelta(
 		delta.Add("", a, b)
 		return delta
 	}
+	customPreCompare(delta, a, b)
 
 	if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig, b.ko.Spec.DistributionConfig) {
 		delta.Add("Spec.DistributionConfig", a.ko.Spec.DistributionConfig, b.ko.Spec.DistributionConfig)
@@ -59,13 +60,6 @@ func newResourceDelta(
 		if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.CacheBehaviors, b.ko.Spec.DistributionConfig.CacheBehaviors) {
 			delta.Add("Spec.DistributionConfig.CacheBehaviors", a.ko.Spec.DistributionConfig.CacheBehaviors, b.ko.Spec.DistributionConfig.CacheBehaviors)
 		} else if a.ko.Spec.DistributionConfig.CacheBehaviors != nil && b.ko.Spec.DistributionConfig.CacheBehaviors != nil {
-			if len(a.ko.Spec.DistributionConfig.CacheBehaviors.Items) != len(b.ko.Spec.DistributionConfig.CacheBehaviors.Items) {
-				delta.Add("Spec.DistributionConfig.CacheBehaviors.Items", a.ko.Spec.DistributionConfig.CacheBehaviors.Items, b.ko.Spec.DistributionConfig.CacheBehaviors.Items)
-			} else if len(a.ko.Spec.DistributionConfig.CacheBehaviors.Items) > 0 {
-				if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.DistributionConfig.CacheBehaviors.Items, b.ko.Spec.DistributionConfig.CacheBehaviors.Items) {
-					delta.Add("Spec.DistributionConfig.CacheBehaviors.Items", a.ko.Spec.DistributionConfig.CacheBehaviors.Items, b.ko.Spec.DistributionConfig.CacheBehaviors.Items)
-				}
-			}
 		}
 		if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.CacheTagConfig, b.ko.Spec.DistributionConfig.CacheTagConfig) {
 			delta.Add("Spec.DistributionConfig.CacheTagConfig", a.ko.Spec.DistributionConfig.CacheTagConfig, b.ko.Spec.DistributionConfig.CacheTagConfig)
@@ -232,24 +226,10 @@ func newResourceDelta(
 			if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations, b.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations) {
 				delta.Add("Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations", a.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations, b.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations)
 			} else if a.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations != nil && b.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations != nil {
-				if len(a.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items) != len(b.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items) {
-					delta.Add("Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items", a.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items, b.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items)
-				} else if len(a.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items) > 0 {
-					if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items, b.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items) {
-						delta.Add("Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items", a.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items, b.ko.Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items)
-					}
-				}
 			}
 			if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations, b.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations) {
 				delta.Add("Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations", a.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations, b.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations)
 			} else if a.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations != nil && b.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations != nil {
-				if len(a.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items) != len(b.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items) {
-					delta.Add("Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items", a.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items, b.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items)
-				} else if len(a.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items) > 0 {
-					if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items, b.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items) {
-						delta.Add("Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items", a.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items, b.ko.Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items)
-					}
-				}
 			}
 			if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.DefaultCacheBehavior.MaxTTL, b.ko.Spec.DistributionConfig.DefaultCacheBehavior.MaxTTL) {
 				delta.Add("Spec.DistributionConfig.DefaultCacheBehavior.MaxTTL", a.ko.Spec.DistributionConfig.DefaultCacheBehavior.MaxTTL, b.ko.Spec.DistributionConfig.DefaultCacheBehavior.MaxTTL)
@@ -407,24 +387,10 @@ func newResourceDelta(
 		if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.OriginGroups, b.ko.Spec.DistributionConfig.OriginGroups) {
 			delta.Add("Spec.DistributionConfig.OriginGroups", a.ko.Spec.DistributionConfig.OriginGroups, b.ko.Spec.DistributionConfig.OriginGroups)
 		} else if a.ko.Spec.DistributionConfig.OriginGroups != nil && b.ko.Spec.DistributionConfig.OriginGroups != nil {
-			if len(a.ko.Spec.DistributionConfig.OriginGroups.Items) != len(b.ko.Spec.DistributionConfig.OriginGroups.Items) {
-				delta.Add("Spec.DistributionConfig.OriginGroups.Items", a.ko.Spec.DistributionConfig.OriginGroups.Items, b.ko.Spec.DistributionConfig.OriginGroups.Items)
-			} else if len(a.ko.Spec.DistributionConfig.OriginGroups.Items) > 0 {
-				if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.DistributionConfig.OriginGroups.Items, b.ko.Spec.DistributionConfig.OriginGroups.Items) {
-					delta.Add("Spec.DistributionConfig.OriginGroups.Items", a.ko.Spec.DistributionConfig.OriginGroups.Items, b.ko.Spec.DistributionConfig.OriginGroups.Items)
-				}
-			}
 		}
 		if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.Origins, b.ko.Spec.DistributionConfig.Origins) {
 			delta.Add("Spec.DistributionConfig.Origins", a.ko.Spec.DistributionConfig.Origins, b.ko.Spec.DistributionConfig.Origins)
 		} else if a.ko.Spec.DistributionConfig.Origins != nil && b.ko.Spec.DistributionConfig.Origins != nil {
-			if len(a.ko.Spec.DistributionConfig.Origins.Items) != len(b.ko.Spec.DistributionConfig.Origins.Items) {
-				delta.Add("Spec.DistributionConfig.Origins.Items", a.ko.Spec.DistributionConfig.Origins.Items, b.ko.Spec.DistributionConfig.Origins.Items)
-			} else if len(a.ko.Spec.DistributionConfig.Origins.Items) > 0 {
-				if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.DistributionConfig.Origins.Items, b.ko.Spec.DistributionConfig.Origins.Items) {
-					delta.Add("Spec.DistributionConfig.Origins.Items", a.ko.Spec.DistributionConfig.Origins.Items, b.ko.Spec.DistributionConfig.Origins.Items)
-				}
-			}
 		}
 		if ackcompare.HasNilDifference(a.ko.Spec.DistributionConfig.PriceClass, b.ko.Spec.DistributionConfig.PriceClass) {
 			delta.Add("Spec.DistributionConfig.PriceClass", a.ko.Spec.DistributionConfig.PriceClass, b.ko.Spec.DistributionConfig.PriceClass)
