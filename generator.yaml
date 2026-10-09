@@ -346,6 +346,8 @@ resources:
         - TooManyQueryStringParameters
         - TooManyTrustedSigners
     hooks:
+      delta_pre_compare:
+        code: customPreCompare(delta, a, b)
       sdk_read_one_post_set_output:
         template_path: hooks/distribution/sdk_read_one_post_set_output.go.tpl
       sdk_create_post_build_request:
@@ -382,6 +384,24 @@ resources:
           path: Status.ACKResourceMetadata.ARN
       DistributionConfig.Origins.Items.CustomOriginConfig.HTTPSPort:
         go_tag: json:"httpSPort,omitempty"
+      # These fields hold lists CloudFront does not keep in order, so
+      # customPreCompare compares them with those lists sorted. Cache behaviors
+      # and origin group members keep their order (precedence and failover).
+      DistributionConfig.CacheBehaviors.Items:
+        compare:
+          is_ignored: true
+      DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items:
+        compare:
+          is_ignored: true
+      DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items:
+        compare:
+          is_ignored: true
+      DistributionConfig.OriginGroups.Items:
+        compare:
+          is_ignored: true
+      DistributionConfig.Origins.Items:
+        compare:
+          is_ignored: true
   Function:
     tags:
       ignore: true

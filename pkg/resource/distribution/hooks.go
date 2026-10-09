@@ -16,11 +16,15 @@ package distribution
 import (
 	"context"
 	"fmt"
+	"slices"
+	"strings"
 	"time"
 
+	ackcompare "github.com/aws-controllers-k8s/runtime/pkg/compare"
 	ackrequeue "github.com/aws-controllers-k8s/runtime/pkg/requeue"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
+	"k8s.io/apimachinery/pkg/api/equality"
 
 	svcapitypes "github.com/aws-controllers-k8s/cloudfront-controller/apis/v1alpha1"
 	"github.com/aws-controllers-k8s/cloudfront-controller/pkg/resource/tags"
@@ -224,4 +228,135 @@ func requeueWaitUntilCanModify(r *resource) *ackrequeue.RequeueNeededAfter {
 			status, "Deployed"),
 		ackrequeue.DefaultRequeueAfterDuration,
 	)
+}
+
+// customPreCompare compares the Distribution fields that hold lists CloudFront
+// does not keep in order. The generated comparison ignores these fields (see
+// generator.yaml). CloudFront stores the function associations of a cache
+// behavior in an arbitrary order on every write, and returns allowed methods
+// and origins in an order of its own. A behavior with two functions would
+// match only about half the time, so with several of them nearly every resync
+// would call UpdateDistribution. Each field is compared after sorting the
+// lists whose order has no meaning.
+func customPreCompare(
+	delta *ackcompare.Delta,
+	a *resource,
+	b *resource,
+) {
+	dcA := a.ko.Spec.DistributionConfig
+	dcB := b.ko.Spec.DistributionConfig
+	if dcA == nil || dcB == nil {
+		return
+	}
+	if dcA.CacheBehaviors != nil && dcB.CacheBehaviors != nil {
+		compareItems(delta, "Spec.DistributionConfig.CacheBehaviors.Items",
+			dcA.CacheBehaviors.Items, dcB.CacheBehaviors.Items, normalizeCacheBehaviors)
+	}
+	if dcbA, dcbB := dcA.DefaultCacheBehavior, dcB.DefaultCacheBehavior; dcbA != nil && dcbB != nil {
+		if dcbA.FunctionAssociations != nil && dcbB.FunctionAssociations != nil {
+			compareItems(delta, "Spec.DistributionConfig.DefaultCacheBehavior.FunctionAssociations.Items",
+				dcbA.FunctionAssociations.Items, dcbB.FunctionAssociations.Items, sortFunctionAssociations)
+		}
+		if dcbA.LambdaFunctionAssociations != nil && dcbB.LambdaFunctionAssociations != nil {
+			compareItems(delta, "Spec.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.Items",
+				dcbA.LambdaFunctionAssociations.Items, dcbB.LambdaFunctionAssociations.Items, sortLambdaFunctionAssociations)
+		}
+	}
+	if dcA.OriginGroups != nil && dcB.OriginGroups != nil {
+		compareItems(delta, "Spec.DistributionConfig.OriginGroups.Items",
+			dcA.OriginGroups.Items, dcB.OriginGroups.Items, sortOriginGroups)
+	}
+	if dcA.Origins != nil && dcB.Origins != nil {
+		compareItems(delta, "Spec.DistributionConfig.Origins.Items",
+			dcA.Origins.Items, dcB.Origins.Items, sortOrigins)
+	}
+}
+
+// compareItems adds a difference at path when a and b differ once both are
+// normalized.
+func compareItems[T any](
+	delta *ackcompare.Delta,
+	path string,
+	a []*T,
+	b []*T,
+	normalize func([]*T) []*T,
+) {
+	if len(a) != len(b) {
+		delta.Add(path, a, b)
+	} else if len(a) > 0 && !equality.Semantic.Equalities.DeepEqual(normalize(a), normalize(b)) {
+		delta.Add(path, a, b)
+	}
+}
+
+// normalizeCacheBehaviors returns copies of the cache behaviors with the lists
+// inside each behavior sorted. The behaviors themselves keep their order: it
+// is their precedence.
+func normalizeCacheBehaviors(
+	behaviors []*svcapitypes.CacheBehavior,
+) []*svcapitypes.CacheBehavior {
+	normalized := make([]*svcapitypes.CacheBehavior, len(behaviors))
+	for i, behavior := range behaviors {
+		if behavior == nil {
+			continue
+		}
+		behavior = behavior.DeepCopy()
+		if behavior.AllowedMethods != nil {
+			behavior.AllowedMethods.Items = sortMethods(behavior.AllowedMethods.Items)
+			if behavior.AllowedMethods.CachedMethods != nil {
+				behavior.AllowedMethods.CachedMethods.Items = sortMethods(behavior.AllowedMethods.CachedMethods.Items)
+			}
+		}
+		if behavior.FunctionAssociations != nil {
+			behavior.FunctionAssociations.Items = sortFunctionAssociations(behavior.FunctionAssociations.Items)
+		}
+		if behavior.LambdaFunctionAssociations != nil {
+			behavior.LambdaFunctionAssociations.Items = sortLambdaFunctionAssociations(behavior.LambdaFunctionAssociations.Items)
+		}
+		normalized[i] = behavior
+	}
+	return normalized
+}
+
+// A cache behavior has at most one function association and one Lambda
+// function association per event type.
+func sortFunctionAssociations(
+	items []*svcapitypes.FunctionAssociation,
+) []*svcapitypes.FunctionAssociation {
+	return sortedBy(items, func(item *svcapitypes.FunctionAssociation) *string { return item.EventType })
+}
+
+func sortLambdaFunctionAssociations(
+	items []*svcapitypes.LambdaFunctionAssociation,
+) []*svcapitypes.LambdaFunctionAssociation {
+	return sortedBy(items, func(item *svcapitypes.LambdaFunctionAssociation) *string { return item.EventType })
+}
+
+func sortMethods(methods []*string) []*string {
+	return sortedBy(methods, func(method *string) *string { return method })
+}
+
+// Origins and origin groups are referenced by ID. The members of an origin
+// group keep their order: it is their failover order.
+func sortOrigins(items []*svcapitypes.Origin) []*svcapitypes.Origin {
+	return sortedBy(items, func(item *svcapitypes.Origin) *string { return item.ID })
+}
+
+func sortOriginGroups(items []*svcapitypes.OriginGroup) []*svcapitypes.OriginGroup {
+	return sortedBy(items, func(item *svcapitypes.OriginGroup) *string { return item.ID })
+}
+
+// sortedBy returns a copy of items sorted by key. The elements themselves are
+// shared with items, not copied.
+func sortedBy[T any](items []*T, key func(*T) *string) []*T {
+	value := func(item *T) string {
+		if item == nil {
+			return ""
+		}
+		return aws.ToString(key(item))
+	}
+	sorted := slices.Clone(items)
+	slices.SortStableFunc(sorted, func(x, y *T) int {
+		return strings.Compare(value(x), value(y))
+	})
+	return sorted
 }
