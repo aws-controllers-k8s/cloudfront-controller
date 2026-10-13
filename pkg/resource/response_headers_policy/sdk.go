@@ -539,6 +539,19 @@ func (rm *resourceManager) sdkCreate(
 	}
 
 	rm.setStatusDefaults(ko)
+	// The resource now exists in AWS and ko carries its identifiers. Mark any
+	// error from here on as a post-create failure so the reconciler retains the
+	// ACK finalizer, and return ko so those identifiers reach the CR status and
+	// the next reconciliation finds the resource instead of creating a second
+	// one. See https://github.com/aws-controllers-k8s/community/issues/2849.
+	defer func() {
+		if err != nil {
+			err = ackerr.WrapPostCreateError(err)
+			if created == nil {
+				created = &resource{ko}
+			}
+		}
+	}()
 	// We need to do this manually because the ETag field (required for the
 	// IfMatch field when updating or deleting a resource in CloudFront) is
 	// outside the wrapper field of `ResponseHeadersPolicy` in the response
