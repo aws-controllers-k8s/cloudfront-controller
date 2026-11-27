@@ -137,9 +137,13 @@ def _wait_for_state(
                 ExclusionIds=exclusion_ids,
             )["VpcBlockPublicAccessExclusions"]
         except ClientError as e:
-            if missing_is_target and "NotFound" in e.response["Error"]["Code"]:
+            if "NotFound" not in e.response["Error"]["Code"]:
+                raise
+            if missing_is_target:
                 return
-            raise
+            # A newly created exclusion is eventually consistent and can be
+            # reported as not found for a short time after creation.
+            exclusions = []
         states = {e["ExclusionId"]: e["State"] for e in exclusions}
         if missing_is_target:
             for exclusion_id in exclusion_ids:
