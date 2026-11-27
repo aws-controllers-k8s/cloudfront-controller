@@ -23,6 +23,7 @@ from e2e import service_marker, CRD_GROUP, CRD_VERSION, load_resource
 from e2e.replacement_values import REPLACEMENT_VALUES
 from e2e.bootstrap_resources import get_bootstrap_resources
 from e2e import vpc_origin
+from e2e import vpc_bpa
 from logging import getLogger
 
 VPC_ORIGIN_RESOURCE_PLURAL = "vpcorigins"
@@ -32,12 +33,38 @@ DELETE_WAIT_PERIODS = 3
 CHECK_STATUS_WAIT_PERIODS = 20
 CHECK_STATUS_WAIT_SECONDS = 60
 MODIFY_WAIT_AFTER_SECONDS = 30
+# VPC BPA exclusions can take a few minutes to take effect after they reach
+# create-complete.
+BPA_EXCLUSION_SETTLE_SECONDS = 60
 
 logger = getLogger(__name__)
 
 
 @pytest.fixture(scope="module")
-def simple_vpc_origin():
+def vpc_origin_bpa_exclusions():
+    """Exempts the VpcOrigin endpoint's subnets from VPC Block Public Access
+    for the duration of the module, if BPA is enabled. CloudFront fails to
+    deploy a VpcOrigin whose endpoint is in a subnet BPA applies to, even when
+    the subnet is private.
+    """
+    if not vpc_bpa.is_enabled():
+        yield []
+        return
+
+    nlb_arn = get_bootstrap_resources().NetworkLoadBalancer.arn
+    subnet_ids = vpc_bpa.get_load_balancer_subnet_ids(nlb_arn)
+    exclusion_ids = []
+    try:
+        exclusion_ids = vpc_bpa.create_subnet_exclusions(subnet_ids)
+        vpc_bpa.wait_until_exclusions_active(exclusion_ids)
+        time.sleep(BPA_EXCLUSION_SETTLE_SECONDS)
+        yield exclusion_ids
+    finally:
+        vpc_bpa.delete_exclusions(exclusion_ids)
+
+
+@pytest.fixture(scope="module")
+def simple_vpc_origin(vpc_origin_bpa_exclusions):
     vpc_origin_name = random_suffix_name("cloudfront-test-vpc-origin", 32)
     vpc_origin_protocol_policy = "http-only"
     vpc_origin_ssl_protocols_1 = "TLSv1.2"
