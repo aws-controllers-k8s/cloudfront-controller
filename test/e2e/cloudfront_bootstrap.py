@@ -91,27 +91,41 @@ class ConnectionGroup(Bootstrappable):
                 f"Cleaning up ConnectionGroup: {self.connection_group_id}"
             )
             try:
+                resp = self.cf_client.get_connection_group(
+                    Identifier=self.connection_group_id
+                )
+                connection_group = resp["ConnectionGroup"]
+                etag = resp["ETag"]
+
                 # Disable before delete
-                self.cf_client.update_connection_group(
-                    Identifier=self.connection_group_id,
-                    Enabled=False,
-                    IfMatch="*",
-                )
-                _wait_until_deployed(
-                    lambda: self.cf_client.get_connection_group(
+                if connection_group.get("Enabled", False):
+                    self.cf_client.update_connection_group(
+                        Id=self.connection_group_id,
+                        Enabled=False,
+                        IfMatch=etag,
+                    )
+                    _wait_until_deployed(
+                        lambda: self.cf_client.get_connection_group(
+                            Identifier=self.connection_group_id
+                        )["ConnectionGroup"],
+                        f"ConnectionGroup {self.connection_group_id} (disable)",
+                    )
+                    # Re-fetch ETag after update
+                    resp = self.cf_client.get_connection_group(
                         Identifier=self.connection_group_id
-                    )["ConnectionGroup"],
-                    f"ConnectionGroup {self.connection_group_id} (disable)",
-                )
+                    )
+                    etag = resp["ETag"]
+
                 self.cf_client.delete_connection_group(
-                    Identifier=self.connection_group_id,
-                    IfMatch="*",
+                    Id=self.connection_group_id,
+                    IfMatch=etag,
                 )
             except Exception as ex:
                 logging.error(
                     f"Error cleaning up ConnectionGroup "
                     f"{self.connection_group_id}: {ex}"
                 )
+                raise
 
         super().cleanup()
 
